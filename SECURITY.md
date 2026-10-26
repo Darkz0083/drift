@@ -1,31 +1,34 @@
-# Security Policy
+# Security
 
-Drift treats security as the top priority. A browser is a hostile environment by nature, and we'd rather hear about a problem privately than read about it publicly.
+## The engine
 
-## Supported versions
+Almost all of this codebase — the browser engine, the blocker, the extension
+host, the IPC surface — belongs to
+[Zephium](https://github.com/zephium-browser/Zephium). A vulnerability there
+affects them first and their fix is the one worth having. **Report engine issues
+to upstream**, privately, per
+[their security policy](https://github.com/zephium-browser/Zephium/blob/main/SECURITY.md).
 
-Only the latest release receives security fixes.
+## The fork's own surface
 
-| Version | Supported |
-| --- | --- |
-| Latest 1.0.0 beta release | Yes |
-| Anything older | No |
+Drift adds two things that can fail on their own:
 
-## Reporting a vulnerability
+**The account layer.** Firebase email/password auth, and a Cloudflare Worker
+that holds model provider keys. If you find a way to read another account's
+usage, bypass the daily quota, or reach a provider key from the client, that is a
+real bug — please report it privately rather than in an issue.
 
-**Do not open a public issue for security problems.**
+**The build pipeline.** The Windows workflow and the packaging scripts.
 
-Report privately in either way:
+## What is *not* a vulnerability
 
-- Use GitHub's [private vulnerability reporting](https://github.com/drift-browser/Drift/security/advisories/new).
-- Email **security@drift.app**.
+- The client holds a Firebase session token. It is meant to. It expires, and it
+  grants only what that account can already do.
+- The Worker refuses requests without a valid token. That is the design.
+- Free-tier provider rate limits surfacing as errors. That is the providers, not
+  a flaw here.
 
-Include:
+## Reporting
 
-- A description of the issue and its impact.
-- Steps to reproduce (a proof of concept helps).
-- Affected version / commit, and your platform (macOS or Windows).
-
-We'll keep you updated and credit you in the release notes unless you'd rather stay anonymous.
-
-Please give us a reasonable window to fix the issue before any public disclosure. We practice coordinated disclosure and won't take legal action against good-faith research.
+Open a [private security advisory](https://github.com/Darkz0083/drift/security/advisories/new)
+on this repository. Please don't open a public issue for anything exploitable.
