@@ -74,6 +74,6 @@ EasyList and EasyPrivacy filter lists are used under CC BY-SA 3.0; see
 ## Credit
 
 The overwhelming majority of this codebase is the work of the Zephium project and
-its contributors. If you want the browser without the fork, use
+its contributors — see [CONTRIBUTORS.md](CONTRIBUTORS.md). If you want the browser without the fork, use
 [upstream](https://github.com/zephium-browser/Zephium) — it is the original, and
 it is actively maintained.
