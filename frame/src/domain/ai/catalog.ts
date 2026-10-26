@@ -52,6 +52,11 @@ export function keyState(models: WorkModelsV1 | null, provider: WorkModelProvide
   return models?.providers.find((row) => row.provider === provider)?.key ?? "missing";
 }
 
+/** A server on this computer, which may take no key at all. */
+function isLocalBase(base: string): boolean {
+  return /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])([:/]|$)/i.test(base);
+}
+
 /** A provider can run calls now: its key is set and not refused. */
 export function usable(models: WorkModelsV1 | null, provider: WorkModelProvider): boolean {
   if (!models) return false;
@@ -62,11 +67,16 @@ export function usable(models: WorkModelsV1 | null, provider: WorkModelProvider)
         (entry) => entry.model.provider === "cloud" && !models.cloud.locked.includes(entry.id),
       )
     );
-  if (provider === "compatible")
-    return (
-      !!models.providers.find((row) => row.provider === "compatible")?.base &&
-      keyState(models, provider) !== "invalid"
-    );
+  if (provider === "compatible") {
+    // A hosted endpoint with no key refuses every call, so it is not usable:
+    // only a server on this computer may run keyless. This mirrors the native
+    // rule, so the picker never offers a model that would be refused.
+    const base = models.providers.find((row) => row.provider === "compatible")?.base;
+    if (!base) return false;
+    const key = keyState(models, provider);
+    if (key === "invalid") return false;
+    return key === "missing" ? isLocalBase(base) : true;
+  }
   const key = keyState(models, provider);
   return key === "set" || key === "valid";
 }

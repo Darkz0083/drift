@@ -68,6 +68,19 @@ describe("the picker's list", () => {
     expect(usable(null, "anthropic")).toBe(false);
   });
 
+  test("a hosted endpoint without a key is not usable, so no model is offered that would be refused", () => {
+    const remote = "https://drift-proxy.example.workers.dev/v1";
+    // The native rule this mirrors: an absent key is not a working key.
+    expect(usable(models({ base: remote }), "compatible")).toBe(false);
+    expect(usable(models({ base: remote, keys: { compatible: "invalid" } }), "compatible")).toBe(
+      false,
+    );
+    expect(usable(models({ base: remote, keys: { compatible: "set" } }), "compatible")).toBe(true);
+    expect(usable(models({ base: remote, keys: { compatible: "valid" } }), "compatible")).toBe(
+      true,
+    );
+  });
+
   test("the trigger drops a family name the mark already says", () => {
     const opus: WorkModelEntry = entry("anthropic", "claude-opus-5-5", "Claude Opus 5.5", true);
     expect(shortName(opus)).toBe("Opus 5.5");

@@ -53,6 +53,11 @@ const ROLES: [WorkModelRole; 3] = [
 ];
 const CLOUD_CATALOG_KEY: &str = "work.models.cloud.catalog";
 const COMPATIBLE_BASE_KEY: &str = "work.models.compatible.base";
+/// Where Drift's own models live. Every install ships knowing this, so a
+/// person who signs in gets models without configuring an endpoint, and every
+/// install on every computer behaves the same. A person's own server replaces
+/// it; clearing the setting falls back to it.
+const DEFAULT_COMPATIBLE_BASE: &str = "https://drift-proxy.kolesovl848.workers.dev/v1";
 const CLOUD_REFRESH: Duration = Duration::from_secs(60 * 60);
 const CLOUD_RETRY: Duration = Duration::from_secs(30);
 const MAX_STORED_CATALOG_BYTES: usize = 512 * 1024;
@@ -370,8 +375,10 @@ fn key_status(state: &State, provider: WorkModelProvider) -> WorkKeyStatus {
         .unwrap_or(WorkKeyStatus::Set)
 }
 
+/// The endpoint the OpenAI-compatible provider calls: the person's own server
+/// when they set one, else Drift's own, which every install knows.
 fn compatible_base() -> Option<String> {
-    setting(COMPATIBLE_BASE_KEY)
+    setting(COMPATIBLE_BASE_KEY).or_else(|| Some(DEFAULT_COMPATIBLE_BASE.to_owned()))
 }
 
 /// Whether an OpenAI-compatible endpoint can be called with `status`.
@@ -1501,6 +1508,10 @@ mod tests {
     #[tokio::test]
     async fn defaults_choices_failures_and_stale_results_stay_truthful() {
         install_settings(Arc::new(Memory(Mutex::new(HashMap::new()))));
+        // Every install knows where Drift's own models live before anything is
+        // configured, so signing in is all it takes — on any computer.
+        assert_eq!(compatible_base().as_deref(), Some(DEFAULT_COMPATIBLE_BASE));
+        assert!(!is_local(DEFAULT_COMPATIBLE_BASE));
         let profile = ProfileId::from(41_u128);
         with_keys(&[P::OpenAi]);
         apply_check(
