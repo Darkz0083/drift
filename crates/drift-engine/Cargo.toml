@@ -153,7 +153,7 @@ windows-probe-sys = { package = "windows-sys", version = "=0.61.2", optional = t
     "Win32_System_Threading",
 ] }
 windows-core = "0.61"
-windows-numerics = "0.2"
+windows-numerics = "0.100"
 
 [target.'cfg(all(unix, not(target_os = "macos")))'.dependencies]
 gtk = "0.18"
