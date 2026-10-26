@@ -1,269 +1,79 @@
-<div align="center">
-  <img src=".github/assets/logo.png" width="112" height="112" alt="Drift" />
-  <h1>Drift</h1>
+# Drift
 
-  <p><strong>A fast, fully featured browser and work environment,<br />reimagined for you and your agents.</strong></p>
+**A fork of [Zephium](https://github.com/zephium-browser/Zephium).**
 
-  <p>
-    <a href="https://github.com/drift-browser/Drift/releases"><img src="https://img.shields.io/github/v/release/drift-browser/Drift?include_prereleases&label=release&color=blue" alt="Latest release" /></a>
-    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MPL--2.0-blue" alt="License: MPL-2.0" /></a>
-    <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey" alt="Platforms: macOS and Windows" />
-    <a href="https://discord.gg/tyveTUyEp7"><img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white" alt="Discord" /></a>
-    <a href="https://www.youtube.com/@crynta"><img src="https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white" alt="YouTube" /></a>
-    <a href="https://x.com/CryntaDev"><img src="https://img.shields.io/badge/x.com-000000?logo=x&logoColor=white" alt="X: @CryntaDev" /></a>
-  </p>
+Drift is Zephium, rebranded and rebuilt for a different purpose: a browser with
+its own identity, its own model access, and accounts that don't depend on
+anyone else's service.
 
-  <p>
-    <a href="https://drift.app">Website</a> ·
-    <a href="https://drift.app/docs">Docs</a> ·
-    <a href="https://youtu.be/QbSarcWspvw">Launch film</a> ·
-    <a href="https://github.com/drift-browser/Drift/releases/latest">Download</a>
-  </p>
-</div>
-
-<details align="center">
-  <summary><sub>Read in another language</sub></summary>
-  <sub>
-    <a href="docs/readme/README.zh-CN.md">简体中文</a> ·
-    <a href="docs/readme/README.ja.md">日本語</a> ·
-    <a href="docs/readme/README.ko.md">한국어</a> ·
-    <a href="docs/readme/README.hi.md">हिन्दी</a> ·
-    <a href="docs/readme/README.es.md">Español</a> ·
-    <a href="docs/readme/README.pt-BR.md">Português</a> ·
-    <a href="docs/readme/README.fr.md">Français</a> ·
-    <a href="docs/readme/README.de.md">Deutsch</a> ·
-    <a href="docs/readme/README.pl.md">Polski</a> ·
-    <a href="docs/readme/README.ru.md">Русский</a> ·
-    <a href="docs/readme/README.id.md">Bahasa Indonesia</a>
-  </sub>
-</details>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/browse-dark.webp" />
-    <img src=".github/assets/browse-light.webp" alt="Drift's new tab: the window opens onto the sky, with the name, the time and date, and the day's figures along its foot" width="960" />
-  </picture>
-</p>
-
-<p align="center">
-  <strong>Safari's efficiency. Brave's protection. Arc's design.</strong><br />
-  And <strong>Work</strong>, a canvas where your agents do real work in plain sight.
-</p>
-
-<p align="center"><a href="https://youtu.be/QbSarcWspvw">▶&nbsp; Watch the launch film</a></p>
+Everything that makes it a browser — the Rust engine, WebKit on macOS and
+WebView2 on Windows, the ad blocker, the extension host, the tab and space
+model — is Zephium's work, and it is excellent. This fork changes the surface
+and the account layer, and nothing else.
 
 ---
 
-Drift is an open-source browser built in Rust on your operating system's own
-web engine: WebKit on macOS, the engine Safari uses, and WebView2 on Windows. It
-is not a fork of Chromium or Firefox. It blocks ads and trackers natively, runs
-Chrome extensions, and puts tasks, notes and your time on the web one click
-away. The download is about 30 MB.
+## What's different from upstream
 
-One switch away is **Work**. Your work already happens in the browser, where
-your tabs, logins and history are. Work brings agents there instead of asking
-you to move somewhere else, and lets you watch them do it.
+**Branding.** New name, new wordmark, new icon, new app identity. The wordmark is
+set in Anurati and converted to outlines, so it ships as geometry rather than
+depending on an installed font.
 
-## Work
+**Accounts.** Upstream's account system talks to Zephium's own service. Drift
+replaces it with:
 
-Describe an outcome in your own words: plan a trip, compare vendors, design a
-system, fix a bug. Work takes it from there on a canvas, and you see every
-step.
+- **Firebase** for identity — email and password, no third party in the loop
+- **A small Cloudflare Worker** that holds the model provider keys server-side
+  and meters usage per account
 
-<p align="center">
-  <img src=".github/assets/work.webp" alt="A whole Work run in Drift: helpers reading Uptime Kuma, Gatus and OpenStatus on their own sites, a local helper checking the endpoints, then the answer, a comparison table and charts, a diagram, the config and four tasks" width="960" />
-</p>
-<p align="center"><sub>Asked for a status page, Work reads three monitors on their own sites, checks your endpoints from your machine, builds the pick, and leaves the comparison, the config and the tasks on the canvas.</sub></p>
+The point of that design: a person signs up and gets the assistant without ever
+entering an API key. The keys stay on the server; the client only ever holds a
+session token.
 
-- **It starts from what you already have.** Work recalls what it knows about
-  you, searches your history when it helps, and loads the right skill for the
-  job. Each step appears on the canvas as it happens.
-- **Helpers work in parallel, in the open.** For a trip, one helper looks for
-  flats while another checks visas and a third compares flights. They browse
-  live pages you can watch, and any source opens in a pane beside the canvas.
-- **Results stay on the canvas.** Comparisons, tables, charts, diagrams, plans,
-  code and documents are laid out where you can read them. They are not lost in
-  a chat scroll.
-- **A plan becomes your day.** One click turns each step of a plan into a task
-  linked back to the Work. Anything worth keeping can be saved as a note.
-- **It reaches past the browser.** Work reads and edits the folders you grant,
-  runs commands, and hands larger coding jobs to Claude Code or Codex. It
-  connects to MCP servers such as Linear, Notion, Sentry, Stripe and Figma, and
-  to command-line tools such as `gh`.
-- **You stay in charge.** Anything that posts, merges or changes something
-  waits for your OK.
-- **Bring any model.** Use your own keys for Anthropic, OpenAI, Google Gemini,
-  xAI, Mistral, DeepSeek, Groq, Cerebras or OpenRouter, or run a model locally
-  through Ollama, LM Studio or any OpenAI-compatible server. Keys live in your
-  system keychain. Or sign in to Drift AI and skip the keys: it picks the
-  right model for each step, and you start with free credits
-  ([pricing](https://drift.app/pricing)).
+> **Status:** the account page signs in against Firebase, and the Worker answers
+> requests correctly. Wiring sign-in so it configures the model provider
+> automatically is not finished yet — until it is, the assistant needs its
+> provider configured by hand on each machine.
 
-Work ships with 25 skills, including trip planning, research, compare and
-choose, plan my day, fix a bug and weekly status. You can write your own.
+---
 
-## Ask Drift
+## Build
 
-An assistant in the sidebar, on `⌘ E` (`Ctrl E` on Windows). It reads the page
-you are on and answers about it, points at what is worth your time, and opens
-what you choose in new tabs. Ask it to take a few steps on the page, or to
-restyle a site you visit every day, and it does it in place. When a job
-outgrows a chat, **Continue in Work** carries it to the canvas, with the page
-along.
+Prerequisites: Rust (the toolchain in `rust-toolchain.toml`), Node, and the
+platform's own web engine.
 
-<p align="center">
-  <img src=".github/assets/ask.webp" alt="Ask Drift beside Hacker News: three stories picked, opened in new tabs, and the front page re-set as calm cards" width="960" />
-</p>
-<p align="center"><sub>Asked what is worth reading, it picks three stories, opens them, and re-sets the front page as calm cards.</sub></p>
+```bash
+npm install --prefix frame
+npm install --prefix desktop
 
-## Browse
-
-### Fast and light
-
-- Native WebKit on macOS and WebView2 on Windows, so pages run on the engine
-  your system already keeps up to date.
-- Inactive tabs go to sleep and wake when you return, so memory stays low with
-  many tabs open.
-- A native ad and tracker blocker, on by default, built on Brave's
-  [adblock-rust](https://github.com/brave/adblock-rust) with EasyList and
-  EasyPrivacy. Requests are stopped before a page can make them, and you can
-  hide anything else on a page with a click.
-
-### Designed to live in
-
-- A new tab that opens onto the sky, by day or by night with your theme, with
-  your time, your focus and the day's tasks along its foot.
-- Vertical tabs in a quiet sidebar, with spaces, profiles, pinned tabs, folders
-  and split view.
-- Liquid Glass on macOS 26 and Mica on Windows 11.
-- A launcher on `⌘ ⇧ Space` (`Ctrl Shift Space` on Windows) reaches tabs,
-  history, notes and commands from anywhere on your desktop. Anything you type
-  there can become a task.
-- Every keyboard shortcut can be changed.
-
-### Extensions
-
-Install extensions straight from the Chrome Web Store. Twenty popular ones are
-verified to work well in Drift and are a click away in the extension manager,
-including 1Password, Bitwarden, Grammarly, DeepL, Dark Reader, Vimium,
-SponsorBlock, Raindrop.io, Notion Web Clipper and Refined GitHub.
-
-### Bring everything with you
-
-The welcome flow imports from Chrome, Safari, Arc, Zen, Firefox, Brave and
-Edge.
-
-## Built in
-
-<table>
-  <tr>
-    <td width="33%" align="center"><img src=".github/assets/tasks.webp" alt="Tasks: today, tomorrow and upcoming, with a task linked to the page it came from" /></td>
-    <td width="33%" align="center"><img src=".github/assets/time.webp" alt="Time: 3 hours 24 minutes on the web today, a 25-minute focus round and time per site" /></td>
-    <td width="33%" align="center"><img src=".github/assets/notes.webp" alt="Notes: a Markdown release checklist with code, beside the page" /></td>
-  </tr>
-  <tr>
-    <td valign="top"><strong>Tasks</strong><br /><sub>Write them the way you would say them, like "call Anna tomorrow at 3". Lists, priorities, deadlines, subtasks, and the page you were on stays linked.</sub></td>
-    <td valign="top"><strong>Time</strong><br /><sub>See where your time on the web goes, counted on this device only. Start a focus round and the sites you choose stay shut until the break.</sub></td>
-    <td valign="top"><strong>Notes</strong><br /><sub>Notes beside the page, each a Markdown file you own. Edits from other apps show up in Drift.</sub></td>
-  </tr>
-</table>
-
-## Private by default
-
-- **No telemetry.** Drift doesn't collect or send anything about how you
-  browse.
-- **No account needed.** History, tasks, notes, memory and time live on your
-  device. An account is only for Drift AI, and until you sign in, Drift
-  never contacts our servers.
-- **Drift AI keeps no content.** Requests pass through to the model that
-  answers them. We count usage for your plan, never store prompts, answers or
-  pages, and never see your card.
-- **Private windows keep nothing** once they close.
-
-## Download
-
-| Platform | Architecture | Installer | Requires |
-| -------- | ------------ | --------- | -------- |
-| macOS | Apple Silicon | [`Drift-macOS-arm64.dmg`](https://github.com/drift-browser/Drift/releases/latest/download/Drift-macOS-arm64.dmg) | macOS Sonoma 14 or later |
-| Windows | x64 | [`Drift-Windows-x64-setup.exe`](https://github.com/drift-browser/Drift/releases/latest/download/Drift-Windows-x64-setup.exe) | Windows 10 or 11 |
-
-Windows builds are not code-signed yet, so SmartScreen may show "Windows
-protected your PC". Choose **More info**, then **Run anyway**. Signing is on
-the way.
-
-Drift downloads updates in the background and installs them when you choose
-**Relaunch to update**. All releases are on the
-[releases page](https://github.com/drift-browser/Drift/releases).
-
-## What's next
-
-- Linux and Intel Macs.
-- Code-signed Windows builds.
-- More extensions verified to work, and native extensions built into Drift.
-- And much more.
-
-## Build from source
-
-Prerequisites:
-
-- [Rust](https://rustup.rs) through `rustup`. The toolchain pinned in
-  [`rust-toolchain.toml`](rust-toolchain.toml) installs itself on first use.
-- Node.js, at the version in [`.node-version`](.node-version).
-- pnpm, through Corepack: `corepack enable`.
-- The [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for your
-  platform: Xcode Command Line Tools on macOS, or the Microsoft C++ Build Tools
-  and WebView2 on Windows.
-
-```sh
-git clone https://github.com/drift-browser/Drift.git
-cd Drift
-pnpm install --frozen-lockfile
-pnpm dev
+npm run build --prefix frame
+cd desktop && npx tauri build
 ```
 
-Development builds use their own `app.drift.dev` profile, so they do not
-touch the data of an installed Drift. Linux is not supported yet. See
-[CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+The macOS bundle lands in `target/debug/bundle/macos/Drift.app`. Windows
+installers are built by CI — `.github/workflows/windows.yml` runs on
+`windows-latest` and uploads an NSIS `.exe` and an `.msi` as artifacts. Tauri
+cannot cross-compile to Windows from macOS, so CI (or a Windows machine) is the
+only route.
 
-## Architecture
+Two build notes learned the hard way: **move `frame/dist` aside before
+rebuilding** (vite clears it, and some environments block bulk deletes), and the
+app occasionally launches to a blank window once — a relaunch paints it.
 
-- Untrusted pages run in raw native WebViews, apart from the privileged Svelte
-  interface that draws the browser.
-- A Rust core owns tabs, storage, the blocker, extensions and agents.
-- Each profile has its own isolated website data and Drift-owned history,
-  session and favicon data.
-- The network blocker is native and built on Brave's
-  [adblock-rust](https://github.com/brave/adblock-rust).
-- Narrow in-tree adapters for Tauri and Wry handle storage policy, WebView
-  construction, callbacks and teardown.
+---
 
-Read more in [docs/architecture.md](docs/architecture.md) and
-[docs/security-model.md](docs/security-model.md).
+## Licence
 
-## Contributing
+Inherited from upstream: **Mozilla Public License 2.0**. See `LICENSE`.
 
-Drift is maintained by one person with a clear product direction, so please
-discuss larger changes before writing them. [CONTRIBUTING.md](CONTRIBUTING.md)
-explains what gets merged and how. Questions and ideas are welcome on
-[Discord](https://discord.gg/tyveTUyEp7).
+MPL is file-level copyleft. If you distribute a binary built from this source,
+you must make the source of the MPL-covered files available. The bundled
+EasyList and EasyPrivacy filter lists are used under CC BY-SA 3.0; see
+`assets/blocker-seed/v1/`.
 
-## Security
+## Credit
 
-Please report vulnerabilities privately, not in a public issue. See
-[SECURITY.md](SECURITY.md).
-
-## License
-
-Drift is licensed under the [Mozilla Public License 2.0](LICENSE).
-
-The bundled EasyList and EasyPrivacy filter lists are used under
-[CC BY-SA 3.0](assets/blocker-seed/v1/LICENSE-CC-BY-SA-3.0.txt); see
-[the notice](assets/blocker-seed/v1/NOTICE) for attribution.
-
-The Drift name and logo are not licensed under the MPL.
-
-## Acknowledgements
-
-Drift stands on [Tauri](https://tauri.app), [Wry](https://github.com/tauri-apps/wry),
-Brave's [adblock-rust](https://github.com/brave/adblock-rust) and
-[EasyList](https://easylist.to).
+The overwhelming majority of this codebase is the work of the Zephium project and
+its contributors. If you want the browser without the fork, use
+[upstream](https://github.com/zephium-browser/Zephium) — it is the original, and
+it is actively maintained.
