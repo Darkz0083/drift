@@ -374,12 +374,28 @@ fn compatible_base() -> Option<String> {
     setting(COMPATIBLE_BASE_KEY)
 }
 
+/// Whether an OpenAI-compatible endpoint can be called with `status`.
+///
+/// A key that is merely absent is not a key that works: a hosted endpoint
+/// without one refuses every call, so a role must not resolve to it. Only this
+/// computer's own server may run keyless.
+fn endpoint_usable(base: Option<&str>, status: WorkKeyStatus) -> bool {
+    match base {
+        None => false,
+        Some(base) => match status {
+            WorkKeyStatus::Invalid => false,
+            WorkKeyStatus::Missing => is_local(base),
+            WorkKeyStatus::Set | WorkKeyStatus::Valid => true,
+        },
+    }
+}
+
 /// Whether calls to `provider` can be made now.
 fn usable(state: &State, provider: WorkModelProvider) -> bool {
     match provider {
         P::Cloud => cloud().is_some() && state.cloud.iter().any(|model| model.available),
         P::Compatible => {
-            compatible_base().is_some() && key_status(state, provider) != WorkKeyStatus::Invalid
+            endpoint_usable(compatible_base().as_deref(), key_status(state, provider))
         }
         provider => {
             state.presence.get(&provider).copied().unwrap_or(false)
@@ -651,7 +667,19 @@ fn effective(state: &State, profile: ProfileId, role: WorkModelRole) -> Option<W
                 .get(&choice.model.provider)
                 .is_none_or(|entries| entries.iter().any(|entry| entry.id == choice.id))
         };
-        return (usable(state, choice.model.provider) && exists).then_some(choice);
+        // The lead is the person's own choice: when it cannot be called, say
+        // so rather than silently running the whole task on something else.
+        if role == WorkModelRole::Lead {
+            return (usable(state, choice.model.provider) && exists).then_some(choice);
+        }
+        // A helper role whose provider cannot be called now (its key went
+        // away, or the server no longer lists the model) falls through to the
+        // lead's family. Returning nothing here would leave the role without a
+        // model, and every helper step in the run would then be refused — the
+        // task stalls with nothing to show for it.
+        if usable(state, choice.model.provider) && exists {
+            return Some(choice);
+        }
     }
     if role != WorkModelRole::Lead {
         if let Some(lead) = effective(state, profile, WorkModelRole::Lead) {
@@ -839,7 +867,18 @@ impl LeadCredential for CompatibleCredential {
             match stored {
                 Some(Ok(secret)) => Ok(secret),
                 Some(Err(keys::LeadKeyError::Missing)) => {
-                    LeadSecret::new("drift".into()).map(Arc::new)
+                    // Only this computer's own server may run without a key.
+                    // Anywhere else the request would be refused, so say so
+                    // instead of sending a bearer the server will reject.
+                    match compatible_base().as_deref() {
+                        Some(base) if is_local(base) => {
+                            LeadSecret::new("local".into()).map(Arc::new)
+                        }
+                        _ => {
+                            record_failure(P::Compatible, self.generation, None);
+                            Err(WorkModelError::MissingKey)
+                        }
+                    }
                 }
                 Some(Err(keys::LeadKeyError::AwaitingApproval)) => {
                     record_failure(
@@ -1397,6 +1436,24 @@ mod tests {
         assert!(priced_locally(entry, false).price.is_none());
     }
 
+    #[test]
+    fn an_endpoint_with_no_key_is_usable_only_on_this_computer() {
+        const REMOTE: Option<&str> = Some("https://drift-proxy.example.workers.dev/v1");
+        const LOCAL: Option<&str> = Some("http://127.0.0.1:11434/v1");
+        // The regression: a hosted endpoint with no key at all used to count
+        // as usable, so the page and light roles resolved to a provider that
+        // refused every call and no helper step in a run could start.
+        assert!(!endpoint_usable(REMOTE, WorkKeyStatus::Missing));
+        assert!(!endpoint_usable(REMOTE, WorkKeyStatus::Invalid));
+        assert!(!endpoint_usable(None, WorkKeyStatus::Set));
+        // A key that is there is usable until the server says otherwise.
+        assert!(endpoint_usable(REMOTE, WorkKeyStatus::Set));
+        assert!(endpoint_usable(REMOTE, WorkKeyStatus::Valid));
+        // This computer's own server may take no key.
+        assert!(endpoint_usable(LOCAL, WorkKeyStatus::Missing));
+        assert!(!endpoint_usable(LOCAL, WorkKeyStatus::Invalid));
+    }
+
     #[derive(Default)]
     pub(super) struct MemoryVault(Mutex<HashMap<P, Arc<LeadSecret>>>);
     impl keys::KeyVault for MemoryVault {
@@ -1553,6 +1610,49 @@ mod tests {
             search_readiness(other).await,
             WorkSearchReadiness::Native(entry) if entry.model.provider == P::Anthropic
         ));
+
+        // A helper role still naming an endpoint whose key went away must
+        // follow the lead. This is what a person with a working key hit after
+        // signing out: page and light stayed on the keyless endpoint, every
+        // helper step was refused, and the task stalled with nothing to show.
+        let stale = profile_id(44);
+        with_keys(&[P::OpenRouter]);
+        store_setting(
+            COMPATIBLE_BASE_KEY.into(),
+            "https://proxy.example.workers.dev/v1".into(),
+        );
+        assert!(!usable(&state(), P::Compatible));
+        let lead_entry = models::builtin()
+            .into_iter()
+            .find(|entry| entry.model.provider == P::OpenRouter)
+            .expect("a built-in OpenRouter model");
+        store_setting(
+            choice_key(stale, WorkModelRole::Lead),
+            serde_json::to_string(&lead_entry).unwrap(),
+        );
+        let dead = WorkModelEntry {
+            id: "compatible/openai/gpt-oss-20b".into(),
+            model: WorkModelRef {
+                provider: P::Compatible,
+                ..lead_entry.model.clone()
+            },
+            ..lead_entry.clone()
+        };
+        store_setting(
+            choice_key(stale, WorkModelRole::Page),
+            serde_json::to_string(&dead).unwrap(),
+        );
+        let page = effective(&state(), stale, WorkModelRole::Page).expect("a page model");
+        assert_ne!(page.model.provider, P::Compatible);
+        assert_eq!(page.model.provider, P::OpenRouter);
+        // The lead is the person's own choice, so it is still reported as
+        // unusable rather than quietly swapped for another provider.
+        assert_eq!(
+            effective(&state(), stale, WorkModelRole::Lead)
+                .expect("the chosen lead")
+                .id,
+            lead_entry.id
+        );
 
         // Signed in with no keys, hosted models carry every role.
         struct Session;

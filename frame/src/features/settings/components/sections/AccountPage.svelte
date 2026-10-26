@@ -6,8 +6,35 @@
    * exist for this build. This replaces it with Drift's own: Firebase for
    * identity, and a Cloudflare Worker holding the model keys, so a signed-in
    * person gets the assistant without ever entering a key.
+   *
+   * The session is handed to the assistant here, not inside the panel: the
+   * panel knows nothing about profiles or model providers, and this page is
+   * where both the profile and the account meet.
    */
   import DriftAccountPanel from "$domain/account/DriftAccountPanel.svelte";
+  import { applyToAssistant } from "$domain/account/assistant";
+  import { load, type Session } from "$domain/account/firebase-auth";
+  import { tabs } from "$domain/tabs";
+
+  let profile = $derived(tabs.profile());
+
+  /** Only a real profile can own model settings; incognito keeps none. */
+  function assistantProfile(): string | null {
+    const current = profile;
+    return current && current.kind !== "incognito" ? current.id : null;
+  }
+
+  function hand(session: Session | null) {
+    const id = assistantProfile();
+    if (id) void applyToAssistant(id, session);
+  }
+
+  // A session can already be on disk from an earlier launch: the panel starts
+  // from it without announcing it, so point the assistant at it here.
+  $effect(() => {
+    if (!assistantProfile()) return;
+    hand(load());
+  });
 </script>
 
 <section class="drift-account-page">
@@ -19,7 +46,7 @@
     </p>
   </header>
 
-  <DriftAccountPanel />
+  <DriftAccountPanel onsession={hand} />
 </section>
 
 <style>
