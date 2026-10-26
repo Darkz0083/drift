@@ -52,10 +52,11 @@ jobs:
       - name: Build the app
         working-directory: desktop
         run: npx tauri build
-        env:
-          # Windows builds aren't code-signed yet, so SmartScreen will warn.
-          # Add the two secrets below to sign, and delete this line.
-          TAURI_SIGNING_PRIVATE_KEY: ""
+        # Windows builds aren't code-signed yet, so SmartScreen will warn.
+        # To sign, add TAURI_SIGNING_PRIVATE_KEY and
+        # TAURI_SIGNING_PRIVATE_KEY_PASSWORD as repository secrets. Do not set
+        # the key to an empty string: Tauri treats a set-but-empty key as a
+        # key it must decode, and the build fails.
 
       - name: Upload installers
         uses: actions/upload-artifact@v4
