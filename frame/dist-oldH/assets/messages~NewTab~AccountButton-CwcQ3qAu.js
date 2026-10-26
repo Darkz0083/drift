@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Account`)),n=((t={},n={})=>(n.locale??e(),`Checking…`)),r=((t={},n={})=>(n.locale??e(),`Included usage used`)),i=((t={},n={})=>(n.locale??e(),`Not included in this plan`)),a=((t={},n={})=>(n.locale??e(),`Included credits`));export{t as a,n as i,i as n,r,a as t};

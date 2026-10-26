@@ -40,12 +40,12 @@ test("the pane renders the presentation sentinels, measures its hole, and dismis
     onadd: vi.fn(),
     onclose,
   });
-  const row = screen.container.querySelector<HTMLElement>("[data-zephium-tab-id]")!;
-  expect(row.dataset.zephiumTabId).toBe("pane-tab");
-  expect(row.dataset.zephiumTabUrl).toBe("https://docs.example/guide");
-  expect(row.dataset.zephiumProjectionRevision).toBe(revision(7));
-  expect(row.querySelector("[data-zephium-tab-label]")?.textContent).toBe("Docs");
-  const address = screen.container.querySelector<HTMLInputElement>("[data-zephium-address]")!;
+  const row = screen.container.querySelector<HTMLElement>("[data-drift-tab-id]")!;
+  expect(row.dataset.driftTabId).toBe("pane-tab");
+  expect(row.dataset.driftTabUrl).toBe("https://docs.example/guide");
+  expect(row.dataset.driftProjectionRevision).toBe(revision(7));
+  expect(row.querySelector("[data-drift-tab-label]")?.textContent).toBe("Docs");
+  const address = screen.container.querySelector<HTMLInputElement>("[data-drift-address]")!;
   expect(address.value).toBe("docs.example");
 
   await expect.poll(() => onmeasure.mock.calls.length).toBeGreaterThan(0);
@@ -76,7 +76,7 @@ test("the pane renders the presentation sentinels, measures its hole, and dismis
 
   await userEvent.keyboard("{Escape}");
   expect(onclose).toHaveBeenCalledOnce();
-  expect(screen.container.querySelector("[data-zephium-tab-id]")).toBeNull();
+  expect(screen.container.querySelector("[data-drift-tab-id]")).toBeNull();
   await screen.unmount();
 });
 

@@ -8,7 +8,7 @@ use std::sync::Mutex;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
-use zephium_core::ports::store::Store;
+use drift_core::ports::store::Store;
 
 #[cfg(target_os = "macos")]
 mod double_tap;
@@ -96,7 +96,7 @@ pub fn validate(accelerator: &str) -> Result<Shortcut, Rejection> {
     }
     // The primary modifier with a character is how every app spells its own
     // commands: ⌘⇧Z is Redo, ⌘⇧T reopens a tab. Taking one globally breaks
-    // it in every app while Zephium runs.
+    // it in every app while Drift runs.
     let primary = if cfg!(target_os = "macos") {
         Modifiers::SUPER
     } else {

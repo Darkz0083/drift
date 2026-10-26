@@ -5,9 +5,9 @@
 
 use super::*;
 use std::sync::Mutex;
-use zephium_import::{Browser, ImportError, Locations};
+use drift_import::{Browser, ImportError, Locations};
 
-const EVENT_IMPORT_PROGRESS: &str = "zephium:import-progress";
+const EVENT_IMPORT_PROGRESS: &str = "drift:import-progress";
 const MAX_PROFILE_ID_BYTES: usize = 512;
 /// An import writes up to tens of thousands of rows in one transaction.
 const WRITE_DEADLINE: std::time::Duration = std::time::Duration::from_secs(120);
@@ -63,7 +63,7 @@ pub(crate) enum ImportProblemView {
     Permission,
     Unreadable,
     Missing,
-    /// Zephium could not keep what was read.
+    /// Drift could not keep what was read.
     Storage,
 }
 
@@ -78,7 +78,7 @@ pub(crate) struct ImportKindProgressView {
 
 /// The running import, whole, each time it moves.
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, tauri_specta::Event)]
-#[tauri_specta(event_name = "zephium:import-progress")]
+#[tauri_specta(event_name = "drift:import-progress")]
 pub(crate) struct ImportJobView {
     source: String,
     profile: String,
@@ -101,9 +101,9 @@ fn problem(error: &ImportError) -> ImportProblemView {
     }
 }
 
-fn discover() -> Vec<zephium_import::Source> {
+fn discover() -> Vec<drift_import::Source> {
     Locations::from_env()
-        .map(|locations| zephium_import::discover(&locations))
+        .map(|locations| drift_import::discover(&locations))
         .unwrap_or_default()
 }
 
@@ -320,37 +320,37 @@ struct ImportedOrigins {
 
 impl ImportedOrigins {
     fn list(&mut self, url: &str) {
-        if let Some(origin) = zephium_import::https_origin(url) {
+        if let Some(origin) = drift_import::https_origin(url) {
             if self.seen.insert(origin.clone()) {
                 self.listed.push(origin);
             }
         }
     }
 
-    fn note(&mut self, work: &zephium_app::ImportWork) {
-        fn walk(origins: &mut ImportedOrigins, nodes: &[zephium_import::ImportNode]) {
+    fn note(&mut self, work: &drift_app::ImportWork) {
+        fn walk(origins: &mut ImportedOrigins, nodes: &[drift_import::ImportNode]) {
             for node in nodes {
                 match node {
-                    zephium_import::ImportNode::Link { url, .. } => origins.list(url),
-                    zephium_import::ImportNode::Folder { children, .. } => walk(origins, children),
+                    drift_import::ImportNode::Link { url, .. } => origins.list(url),
+                    drift_import::ImportNode::Folder { children, .. } => walk(origins, children),
                 }
             }
         }
         match work {
-            zephium_app::ImportWork::Bookmarks { nodes, .. } => walk(self, nodes),
-            zephium_app::ImportWork::Essentials(sites) => {
+            drift_app::ImportWork::Bookmarks { nodes, .. } => walk(self, nodes),
+            drift_app::ImportWork::Essentials(sites) => {
                 for site in sites {
                     self.list(&site.url);
                 }
             }
-            zephium_app::ImportWork::History(visits) => {
+            drift_app::ImportWork::History(visits) => {
                 for visit in visits {
-                    if let Some(origin) = zephium_import::https_origin(&visit.url) {
+                    if let Some(origin) = drift_import::https_origin(&visit.url) {
                         *self.visited.entry(origin).or_default() += 1;
                     }
                 }
             }
-            zephium_app::ImportWork::Icons(_) => {}
+            drift_app::ImportWork::Icons(_) => {}
         }
     }
 
@@ -366,7 +366,7 @@ impl ImportedOrigins {
             .collect();
         visited.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
         listed.extend(visited.into_iter().map(|(origin, _)| origin));
-        listed.truncate(zephium_import::MAX_ICONS);
+        listed.truncate(drift_import::MAX_ICONS);
         listed
     }
 }
@@ -384,7 +384,7 @@ async fn import_icons(
     let profile = profile.to_owned();
     let icons = tauri::async_runtime::spawn_blocking(move || {
         let locations = Locations::from_env()?;
-        let icons = zephium_import::icons(&locations, browser, &profile, &wanted).ok()?;
+        let icons = drift_import::icons(&locations, browser, &profile, &wanted).ok()?;
         Some(
             icons
                 .into_iter()
@@ -400,19 +400,19 @@ async fn import_icons(
     .unwrap_or_default();
     // Sent even when empty: storing it is what refreshes the sidebar, so a
     // source with no icons of its own still has its Essentials fetched.
-    let _ = write(app, zephium_app::ImportWork::Icons(icons)).await;
+    let _ = write(app, drift_app::ImportWork::Icons(icons)).await;
 }
 
 async fn read(
     browser: Browser,
     profile: &str,
     kind: ImportKindView,
-) -> Result<(zephium_app::ImportWork, u32), ImportError> {
+) -> Result<(drift_app::ImportWork, u32), ImportError> {
     let profile = profile.to_owned();
     tauri::async_runtime::spawn_blocking(move || {
         let locations = Locations::from_env().ok_or(ImportError::Missing)?;
         // Discovery again: only a profile this source lists right now is read.
-        let source = zephium_import::discover(&locations)
+        let source = drift_import::discover(&locations)
             .into_iter()
             .find(|source| source.browser == browser)
             .ok_or(ImportError::Missing)?;
@@ -423,19 +423,19 @@ async fn read(
             .ok_or(ImportError::Missing)?;
         match kind {
             ImportKindView::Essentials => {
-                let sites: Vec<zephium_app::ImportedSite> =
-                    zephium_import::essentials(&locations, browser, &profile)?
+                let sites: Vec<drift_app::ImportedSite> =
+                    drift_import::essentials(&locations, browser, &profile)?
                         .into_iter()
-                        .map(|site| zephium_app::ImportedSite {
+                        .map(|site| drift_app::ImportedSite {
                             url: site.url,
                             title: site.title,
                         })
                         .collect();
                 let total = u32::try_from(sites.len()).unwrap_or(u32::MAX);
-                Ok((zephium_app::ImportWork::Essentials(sites), total))
+                Ok((drift_app::ImportWork::Essentials(sites), total))
             }
             ImportKindView::Bookmarks => {
-                let nodes = zephium_import::bookmarks(&locations, browser, &profile)?;
+                let nodes = drift_import::bookmarks(&locations, browser, &profile)?;
                 let total = links(&nodes);
                 // One folder per source, and per profile when there are several,
                 // so imports from two Chrome profiles stay apart.
@@ -444,15 +444,15 @@ async fn read(
                 } else {
                     format!("Imported from {}", browser.name())
                 };
-                Ok((zephium_app::ImportWork::Bookmarks { folder, nodes }, total))
+                Ok((drift_app::ImportWork::Bookmarks { folder, nodes }, total))
             }
             ImportKindView::History => {
                 let now = std::time::SystemTime::now()
                     .duration_since(std::time::UNIX_EPOCH)
                     .map_or(0, |elapsed| elapsed.as_secs() as i64);
-                let visits = zephium_import::history(&locations, browser, &profile, now)?;
+                let visits = drift_import::history(&locations, browser, &profile, now)?;
                 let total = u32::try_from(visits.len()).unwrap_or(u32::MAX);
-                Ok((zephium_app::ImportWork::History(visits), total))
+                Ok((drift_app::ImportWork::History(visits), total))
             }
         }
     })
@@ -460,22 +460,22 @@ async fn read(
     .unwrap_or(Err(ImportError::Unreadable))
 }
 
-fn links(nodes: &[zephium_import::ImportNode]) -> u32 {
+fn links(nodes: &[drift_import::ImportNode]) -> u32 {
     nodes
         .iter()
         .map(|node| match node {
-            zephium_import::ImportNode::Link { .. } => 1,
-            zephium_import::ImportNode::Folder { children, .. } => links(children),
+            drift_import::ImportNode::Link { .. } => 1,
+            drift_import::ImportNode::Folder { children, .. } => links(children),
         })
         .fold(0u32, u32::saturating_add)
 }
 
-async fn write(app: &tauri::AppHandle, work: zephium_app::ImportWork) -> Option<u32> {
+async fn write(app: &tauri::AppHandle, work: drift_app::ImportWork) -> Option<u32> {
     let shell = app.try_state::<Handle>()?.inner().clone();
     let (send, receive) = tokio::sync::oneshot::channel();
     if !shell.dispatch(Command::Import {
         work: Box::new(work),
-        done: zephium_app::ImportCompletion::new(move |added| {
+        done: drift_app::ImportCompletion::new(move |added| {
             let _ = send.send(added);
         }),
     }) {
@@ -498,7 +498,7 @@ mod tests {
 
     #[test]
     fn links_count_through_folders() {
-        use zephium_import::ImportNode;
+        use drift_import::ImportNode;
         let link = || ImportNode::Link {
             title: String::new(),
             url: "https://a.example/".into(),
@@ -515,21 +515,21 @@ mod tests {
 
     #[test]
     fn icons_are_wanted_for_listed_sites_first_then_the_most_visited() {
-        use zephium_import::{ImportNode, ImportedVisit};
+        use drift_import::{ImportNode, ImportedVisit};
         let visit = |url: &str| ImportedVisit {
             url: url.into(),
             title: String::new(),
             visited_at: 1,
         };
         let mut origins = ImportedOrigins::default();
-        origins.note(&zephium_app::ImportWork::History(vec![
+        origins.note(&drift_app::ImportWork::History(vec![
             visit("https://rare.example/"),
             visit("https://often.example/a"),
             visit("https://often.example/b"),
             visit("https://x.com/home"),
             visit("http://plain.example/"),
         ]));
-        origins.note(&zephium_app::ImportWork::Bookmarks {
+        origins.note(&drift_app::ImportWork::Bookmarks {
             folder: "Imported".into(),
             nodes: vec![ImportNode::Folder {
                 title: "F".into(),

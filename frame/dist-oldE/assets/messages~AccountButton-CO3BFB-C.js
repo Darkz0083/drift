@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`Models`)),n=((t={},n={})=>(n.locale??e(),`Sign in to Drift`));export{t as n,n as t};

@@ -72,7 +72,7 @@ impl X11Shortcut {
         let terminal = Arc::new(AtomicU8::new(WorkerTerminal::Running as u8));
         let worker_terminal = terminal.clone();
         let worker = std::thread::Builder::new()
-            .name("zephium-x11-shortcut".to_owned())
+            .name("drift-x11-shortcut".to_owned())
             .spawn(move || {
                 let _completion = CompletionSignal(completed_tx);
                 let result = run_worker(shortcut, target, stop_rx, worker_lifecycle.clone());
@@ -802,7 +802,7 @@ mod tests {
             .nth(1)
             .and_then(|source| source.split("pub(crate) fn shutdown").next())
             .expect("bounded X11 spawn adapter");
-        assert!(spawn.contains("zephium-x11-shortcut"));
+        assert!(spawn.contains("drift-x11-shortcut"));
         assert!(!spawn.contains("RustConnection::connect"));
 
         let worker = production

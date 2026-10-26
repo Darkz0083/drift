@@ -6,27 +6,27 @@
 
 fn main() -> std::process::ExitCode {
     #[cfg(all(target_os = "macos", feature = "work-product"))]
-    zephium_app::work_commands::private_guard_main();
+    drift_app::work_commands::private_guard_main();
     #[cfg(all(target_os = "macos", feature = "work-integration-qa", debug_assertions))]
     if let Some((_, stage)) = [
         (
             "--probe-interactive-safari-government",
-            zephium_engine::LivenessStage::Safari,
+            drift_engine::LivenessStage::Safari,
         ),
         (
             "--probe-interactive-scripts-government",
-            zephium_engine::LivenessStage::BrowseScripts,
+            drift_engine::LivenessStage::BrowseScripts,
         ),
         (
             "--probe-interactive-gate-government",
-            zephium_engine::LivenessStage::DocumentGate,
+            drift_engine::LivenessStage::DocumentGate,
         ),
     ]
     .into_iter()
     .find(|(flag, _)| std::env::args_os().skip(1).eq([*flag]))
     {
-        return if zephium_engine::run_interactive_liveness_probe(
-            zephium_engine::LivenessSite::Government,
+        return if drift_engine::run_interactive_liveness_probe(
+            drift_engine::LivenessSite::Government,
             stage,
         )
         .is_ok()
@@ -41,7 +41,7 @@ fn main() -> std::process::ExitCode {
         .skip(1)
         .eq(["--probe-interactive-government"])
     {
-        return if zephium_engine::run_interactive_government_probe().is_ok() {
+        return if drift_engine::run_interactive_government_probe().is_ok() {
             std::process::ExitCode::SUCCESS
         } else {
             std::process::ExitCode::FAILURE
@@ -51,26 +51,26 @@ fn main() -> std::process::ExitCode {
     if let Some((_, stage)) = [
         (
             "--probe-bare-government",
-            zephium_engine::LivenessStage::Bare,
+            drift_engine::LivenessStage::Bare,
         ),
         (
             "--probe-safari-government",
-            zephium_engine::LivenessStage::Safari,
+            drift_engine::LivenessStage::Safari,
         ),
         (
             "--probe-scripts-government",
-            zephium_engine::LivenessStage::BrowseScripts,
+            drift_engine::LivenessStage::BrowseScripts,
         ),
         (
             "--probe-gate-government",
-            zephium_engine::LivenessStage::DocumentGate,
+            drift_engine::LivenessStage::DocumentGate,
         ),
     ]
     .into_iter()
     .find(|(flag, _)| std::env::args_os().skip(1).eq([*flag]))
     {
-        return if zephium_engine::run_liveness_probe(
-            zephium_engine::LivenessSite::Government,
+        return if drift_engine::run_liveness_probe(
+            drift_engine::LivenessSite::Government,
             stage,
         )
         .is_ok()
@@ -87,7 +87,7 @@ fn main() -> std::process::ExitCode {
     {
         use std::io::Write as _;
         let started = std::time::Instant::now();
-        let available = zephium_agentic::load_macos_development_openai_credential().is_ok();
+        let available = drift_agentic::load_macos_development_openai_credential().is_ok();
         let _ = writeln!(
             std::io::stderr(),
             "keychain_check available={available} elapsed_ms={}",
@@ -99,6 +99,6 @@ fn main() -> std::process::ExitCode {
             std::process::ExitCode::FAILURE
         };
     }
-    zephium_desktop_lib::run();
+    drift_desktop_lib::run();
     std::process::ExitCode::SUCCESS
 }

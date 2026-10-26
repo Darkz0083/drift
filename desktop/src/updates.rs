@@ -1,4 +1,4 @@
-//! Updates from GitHub Releases, signed with Zephium's updater key.
+//! Updates from GitHub Releases, signed with Drift's updater key.
 //!
 //! A check downloads a newer release in the background and parks it on disk.
 //! It installs when the person relaunches, or on macOS when they quit, always
@@ -369,7 +369,7 @@ pub(crate) fn update_relaunch(caller: WebviewWindow, app: tauri::AppHandle) -> b
         };
         let worker_app = install_app.clone();
         let spawned = std::thread::Builder::new()
-            .name("zephium-update-install".into())
+            .name("drift-update-install".into())
             .spawn(move || {
                 let next_version = parked.update.version.clone();
                 if let Err(error) = stage(parked, &worker_app) {
@@ -442,7 +442,7 @@ pub(crate) fn restore(app: &tauri::AppHandle, directory: &std::path::Path) {
     if !path.exists() {
         return;
     }
-    // The installer replaced this build and exited before Zephium could clean
+    // The installer replaced this build and exited before Drift could clean
     // up; running the retained version means the update finished.
     if recovery::retained_version(&path)
         .is_some_and(|version| version == app.package_info().version.to_string())
@@ -484,7 +484,7 @@ fn stage(mut parked: Parked, _app: &tauri::AppHandle) -> Result<(), InstallError
 }
 
 /// The Windows installer replaces the running executable, so it starts only
-/// after Zephium has shut down completely.
+/// after Drift has shut down completely.
 #[cfg(target_os = "windows")]
 fn stage(mut parked: Parked, app: &tauri::AppHandle) -> Result<(), InstallError> {
     let path = lock(&app.state::<Updates>().recovery_path)
@@ -550,7 +550,7 @@ fn install_on_quit(app: &tauri::AppHandle) {
 }
 
 /// Called after the WebView2 runtime has been released. On success the
-/// installer takes over and this process exits; it relaunches Zephium itself.
+/// installer takes over and this process exits; it relaunches Drift itself.
 #[cfg(target_os = "windows")]
 pub(crate) fn finish_after_exit(clean: bool) {
     let Some((mut parked, _path)) = lock(&INSTALL_AFTER_EXIT).take() else {
@@ -578,9 +578,9 @@ pub(crate) fn finish_after_exit(clean: bool) {
 #[cfg(target_os = "windows")]
 fn explain_deferred_update() {
     rfd::MessageDialog::new()
-        .set_title("Zephium update postponed")
+        .set_title("Drift update postponed")
         .set_level(rfd::MessageLevel::Warning)
-        .set_description("Zephium could not finish the update safely. The downloaded update has been kept. Open Zephium again to retry from Settings → About.")
+        .set_description("Drift could not finish the update safely. The downloaded update has been kept. Open Drift again to retry from Settings → About.")
         .set_buttons(rfd::MessageButtons::Ok)
         .show();
 }
@@ -612,7 +612,7 @@ mod highlight_tests {
     #[test]
     fn release_notes_become_a_short_plain_list() {
         let notes = "## What's Changed\n\
-* feat(browse): ask before a page opens another app by @crynta in https://github.com/zephium-browser/Zephium/pull/60\n\
+* feat(browse): ask before a page opens another app by @crynta in https://github.com/drift-browser/Drift/pull/60\n\
 - **Page dialogs** now show as a sheet ([#61](https://github.com/x/y/pull/61)).\n\
 - Fix `confirm()` returning false\n\
 - one\n- two\n- three\n\

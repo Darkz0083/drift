@@ -34,33 +34,33 @@ MODEL = "gpt-6-luna"
 SCHEMA = 1
 EXPORT_SCHEMA = 1
 INSTRUMENTATION = {
-    "crates/zephium-terra-macos-probe/src/acceptance.rs",
-    "crates/zephium-terra-macos-probe/src/work_durable.rs",
-    "crates/zephium-terra-macos-probe/src/loopback_support.rs",
+    "crates/drift-terra-macos-probe/src/acceptance.rs",
+    "crates/drift-terra-macos-probe/src/work_durable.rs",
+    "crates/drift-terra-macos-probe/src/loopback_support.rs",
     "scripts/work-eval", "scripts/test_work_eval.py",
 }
 
 
 FORM_INSTRUMENTATION = {
-    "crates/zephium-engine/src/host/work_resource.rs",
-    "crates/zephium-engine/src/host/work_resource_form_oracle.rs",
-    "crates/zephium-engine/src/host/work_form_oracle.js",
-    "crates/zephium-engine/src/host/work_resource_action.rs",
-    "crates/zephium-engine/src/platform/mod.rs",
-    "crates/zephium-engine/src/platform/form_qualification.rs",
-    "crates/zephium-engine/src/platform/form_submit_observer.js",
-    "crates/zephium-engine/src/platform/work_document_navigation.rs",
-    "crates/zephium-engine/src/platform/macos/agent_context.rs",
-    "crates/zephium-engine/src/platform/macos/semantic_runtime.rs",
-    "crates/zephium-engine/src/platform/macos/agentic_semantic_program_probe.rs",
-    "crates/zephium-engine/src/platform/macos/agentic_form_diagnostic_probe.rs",
-    "crates/zephium-engine/src/platform/macos/agentic_form_diagnostic_probe.js",
+    "crates/drift-engine/src/host/work_resource.rs",
+    "crates/drift-engine/src/host/work_resource_form_oracle.rs",
+    "crates/drift-engine/src/host/work_form_oracle.js",
+    "crates/drift-engine/src/host/work_resource_action.rs",
+    "crates/drift-engine/src/platform/mod.rs",
+    "crates/drift-engine/src/platform/form_qualification.rs",
+    "crates/drift-engine/src/platform/form_submit_observer.js",
+    "crates/drift-engine/src/platform/work_document_navigation.rs",
+    "crates/drift-engine/src/platform/macos/agent_context.rs",
+    "crates/drift-engine/src/platform/macos/semantic_runtime.rs",
+    "crates/drift-engine/src/platform/macos/agentic_semantic_program_probe.rs",
+    "crates/drift-engine/src/platform/macos/agentic_form_diagnostic_probe.rs",
+    "crates/drift-engine/src/platform/macos/agentic_form_diagnostic_probe.js",
 }
 LOCAL_INSTRUMENTATION = {
-    "crates/zephium-terra-macos-probe/src/main.rs",
-    "crates/zephium-terra-macos-probe/src/work_local_fixture.rs",
-    "crates/zephium-terra-macos-probe/src/work_heldout_blocks.rs",
-    "crates/zephium-terra-macos-probe/Cargo.toml", "Cargo.lock", "eval/work-heldout-v1.json",
+    "crates/drift-terra-macos-probe/src/main.rs",
+    "crates/drift-terra-macos-probe/src/work_local_fixture.rs",
+    "crates/drift-terra-macos-probe/src/work_heldout_blocks.rs",
+    "crates/drift-terra-macos-probe/Cargo.toml", "Cargo.lock", "eval/work-heldout-v1.json",
 }
 LOCAL_ELIGIBILITY = {"pending_confined_fixture", "pending_blocks_state_oracle"}
 
@@ -191,7 +191,7 @@ def prepare_references(args):
             for name, source in task["oracle"]["sources"].items():
                 url = source["url"]
                 if url not in cache:
-                    request = urllib.request.Request(url, headers={"User-Agent": "Zephium-local-evaluation/1.0 (public reference capture)"})
+                    request = urllib.request.Request(url, headers={"User-Agent": "Drift-local-evaluation/1.0 (public reference capture)"})
                     with urllib.request.urlopen(request, timeout=25) as response:
                         final = response.geturl()
                         if host(final) != host(url):
@@ -598,7 +598,7 @@ def grade(task, evidence, reference, manifest):
 
 @contextlib.contextmanager
 def live_lease():
-    descriptor = os.open("/private/tmp/zephium-native-probe.lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    descriptor = os.open("/private/tmp/drift-native-probe.lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
     try:
         fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
         yield
@@ -782,7 +782,7 @@ def cleanup_local_fixture(task, setup, manifest_sha, *, reaped, home=None):
     if not isinstance(locator, dict) or locator.get("kind") != "owned_home_child_v1" or locator.get("mode") != 0o700:
         return "refused_locator"
     name = locator.get("home_basename")
-    if not isinstance(name, str) or not re.fullmatch(r"zephium-work-fixture-[A-Za-z0-9_-]{6,64}", name):
+    if not isinstance(name, str) or not re.fullmatch(r"drift-work-fixture-[A-Za-z0-9_-]{6,64}", name):
         return "refused_locator"
     def matches(info, identity):
         return isinstance(identity, dict) and all(type(identity.get(key)) is int for key in ("device", "inode", "uid")) and (info.st_dev, info.st_ino, info.st_uid) == (identity["device"], identity["inode"], identity["uid"]) and info.st_uid == os.getuid() == os.geteuid()
@@ -916,7 +916,7 @@ def run_local_case(root, frozen, task, out):
     directory.mkdir(mode=0o700)
     export = directory / "evidence.json"
     setup_path = export.with_suffix(".freeze.json")
-    env = {key: value for key, value in os.environ.items() if not key.startswith("ZEPHIUM_") and key not in ("RUST_LOG", "RUST_BACKTRACE")}
+    env = {key: value for key, value in os.environ.items() if not key.startswith("DRIFT_") and key not in ("RUST_LOG", "RUST_BACKTRACE")}
     if digest(root / "probe") != frozen["probe_sha256"]:
         raise ValueError("frozen probe changed before launch")
     started = time.monotonic()
@@ -972,14 +972,14 @@ def run_case(root, frozen, task, reference, manifest, out):
     export = directory / "evidence.json"
     env = dict(os.environ)
     for key in list(env):
-        if key.startswith("ZEPHIUM_") or key in ("RUST_LOG", "RUST_BACKTRACE"):
+        if key.startswith("DRIFT_") or key in ("RUST_LOG", "RUST_BACKTRACE"):
             env.pop(key)
-    env.update(ZEPHIUM_EVAL_PUBLIC_EXPORT=str(export), ZEPHIUM_EVAL_CASE_ID=task["id"], ZEPHIUM_EVAL_READ_DECISIONS=frozen.get("read_decisions", "recommended"))
+    env.update(DRIFT_EVAL_PUBLIC_EXPORT=str(export), DRIFT_EVAL_CASE_ID=task["id"], DRIFT_EVAL_READ_DECISIONS=frozen.get("read_decisions", "recommended"))
     form = task.get("eligibility") == "pending_form_state_oracle"
     if form:
         if frozen.get("form_oracle", {}).get("version") != 2 or task["id"] not in FORM_CHECK_COUNTS:
             raise ValueError("form task requires an explicit frozen observer")
-        env["ZEPHIUM_EVAL_FORM_ORACLE"] = task["id"]
+        env["DRIFT_EVAL_FORM_ORACLE"] = task["id"]
     if digest(root / "probe") != frozen["probe_sha256"]:
         raise ValueError("frozen probe changed before launch")
     command = [str(root / "probe"), "--live-lead-request", task_request(task),
@@ -1256,7 +1256,7 @@ def main():
     freezing.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     freezing.add_argument("--references", required=True)
     freezing.add_argument("--probe", required=True)
-    freezing.add_argument("--identifier", default="app.zephium.work-integration.probe")
+    freezing.add_argument("--identifier", default="app.drift.work-integration.probe")
     freezing.add_argument("--source-root", required=True)
     freezing.add_argument("--base-ref", default="3fcd07c5")
     freezing.add_argument("--label", choices=["baseline", "candidate"], required=True)

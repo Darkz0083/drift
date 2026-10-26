@@ -20,7 +20,7 @@ use objc2_foundation::{
 };
 use objc2_quartz_core::{CABasicAnimation, CAMediaTiming, CATransaction};
 use objc2_web_kit::WKWebView;
-use zephium_core::layout::{MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH};
+use drift_core::layout::{MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH};
 
 type Commit = Rc<dyn Fn(f64, u64)>;
 static REVISION: AtomicU64 = AtomicU64::new(0);
@@ -112,7 +112,7 @@ pub struct Ivars {
 define_class!(
     #[unsafe(super(NSView))]
     #[thread_kind = MainThreadOnly]
-    #[name = "ZephiumSidebarResizeControl"]
+    #[name = "DriftSidebarResizeControl"]
     #[ivars = Ivars]
     pub(super) struct Control;
     impl Control {
@@ -196,7 +196,7 @@ define_class!(
 define_class!(
     #[unsafe(super(NSView))]
     #[thread_kind = MainThreadOnly]
-    #[name = "ZephiumSidebarResizeGuide"]
+    #[name = "DriftSidebarResizeGuide"]
     struct Guide;
     impl Guide {
         #[unsafe(method(hitTest:))]
@@ -396,7 +396,7 @@ impl Control {
                 CATransaction::setCompletionBlock(Some(&completed));
             }
             layer.setOpacity(0.0);
-            layer.addAnimation_forKey(&animation, Some(ns_string!("zephium.sidebar-guide.fade")));
+            layer.addAnimation_forKey(&animation, Some(ns_string!("drift.sidebar-guide.fade")));
             CATransaction::commit();
         }
     }

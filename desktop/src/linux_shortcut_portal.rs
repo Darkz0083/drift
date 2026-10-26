@@ -23,9 +23,9 @@ const REQUEST_INTERFACE: &str = "org.freedesktop.portal.Request";
 const SESSION_INTERFACE: &str = "org.freedesktop.portal.Session";
 const REQUEST_PATH_PREFIX: &str = "/org/freedesktop/portal/desktop/request";
 const SESSION_PATH_PREFIX: &str = "/org/freedesktop/portal/desktop/session";
-const PORTAL_DESKTOP_ID: &str = "app.zephium";
+const PORTAL_DESKTOP_ID: &str = "app.drift";
 const SHORTCUT_ID: &str = LAUNCHER_COMMAND_ID;
-const SHORTCUT_DESCRIPTION: &str = "Toggle Zephium launcher";
+const SHORTCUT_DESCRIPTION: &str = "Toggle Drift launcher";
 const CANCELLATION_POLL: Duration = Duration::from_millis(100);
 const RECONNECT_BACKOFF: [Duration; 2] = [Duration::from_millis(250), Duration::from_secs(1)];
 const MAX_PORTAL_ATTEMPTS: usize = RECONNECT_BACKOFF.len() + 1;
@@ -315,7 +315,7 @@ async fn register_host_connection(connection: &zbus::Connection) -> Result<(), P
     )
     .await
     .ok_or(PortalError::TimedOut("register the host portal connection"))?;
-    // Zephium is a host application and therefore owns one exact Registry
+    // Drift is a host application and therefore owns one exact Registry
     // identity. Falling back to automatic cgroup inference after rejection can
     // attribute a raw development launch to its terminal (or another scope),
     // persisting consent under the wrong application. Keep the focused GTK
@@ -901,7 +901,7 @@ fn portal_token_from_nonce(
         nonce_hex.push(char::from(HEX[usize::from(byte >> 4)]));
         nonce_hex.push(char::from(HEX[usize::from(byte & 0x0f)]));
     }
-    format!("zephium_{purpose}_{nonce_hex}_{sequence}")
+    format!("drift_{purpose}_{nonce_hex}_{sequence}")
 }
 
 fn decode_session_handle(
@@ -1128,11 +1128,11 @@ mod tests {
 
     #[test]
     fn portal_paths_are_exact_and_dbus_safe() {
-        let path = portal_path(REQUEST_PATH_PREFIX, ":1.204", "zephium_bind_7_3")
+        let path = portal_path(REQUEST_PATH_PREFIX, ":1.204", "drift_bind_7_3")
             .expect("valid predicted request path");
         assert_eq!(
             path.as_str(),
-            "/org/freedesktop/portal/desktop/request/1_204/zephium_bind_7_3"
+            "/org/freedesktop/portal/desktop/request/1_204/drift_bind_7_3"
         );
         assert!(portal_path(REQUEST_PATH_PREFIX, ":1.2", "bad.token").is_err());
     }
@@ -1247,7 +1247,7 @@ mod tests {
     #[test]
     fn portal_tokens_have_bounded_path_safe_nonce_encoding_and_nonwrapping_sequence() {
         let token = portal_token_from_nonce("bind", &[0xab; PORTAL_TOKEN_NONCE_BYTES], 42);
-        assert_eq!(token, "zephium_bind_abababababababababababababababab_42");
+        assert_eq!(token, "drift_bind_abababababababababababababababab_42");
         assert!(token
             .bytes()
             .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_'));

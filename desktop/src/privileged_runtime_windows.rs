@@ -5,7 +5,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
-use zephium_core::webview2::{RuntimeGeneration, RuntimeGenerationKind};
+use drift_core::webview2::{RuntimeGeneration, RuntimeGenerationKind};
 
 static RUNTIME_STATE: OnceLock<RuntimeGeneration> = OnceLock::new();
 
@@ -34,8 +34,8 @@ pub fn prepare(
     let panel = runtime.root().join(panel_label);
     fs::create_dir(&main)?;
     fs::create_dir(&panel)?;
-    let main = zephium_core::webview2::canonical_user_data_directory(&main)?;
-    let panel = zephium_core::webview2::canonical_user_data_directory(&panel)?;
+    let main = drift_core::webview2::canonical_user_data_directory(&main)?;
+    let panel = drift_core::webview2::canonical_user_data_directory(&panel)?;
     if main.parent() != Some(runtime.root()) || panel.parent() != Some(runtime.root()) {
         return Err(io::Error::other(
             "privileged WebView2 UDF escaped its owned runtime generation",

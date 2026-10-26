@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`All notes`)),n=((t={},n={})=>(n.locale??e(),`Notes`)),r=((t={},n={})=>(n.locale??e(),`Close Notes`)),i=((t={},n={})=>(n.locale??e(),`Show Notes Folder`)),a=((t={},n={})=>(n.locale??e(),`Search notes`));export{t as a,n as i,i as n,r,a as t};

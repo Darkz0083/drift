@@ -1,5 +1,5 @@
 use std::path::Path;
-use zephium_webext::prepare;
+use drift_webext::prepare;
 
 /// Added to every package: `nativeMessaging` for the browser's own bridges,
 /// and `activeTab`, which grants nothing until the user clicks the
@@ -18,9 +18,9 @@ pub(super) fn compat_revision(_access: &super::Access) -> String {
     // FNV-1a over the layer and the Chrome identity it presents; changing
     // either rebuilds every package from its original.
     let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
-    for byte in zephium_webext_macos::compat::SCRIPT
+    for byte in drift_webext_macos::compat::SCRIPT
         .bytes()
-        .chain(zephium_webext::store::CHROME_VERSION.bytes())
+        .chain(drift_webext::store::CHROME_VERSION.bytes())
         .chain(ADDED_PERMISSIONS.concat().bytes())
         .chain([u8::from(DIAGNOSTICS)])
     {
@@ -32,14 +32,14 @@ pub(super) fn compat_revision(_access: &super::Access) -> String {
 
 #[cfg(target_os = "macos")]
 fn compat_layer() -> prepare::CompatLayer {
-    prepare::CompatLayer::new(zephium_webext_macos::compat::SCRIPT)
+    prepare::CompatLayer::new(drift_webext_macos::compat::SCRIPT)
         .with_permissions(ADDED_PERMISSIONS)
         .with_diagnostics(DIAGNOSTICS)
 }
 
 #[cfg(target_os = "windows")]
 pub(super) fn compat_revision(access: &super::Access) -> String {
-    zephium_webext::windows::access_revision(match access {
+    drift_webext::windows::access_revision(match access {
         super::Access::All => None,
         super::Access::Sites { sites } => Some(sites),
         super::Access::Click => Some(&[]),
@@ -64,7 +64,7 @@ pub(super) fn prepare_package(
                 return Err("On click site access is not available on Windows yet.".into())
             }
         };
-        zephium_webext::windows::prepare(dir, sites)?;
+        drift_webext::windows::prepare(dir, sites)?;
         Ok(prepare::PrepareReport::default())
     }
 }

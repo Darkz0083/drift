@@ -5,11 +5,11 @@ use std::{
     future::Future,
     sync::{Arc, Mutex},
 };
-use zephium_core::{
+use drift_core::{
     ids::ProfileId,
     work::{WorkCommandId, WorkError},
 };
-use zephium_ipc::work::{WorkOperationStateV1, WorkOperationV1};
+use drift_ipc::work::{WorkOperationStateV1, WorkOperationV1};
 
 type Key = (ProfileId, WorkCommandId);
 const MAX_OPERATIONS: usize = 16;
@@ -98,8 +98,8 @@ impl WorkOperations {
         &self,
         key: &str,
         value: &str,
-        dispatch: impl FnOnce() -> zephium_ipc::OperationAdmission,
-    ) -> Result<zephium_ipc::OperationAdmission, WorkError> {
+        dispatch: impl FnOnce() -> drift_ipc::OperationAdmission,
+    ) -> Result<drift_ipc::OperationAdmission, WorkError> {
         let ai = match key {
             "ai.enabled" => true,
             "work.enabled" => false,
@@ -134,7 +134,7 @@ impl WorkOperations {
 
     /// Called only after the exact actor disposition is accepted by the result
     /// ledger. A Store-queue refusal releases the fence without changing flags.
-    pub(crate) fn preference_processed(&self, disposition: &zephium_ipc::OperationDisposition) {
+    pub(crate) fn preference_processed(&self, disposition: &drift_ipc::OperationDisposition) {
         let Ok(mut registry) = self.0.lock() else {
             return;
         };
@@ -148,8 +148,8 @@ impl WorkOperations {
         let Some(pending) = registry.preference.take() else {
             return;
         };
-        if disposition.outcome == zephium_ipc::OperationOutcome::Deferred
-            && disposition.reason == zephium_ipc::OperationReason::StoreWorkPending
+        if disposition.outcome == drift_ipc::OperationOutcome::Deferred
+            && disposition.reason == drift_ipc::OperationReason::StoreWorkPending
         {
             if pending.ai {
                 registry.ai_enabled = pending.enabled;
@@ -248,7 +248,7 @@ impl WorkOperations {
     pub(crate) fn observe(
         &self,
         key: Key,
-        work: zephium_core::work::WorkId,
+        work: drift_core::work::WorkId,
         acknowledge: bool,
     ) -> Result<WorkOperationStateV1, WorkError> {
         let mut registry = self.0.lock().map_err(|_| WorkError::Unavailable)?;
@@ -318,10 +318,10 @@ impl WorkOperations {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zephium_core::work::{WorkId, WorkRevision};
+    use drift_core::work::{WorkId, WorkRevision};
     fn input(id: u128) -> WorkOperationV1 {
         WorkOperationV1::Plan {
-            request: zephium_ipc::work::WorkPlanRequestV1 {
+            request: drift_ipc::work::WorkPlanRequestV1 {
                 version: 1,
                 work: WorkId::from(id),
                 expected_revision: WorkRevision::INITIAL,
@@ -329,24 +329,24 @@ mod tests {
             },
         }
     }
-    fn queued(id: &str) -> zephium_ipc::OperationAdmission {
-        zephium_ipc::OperationAdmission {
+    fn queued(id: &str) -> drift_ipc::OperationAdmission {
+        drift_ipc::OperationAdmission {
             operation_id: Some(id.into()),
             accepted: true,
         }
     }
-    fn processed(id: &str, admitted: bool) -> zephium_ipc::OperationDisposition {
-        zephium_ipc::OperationDisposition {
+    fn processed(id: &str, admitted: bool) -> drift_ipc::OperationDisposition {
+        drift_ipc::OperationDisposition {
             operation_id: id.into(),
             outcome: if admitted {
-                zephium_ipc::OperationOutcome::Deferred
+                drift_ipc::OperationOutcome::Deferred
             } else {
-                zephium_ipc::OperationOutcome::Rejected
+                drift_ipc::OperationOutcome::Rejected
             },
             reason: if admitted {
-                zephium_ipc::OperationReason::StoreWorkPending
+                drift_ipc::OperationReason::StoreWorkPending
             } else {
-                zephium_ipc::OperationReason::StoreAdmissionRejected
+                drift_ipc::OperationReason::StoreAdmissionRejected
             },
         }
     }
@@ -410,7 +410,7 @@ mod tests {
     async fn setting_admission_and_store_refusal_never_publish_false_disabled_state() {
         let owner = WorkOperations::default();
         let rejected = owner
-            .preference("ai.enabled", "false", || zephium_ipc::OperationAdmission {
+            .preference("ai.enabled", "false", || drift_ipc::OperationAdmission {
                 operation_id: None,
                 accepted: false,
             })

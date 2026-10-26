@@ -21,11 +21,11 @@ test("presentation sentinels expose the exact title and revision synchronously",
     onPointerUp: vi.fn(),
     onPointerCancel: vi.fn(),
   });
-  const row = screen.container.querySelector("[data-zephium-tab-id]")!;
-  expect(row.getAttribute("data-zephium-tab-id")).toBe(tab.id);
-  expect(row.getAttribute("data-zephium-tab-url")).toBe(tab.url);
-  expect(row.getAttribute("data-zephium-projection-revision")).toBe(tab.projection_revision);
-  const label = row.querySelector("[data-zephium-tab-label]")!;
+  const row = screen.container.querySelector("[data-drift-tab-id]")!;
+  expect(row.getAttribute("data-drift-tab-id")).toBe(tab.id);
+  expect(row.getAttribute("data-drift-tab-url")).toBe(tab.url);
+  expect(row.getAttribute("data-drift-projection-revision")).toBe(tab.projection_revision);
+  const label = row.querySelector("[data-drift-tab-label]")!;
   expect(label.textContent).toBe(tab.title);
   expect(label.childElementCount).toBe(0);
   // Validate the production scoped transport, including synchronous delivery.

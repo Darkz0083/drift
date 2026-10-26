@@ -53,22 +53,22 @@ reviews:
         - Error handling: no unwrap, expect or panic on IPC input, filesystem, network or page-derived data. Security decisions fail closed, and the code must not claim fail-closed when it is fail-open.
         - `unsafe` only in engine and native adapters, each block with a SAFETY comment whose claim actually holds.
         - Load-bearing behavior changes come with a test of the contract, including the deny or malformed-input path.
-    - path: "crates/zephium-core/**"
+    - path: "crates/drift-core/**"
       instructions: |
         The domain stays pure: no I/O, no platform or Tauri types, no `unsafe`. Every mutation of a persistable aggregate goes through its reducer.
-    - path: "{desktop,crates/zephium-ipc}/**"
+    - path: "{desktop,crates/drift-ipc}/**"
       instructions: |
         Privileged boundary. Only `desktop` knows Tauri. Every new or changed command needs an explicit caller policy, Rust-side validation and bounds on all input, and the smallest Tauri capability set. No content page may gain IPC, a privileged initialization object or a content-reachable custom protocol. A changed IPC type must come with regenerated bindings. Mutating IPC keeps the result-ledger semantics: admission is not success.
-    - path: "crates/zephium-engine/**"
+    - path: "crates/drift-engine/**"
       instructions: |
         Native engine adapters for WKWebView and WebView2. Check main-thread work and blocking calls, the view lifecycle watermarks and native resource ceilings, hidden and sleeping view behavior, and that page-derived strings and bytes stay tainted and bounded. Platform differences between macOS and Windows must both be handled, not only the platform the author tested.
-    - path: "crates/zephium-blocker*/**"
+    - path: "crates/drift-blocker*/**"
       instructions: |
         Content blocking runs on every request and page. Measure-level concerns matter: per-request cost, memory held per profile, startup cost of rule compilation, and behavior when a filter list is malformed or hostile. Protection is on by default and must not make browsing slower than protection off.
     - path: "vendor/**"
       instructions: |
         Vendored security forks. Every change must be a minimal, explained patch with the fork's FORK.toml or provenance record updated to match; flag unrelated upstream drift, version bumps without a review record, and any weakening of the hardening the fork exists for.
-    - path: "{crates/zephium-agent*,crates/zephium-work*,crates/zephium-mcp,crates/zephium-app/src/work*}/**"
+    - path: "{crates/drift-agent*,crates/drift-work*,crates/drift-mcp,crates/drift-app/src/work*}/**"
       instructions: |
         Work and agent code acts on the user's behalf. Page and tool output is untrusted input (prompt injection): it must not widen what the agent may do. Side effects need the documented approval path. User data must stay within its scope, and secrets and full URLs must not reach logs. Resource use stays bounded per run.
     - path: "frame/**/*.{svelte,ts}"
@@ -176,7 +176,7 @@ reviews:
     - label: "area: work"
       instructions: Work mode and agent code.
     - label: "area: engine"
-      instructions: crates/zephium-engine or the native WebView adapters.
+      instructions: crates/drift-engine or the native WebView adapters.
     - label: "area: blocker"
       instructions: Content blocking and filter lists.
     - label: "area: extensions"

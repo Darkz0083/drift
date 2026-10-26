@@ -7,13 +7,13 @@ publish = false
 
 [features]
 default = []
-blocker-seed-runtime = ["dep:zephium-blocker", "zephium-blocker/runtime"]
-blocker-seed-webkit = ["dep:zephium-blocker", "zephium-blocker/webkit"]
+blocker-seed-runtime = ["dep:drift-blocker", "drift-blocker/runtime"]
+blocker-seed-webkit = ["dep:drift-blocker", "drift-blocker/webkit"]
 
 [dependencies]
 base64.workspace = true
-zephium-core.workspace = true
-zephium-blocker = { workspace = true, optional = true }
+drift-core.workspace = true
+drift-blocker = { workspace = true, optional = true }
 flate2 = { version = "=1.1.9", default-features = false, features = ["rust_backend"] }
 serde.workspace = true
 serde_json.workspace = true

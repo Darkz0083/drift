@@ -7,8 +7,8 @@ private let maximumArtifactBytes: Int64 = 32 * 1024 * 1024
 private let nativeDeadlineSeconds: TimeInterval = 170
 private let productionColdCompileBudgetSeconds: TimeInterval = 15
 private let duplicateCallbackDrainSeconds: TimeInterval = 0.25
-private let identifierPrefix = "app.zephium.rules.v1."
-private let artifactDigestDomain = Data("zephium-webkit-content-rules".utf8)
+private let identifierPrefix = "app.drift.rules.v1."
+private let artifactDigestDomain = Data("drift-webkit-content-rules".utf8)
 private let artifactFormatVersion: UInt32 = 4
 private let expectedReleaseArtifactDigest =
     "b0e7d8af3782731f328a97ea4a5b77034bd32f200c3e1632f5d85c316f6d5621"
@@ -100,7 +100,7 @@ private func readExactRegularArtifact(at path: String) throws -> Data {
 
 private func isolatedCacheDirectory() throws -> URL {
     let parent = FileManager.default.temporaryDirectory.path
-    var template = Array("\(parent)/zephium-wk-rule-probe.XXXXXX".utf8CString)
+    var template = Array("\(parent)/drift-wk-rule-probe.XXXXXX".utf8CString)
     let path = template.withUnsafeMutableBufferPointer { buffer -> String? in
         guard let baseAddress = buffer.baseAddress, mkdtemp(baseAddress) != nil else {
             return nil

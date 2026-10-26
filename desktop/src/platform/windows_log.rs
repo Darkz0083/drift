@@ -3,8 +3,8 @@ use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime};
 
-const ACTIVE_LOG_NAME: &str = "zephium.log";
-const LOG_LOCK_NAME: &str = ".zephium-log.lock";
+const ACTIVE_LOG_NAME: &str = "drift.log";
+const LOG_LOCK_NAME: &str = ".drift-log.lock";
 
 #[derive(Clone, Copy)]
 struct LogPolicy {
@@ -140,7 +140,7 @@ impl RotatingLog {
 }
 
 fn archive_path(directory: &Path, index: usize) -> PathBuf {
-    directory.join(format!("zephium.{index}.log"))
+    directory.join(format!("drift.{index}.log"))
 }
 
 fn is_reparse_point(metadata: &Metadata) -> bool {
@@ -431,13 +431,13 @@ pub fn redirect_stderr(dir: &Path) {
     let write_pipe = unsafe { File::from_raw_handle(write_handle.0) };
     let (queue, receiver) = std::sync::mpsc::sync_channel(STDERR_BUFFER_CHUNKS);
     let Ok(_writer) = std::thread::Builder::new()
-        .name("zephium-stderr-writer".to_owned())
+        .name("drift-stderr-writer".to_owned())
         .spawn(move || write_stderr(receiver, sink))
     else {
         return;
     };
     let Ok(_reader) = std::thread::Builder::new()
-        .name("zephium-stderr-reader".to_owned())
+        .name("drift-stderr-reader".to_owned())
         .spawn(move || drain_stderr(read_pipe, queue))
     else {
         return;
@@ -467,7 +467,7 @@ mod log_tests {
                 .expect("test clock follows Unix epoch")
                 .as_nanos();
             let path = std::env::temp_dir().join(format!(
-                "zephium-log-test-{}-{id}-{nonce}",
+                "drift-log-test-{}-{id}-{nonce}",
                 std::process::id()
             ));
             std::fs::create_dir(&path).expect("create isolated log test directory");

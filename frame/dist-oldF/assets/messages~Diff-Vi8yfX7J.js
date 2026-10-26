@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Added`)),n=((t,n={})=>(n.locale??e(),`Line ${t?.line}`)),r=((t={},n={})=>(n.locale??e(),`Removed`));export{n,t as r,r as t};

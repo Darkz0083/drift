@@ -19,7 +19,7 @@ async function survey(
   );
   frame.srcdoc = `<style>body{margin:0}input{width:150px;height:30px}</style>${body}<script>${privacy}${inject("semanticMediaRuntime")}
     addEventListener("load",()=>{
-      const api=globalThis.__zephiumSemanticRuntimeV1;
+      const api=globalThis.__driftSemanticRuntimeV1;
       const before=JSON.parse(api.invoke("P1:privacy"));
       ${change}
       const after=JSON.parse(api.invoke("P1:privacy"));

@@ -41,7 +41,7 @@ const defaults = {
   "performance.memory": "balanced",
   "performance.exceptions": "",
   "updates.auto-check": "true",
-  "ui.theme": "zephium",
+  "ui.theme": "drift",
   "ui.theme-custom": "",
   "ui.window-tint": "0",
   "ui.font": "system",
@@ -74,7 +74,7 @@ export const aiEnabled = () => values["ai.enabled"] !== "false";
 export type Feature = "work" | "notes" | "tasks" | "time";
 /** A feature switch: off, the feature leaves the app; its data stays. */
 export const enabled = (feature: Feature) => values[`${feature}.enabled`] !== "false";
-/** The feature a command belongs to. Mirrors `zephium_core::commands::feature_of`. */
+/** The feature a command belongs to. Mirrors `drift_core::commands::feature_of`. */
 function featureOf(command: string): Feature | "ai" | null {
   if (["work.dictate", "tool.ai", "mode.choose"].includes(command)) return "ai";
   if (command === "browser.work" || command === "mode.work" || command.startsWith("work."))
@@ -207,7 +207,7 @@ export async function set(key: PreferenceKey, next: string) {
   }
 }
 
-/** Every preference back to how Zephium ships, one validated write at a
+/** Every preference back to how Drift ships, one validated write at a
  *  time. False when any of them did not land. */
 export async function resetAll(): Promise<boolean> {
   for (const key of Object.keys(defaults) as PreferenceKey[]) {

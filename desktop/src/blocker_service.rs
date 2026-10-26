@@ -3,8 +3,8 @@
 use std::path::Path;
 use std::sync::Arc;
 
-use zephium_blocker::CompiledArtifactCacheConfig;
-use zephium_blocker_service::{
+use drift_blocker::CompiledArtifactCacheConfig;
+use drift_blocker_service::{
     EmbeddedReleaseAsset, LicensePolicy, ManagedBlocker, ReleaseCatalogSeed, UpdateLimits,
 };
 
@@ -23,7 +23,7 @@ const RELEASE_SEED_EASYPRIVACY: &[u8] =
 
 pub(crate) fn start_with_updates(
     data_dir: &Path,
-    validate: zephium_blocker_service::NativeRuleValidator,
+    validate: drift_blocker_service::NativeRuleValidator,
 ) -> std::io::Result<Arc<ManagedBlocker>> {
     let artifact_cache = CompiledArtifactCacheConfig::new(data_dir.join(COMPILED_CACHE_DIRECTORY))
         .map_err(|error| std::io::Error::other(error.to_string()))?;
@@ -80,9 +80,9 @@ mod tests {
     use super::*;
     use std::time::{Duration, Instant};
 
-    use zephium_core::blocker::{BlockerConfig, ContentPolicyGeneration};
-    use zephium_core::ids::ProfileId;
-    use zephium_core::ports::blocker::{
+    use drift_core::blocker::{BlockerConfig, ContentPolicyGeneration};
+    use drift_core::ids::ProfileId;
+    use drift_core::ports::blocker::{
         BlockerCatalog, BlockerCatalogPhase, BlockerCatalogProvenance,
         BlockerCatalogRefreshDispatch, BlockerCompileOutcome, BlockerCompiler, BlockerDispatch,
         BlockerShutdownOutcome,

@@ -31,8 +31,8 @@ const names: Record<WorkModelProvider, string> = {
   mistral: "Mistral",
   groq: "Groq",
   cerebras: "Cerebras",
-  compatible: "Custom",
-  cloud: "Zephium",
+  compatible: "Drift",
+  cloud: "Drift Cloud (retired)",
 };
 
 export function providerName(provider: WorkModelProvider): string {

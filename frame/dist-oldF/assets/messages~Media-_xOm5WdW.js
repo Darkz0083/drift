@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Recording`)),n=((t,n={})=>(n.locale??e(),`Play ${t?.title}`)),r=((t={},n={})=>(n.locale??e(),`YouTube video`));export{n,t as r,r as t};

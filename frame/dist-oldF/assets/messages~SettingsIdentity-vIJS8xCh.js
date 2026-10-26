@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t,n={})=>(n.locale??e(),`${t?.plan} plan`)),n=((t={},n={})=>(n.locale??e(),`Drift account`)),r=((t={},n={})=>(n.locale??e(),`Drift AI and your devices`)),i=((t={},n={})=>(n.locale??e(),`Your plan and devices`));export{t as i,r as n,n as r,i as t};

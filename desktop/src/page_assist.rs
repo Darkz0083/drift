@@ -1,16 +1,16 @@
 //! The assistant's commands and its one event. Admission and gating live here; the
 //! conversation, the page reads and the model loop belong to the page-assist
-//! service in `zephium-work-composition`.
+//! service in `drift-work-composition`.
 use super::*;
-use zephium_ipc::page_assist::*;
+use drift_ipc::page_assist::*;
 
 /// One change to an assistant conversation.
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, tauri_specta::Event)]
-#[tauri_specta(event_name = "zephium:page-assist-changed")]
+#[tauri_specta(event_name = "drift:page-assist-changed")]
 pub(crate) struct PageAssistChanged(pub(crate) PageAssistChangedV1);
 
 const VERSION: u16 = 2;
-const EVENT: &str = "zephium:page-assist-changed";
+const EVENT: &str = "drift:page-assist-changed";
 
 fn allowed(caller: &WebviewWindow, command: &'static str) -> bool {
     authorize(caller, CallerPolicy::Main, command)
@@ -74,12 +74,12 @@ mod product {
     use std::collections::HashMap;
     use std::sync::{Arc, Mutex, OnceLock};
     use std::time::Instant;
-    use zephium_core::ids::ProfileId;
-    use zephium_core::ports::engine::Engine as _;
-    use zephium_core::ports::store::Store as _;
-    use zephium_core::work::model::{WorkModelError, WorkModelRole};
-    use zephium_work_composition::page_assist::port::*;
-    use zephium_work_composition::page_assist::{PageAssist, Ports};
+    use drift_core::ids::ProfileId;
+    use drift_core::ports::engine::Engine as _;
+    use drift_core::ports::store::Store as _;
+    use drift_core::work::model::{WorkModelError, WorkModelRole};
+    use drift_work_composition::page_assist::port::*;
+    use drift_work_composition::page_assist::{PageAssist, Ports};
 
     static SERVICE: OnceLock<PageAssist> = OnceLock::new();
 
@@ -123,10 +123,10 @@ mod product {
     /// Follows one tab's committed address; a change is a navigation.
     fn follow(
         tabs: &mut HashMap<String, TabEntry>,
-        tab: &zephium_ipc::TabView,
+        tab: &drift_ipc::TabView,
         profile: Option<(ProfileId, bool, Option<&str>)>,
     ) -> Option<(String, Option<String>)> {
-        let viewer = tab.content != zephium_ipc::TabContentView::Web;
+        let viewer = tab.content != drift_ipc::TabContentView::Web;
         match tabs.get_mut(&tab.id) {
             Some(entry) => {
                 if let Some((profile, private, space)) = profile {
@@ -176,10 +176,10 @@ mod product {
         }
     }
 
-    pub(crate) fn observe_items(state: &zephium_ipc::ItemsState) {
+    pub(crate) fn observe_items(state: &drift_ipc::ItemsState) {
         let Some((profile, private)) = state.profile.as_ref().and_then(|profile| {
             ProfileId::parse(&profile.id)
-                .map(|id| (id, profile.kind == zephium_ipc::ProfileKindView::Incognito))
+                .map(|id| (id, profile.kind == drift_ipc::ProfileKindView::Incognito))
         }) else {
             return;
         };
@@ -222,7 +222,7 @@ mod product {
     /// A tab in another Space is never judged from this Space's list.
     fn closed_tabs(
         tabs: &HashMap<String, TabEntry>,
-        state: &zephium_ipc::ItemsState,
+        state: &drift_ipc::ItemsState,
         profile: ProfileId,
         space: Option<&str>,
     ) -> Vec<String> {
@@ -239,7 +239,7 @@ mod product {
             .collect()
     }
 
-    pub(crate) fn observe_tab(tab: &zephium_ipc::TabView) {
+    pub(crate) fn observe_tab(tab: &drift_ipc::TabView) {
         let change = with_tabs(|tabs| follow(tabs, tab, None));
         navigated(change.into_iter().collect());
     }
@@ -258,7 +258,7 @@ mod product {
         }
     }
 
-    static ENGINE: OnceLock<Arc<zephium_engine::WebviewEngine>> = OnceLock::new();
+    static ENGINE: OnceLock<Arc<drift_engine::WebviewEngine>> = OnceLock::new();
 
     /// Turns the Browse reader on or off in every view. It never runs on a
     /// bank, payment, health or government site.
@@ -266,10 +266,10 @@ mod product {
         let Some(engine) = ENGINE.get() else {
             return;
         };
-        engine.set_page_reader(on.then(|| zephium_engine::page_reader::PageReaderPolicy {
+        engine.set_page_reader(on.then(|| drift_engine::page_reader::PageReaderPolicy {
             sensitive: Arc::new(|url: &str| {
-                zephium_app::work_sites::site_of(url)
-                    .is_none_or(|site| zephium_app::work_sites::is_sensitive(&site))
+                drift_app::work_sites::site_of(url)
+                    .is_none_or(|site| drift_app::work_sites::is_sensitive(&site))
             }),
             human_input: Arc::new(|tab| {
                 if let Some(service) = service() {
@@ -287,8 +287,8 @@ mod product {
         tokio::time::timeout(READER_WAIT, receiver).await.ok()?.ok()
     }
 
-    fn read_failure(failure: zephium_engine::page_reader::PageReadFailure) -> ReadFailure {
-        use zephium_engine::page_reader::PageReadFailure as Engine;
+    fn read_failure(failure: drift_engine::page_reader::PageReadFailure) -> ReadFailure {
+        use drift_engine::page_reader::PageReadFailure as Engine;
         match failure {
             Engine::NotReady => ReadFailure::NotReady,
             Engine::PageChanged => ReadFailure::PageChanged,
@@ -296,8 +296,8 @@ mod product {
         }
     }
 
-    fn readout(read: zephium_engine::page_reader::PageReadout) -> Readout {
-        use zephium_engine::page_reader::{PageFieldKind as Field, PageRole as Engine};
+    fn readout(read: drift_engine::page_reader::PageReadout) -> Readout {
+        use drift_engine::page_reader::{PageFieldKind as Field, PageRole as Engine};
         Readout {
             epoch: read.epoch,
             read: read.read,
@@ -336,10 +336,10 @@ mod product {
         }
     }
 
-    fn outline(outline: zephium_engine::page_reader::PageOutline) -> Outline {
-        use zephium_engine::page_reader::PageOutlineKind as Engine;
-        let rgb = |color: Option<zephium_engine::page_reader::Rgb>| {
-            color.map(|zephium_engine::page_reader::Rgb(r, g, b)| Rgb(r, g, b))
+    fn outline(outline: drift_engine::page_reader::PageOutline) -> Outline {
+        use drift_engine::page_reader::PageOutlineKind as Engine;
+        let rgb = |color: Option<drift_engine::page_reader::Rgb>| {
+            color.map(|drift_engine::page_reader::Rgb(r, g, b)| Rgb(r, g, b))
         };
         Outline::admit(Outline {
             nodes: outline
@@ -380,19 +380,19 @@ mod product {
         tab: &str,
         epoch: u64,
         step: &StepRequest,
-    ) -> Result<zephium_work_composition::page_assist::steps::PlannedStep, StepFailure> {
-        let item = zephium_core::ids::ItemId::parse(tab).ok_or(StepFailure::Refused)?;
-        if zephium_engine::page_reader::committed_epoch(item) != Some(epoch) {
+    ) -> Result<drift_work_composition::page_assist::steps::PlannedStep, StepFailure> {
+        let item = drift_core::ids::ItemId::parse(tab).ok_or(StepFailure::Refused)?;
+        if drift_engine::page_reader::committed_epoch(item) != Some(epoch) {
             return Err(StepFailure::PageChanged);
         }
-        let read = zephium_engine::page_reader::planned_read(item, step.read)
+        let read = drift_engine::page_reader::planned_read(item, step.read)
             .filter(|read| read.epoch() == epoch)
             .ok_or(StepFailure::PageChanged)?;
         let target = match step.target {
             Some(passage) => Some(read.reference(passage).ok_or(StepFailure::Unsuitable)?),
             None => None,
         };
-        zephium_work_composition::page_assist::steps::plan(
+        drift_work_composition::page_assist::steps::plan(
             read.observation(),
             read.frame(),
             target,
@@ -402,7 +402,7 @@ mod product {
 
     /// The live tab, read through the engine's Browse reader.
     struct DesktopPage {
-        engine: Arc<zephium_engine::WebviewEngine>,
+        engine: Arc<drift_engine::WebviewEngine>,
     }
 
     impl PagePort for DesktopPage {
@@ -410,12 +410,12 @@ mod product {
             cfg!(any(target_os = "macos", target_os = "windows"))
         }
         fn facts(&self, tab: &str) -> Option<TabFacts> {
-            let item = zephium_core::ids::ItemId::parse(tab);
-            let committed = item.and_then(zephium_engine::page_reader::committed_epoch);
+            let item = drift_core::ids::ItemId::parse(tab);
+            let committed = item.and_then(drift_engine::page_reader::committed_epoch);
             // A document that predates the reader (it was switched on after
             // the page loaded) reads as loading until its next navigation.
             let unread = committed.is_some()
-                && item.is_some_and(|item| !zephium_engine::page_reader::readable(item));
+                && item.is_some_and(|item| !drift_engine::page_reader::readable(item));
             with_tabs(|tabs| {
                 tabs.get(tab).map(|entry| TabFacts {
                     profile: entry.profile,
@@ -435,7 +435,7 @@ mod product {
             epoch: u64,
         ) -> BoxFuture<'a, Result<Readout, ReadFailure>> {
             Box::pin(async move {
-                let item = zephium_core::ids::ItemId::parse(tab).ok_or(ReadFailure::Unavailable)?;
+                let item = drift_core::ids::ItemId::parse(tab).ok_or(ReadFailure::Unavailable)?;
                 let (sender, receiver) = tokio::sync::oneshot::channel();
                 self.engine.page_read(item, epoch, move |result| {
                     let _ = sender.send(result);
@@ -453,7 +453,7 @@ mod product {
             epoch: u64,
         ) -> BoxFuture<'a, Result<Outline, ReadFailure>> {
             Box::pin(async move {
-                let item = zephium_core::ids::ItemId::parse(tab).ok_or(ReadFailure::Unavailable)?;
+                let item = drift_core::ids::ItemId::parse(tab).ok_or(ReadFailure::Unavailable)?;
                 let (sender, receiver) = tokio::sync::oneshot::channel();
                 self.engine.page_outline(item, epoch, move |result| {
                     let _ = sender.send(result);
@@ -467,7 +467,7 @@ mod product {
         }
         fn selection<'a>(&'a self, tab: &'a str, epoch: u64) -> BoxFuture<'a, Option<String>> {
             Box::pin(async move {
-                let item = zephium_core::ids::ItemId::parse(tab)?;
+                let item = drift_core::ids::ItemId::parse(tab)?;
                 let (sender, receiver) = tokio::sync::oneshot::channel();
                 self.engine.page_selection(item, epoch, move |selection| {
                     let _ = sender.send(selection);
@@ -476,11 +476,11 @@ mod product {
             })
         }
         fn highlight(&self, tab: &str, epoch: u64, text: &str) -> bool {
-            let Some(item) = zephium_core::ids::ItemId::parse(tab) else {
+            let Some(item) = drift_core::ids::ItemId::parse(tab) else {
                 return false;
             };
-            if zephium_engine::page_reader::committed_epoch(item) != Some(epoch)
-                || !zephium_engine::page_reader::readable(item)
+            if drift_engine::page_reader::committed_epoch(item) != Some(epoch)
+                || !drift_engine::page_reader::readable(item)
             {
                 return false;
             }
@@ -503,14 +503,14 @@ mod product {
             step: &'a StepRequest,
         ) -> BoxFuture<'a, Result<(), StepFailure>> {
             Box::pin(async move {
-                let item = zephium_core::ids::ItemId::parse(tab).ok_or(StepFailure::Refused)?;
+                let item = drift_core::ids::ItemId::parse(tab).ok_or(StepFailure::Refused)?;
                 let planned = plan_step(tab, epoch, step)?;
                 let (sender, receiver) = tokio::sync::oneshot::channel();
                 self.engine
                     .page_act(item, epoch, step.read, planned.proposal, move |result| {
                         let _ = sender.send(result);
                     });
-                use zephium_engine::page_reader::PageActFailure as Engine;
+                use drift_engine::page_reader::PageActFailure as Engine;
                 match reader_answer(receiver).await {
                     Some(Ok(())) => Ok(()),
                     Some(Err(Engine::PageChanged)) => Err(StepFailure::PageChanged),
@@ -532,12 +532,12 @@ mod product {
             marks: Vec<(u8, u16)>,
         ) -> BoxFuture<'a, Vec<u8>> {
             Box::pin(async move {
-                let Some(item) = zephium_core::ids::ItemId::parse(tab) else {
+                let Some(item) = drift_core::ids::ItemId::parse(tab) else {
                     return Vec::new();
                 };
                 let marks = marks
                     .into_iter()
-                    .map(|(n, passage)| zephium_engine::page_reader::PageMark { n, passage })
+                    .map(|(n, passage)| drift_engine::page_reader::PageMark { n, passage })
                     .collect();
                 let (sender, receiver) = tokio::sync::oneshot::channel();
                 self.engine
@@ -548,12 +548,12 @@ mod product {
             })
         }
         fn mark_focus(&self, tab: &str, epoch: u64, n: Option<u8>, scroll: bool) {
-            if let Some(item) = zephium_core::ids::ItemId::parse(tab) {
+            if let Some(item) = drift_core::ids::ItemId::parse(tab) {
                 self.engine.page_mark_focus(item, epoch, n, scroll);
             }
         }
         fn marks_clear(&self, tab: &str) {
-            if let Some(item) = zephium_core::ids::ItemId::parse(tab) {
+            if let Some(item) = drift_core::ids::ItemId::parse(tab) {
                 self.engine.page_marks_clear(item);
             }
         }
@@ -563,13 +563,13 @@ mod product {
             epoch: u64,
         ) -> BoxFuture<'a, Result<Pick, PickFailure>> {
             Box::pin(async move {
-                let item = zephium_core::ids::ItemId::parse(tab).ok_or(PickFailure::Unavailable)?;
+                let item = drift_core::ids::ItemId::parse(tab).ok_or(PickFailure::Unavailable)?;
                 let (sender, receiver) = tokio::sync::oneshot::channel();
                 self.engine
                     .page_pick(item, epoch, reduce_motion(), move |result| {
                         let _ = sender.send(result);
                     });
-                use zephium_engine::page_reader::PagePickFailure as Engine;
+                use drift_engine::page_reader::PagePickFailure as Engine;
                 match tokio::time::timeout(PICK_WAIT, receiver).await {
                     Ok(Ok(Ok(pick))) => Ok(picked(pick)),
                     Ok(Ok(Err(Engine::Cancelled))) => Err(PickFailure::Cancelled),
@@ -589,7 +589,7 @@ mod product {
             pick: u64,
         ) -> BoxFuture<'a, Option<Pick>> {
             Box::pin(async move {
-                let item = zephium_core::ids::ItemId::parse(tab)?;
+                let item = drift_core::ids::ItemId::parse(tab)?;
                 let (sender, receiver) = tokio::sync::oneshot::channel();
                 self.engine.page_pick_read(item, epoch, pick, move |found| {
                     let _ = sender.send(found);
@@ -598,18 +598,18 @@ mod product {
             })
         }
         fn pick_clear(&self, tab: &str, pick: u64) {
-            if let Some(item) = zephium_core::ids::ItemId::parse(tab) {
+            if let Some(item) = drift_core::ids::ItemId::parse(tab) {
                 self.engine.page_pick_clear(item, pick);
             }
         }
         fn pick_cancel(&self, tab: &str) {
-            if let Some(item) = zephium_core::ids::ItemId::parse(tab) {
+            if let Some(item) = drift_core::ids::ItemId::parse(tab) {
                 self.engine.page_pick_cancel(item);
             }
         }
         fn glow(&self, tab: &str, glow: Glow) {
-            use zephium_engine::page_reader::PageGlow;
-            if let Some(item) = zephium_core::ids::ItemId::parse(tab) {
+            use drift_engine::page_reader::PageGlow;
+            if let Some(item) = drift_core::ids::ItemId::parse(tab) {
                 let glow = match glow {
                     Glow::Off => PageGlow::Off,
                     Glow::Working => PageGlow::Working,
@@ -635,7 +635,7 @@ mod product {
         REDUCE_MOTION.load(std::sync::atomic::Ordering::Relaxed)
     }
 
-    fn picked(pick: zephium_engine::page_reader::PagePick) -> Pick {
+    fn picked(pick: drift_engine::page_reader::PagePick) -> Pick {
         Pick {
             pick: pick.pick,
             label: pick.label,
@@ -649,30 +649,30 @@ mod product {
     impl ModelSource for Models {
         fn entry<'a>(&'a self, profile: &'a ProfileId) -> BoxFuture<'a, Option<ModelChoice>> {
             Box::pin(async move {
-                let (entry, _) = zephium_app::work_models::resolve_entry_for(
+                let (entry, _) = drift_app::work_models::resolve_entry_for(
                     *profile,
                     WorkModelRole::Page,
                     None,
                 )
                 .await
                 .ok()?;
-                let effort = zephium_app::work_models::lead_effort(*profile, &entry);
+                let effort = drift_app::work_models::lead_effort(*profile, &entry);
                 Some(ModelChoice { entry, effort })
             })
         }
         fn resolve<'a>(
             &'a self,
             profile: &'a ProfileId,
-            source: zephium_app::work_models::WorkCallSource,
+            source: drift_app::work_models::WorkCallSource,
         ) -> BoxFuture<'a, Result<ResolvedModel, WorkModelError>> {
             Box::pin(async move {
-                let (entry, client) = zephium_app::work_models::resolve_entry_for(
+                let (entry, client) = drift_app::work_models::resolve_entry_for(
                     *profile,
                     WorkModelRole::Page,
                     Some(source),
                 )
                 .await?;
-                let effort = zephium_app::work_models::lead_effort(*profile, &entry);
+                let effort = drift_app::work_models::lead_effort(*profile, &entry);
                 Ok(ResolvedModel {
                     entry,
                     effort,
@@ -763,7 +763,7 @@ mod product {
         ) -> BoxFuture<'a, Vec<PageAssistBringV1>> {
             Box::pin(async move {
                 let mut brings = Vec::new();
-                let handle = self.0.state::<zephium_app::Handle>();
+                let handle = self.0.state::<drift_app::Handle>();
                 if let Some(words) = request.task.as_deref() {
                     if let Ok(Some(task)) =
                         tokio::time::timeout(LOOKUP_WAIT, handle.find_task(*profile, words)).await
@@ -860,7 +860,7 @@ mod product {
     }
 
     /// The Space's tabs and new background tabs, through the shell.
-    struct DesktopTabs(tauri::AppHandle, Arc<zephium_store::SqliteStore>);
+    struct DesktopTabs(tauri::AppHandle, Arc<drift_store::SqliteStore>);
 
     impl Tabs for DesktopTabs {
         fn navigate(&self, profile: &ProfileId, tab: &str, url: &str) -> bool {
@@ -868,14 +868,14 @@ mod product {
                 tabs.get(tab)
                     .is_some_and(|entry| entry.profile == *profile && !entry.private)
             });
-            let Some(id) = zephium_core::ids::ItemId::parse(tab).filter(|_| owned) else {
+            let Some(id) = drift_core::ids::ItemId::parse(tab).filter(|_| owned) else {
                 return false;
             };
-            zephium_core::navigation::classify(url).is_some()
+            drift_core::navigation::classify(url).is_some()
                 && self
                     .0
-                    .state::<zephium_app::Handle>()
-                    .dispatch(zephium_app::Command::Navigate {
+                    .state::<drift_app::Handle>()
+                    .dispatch(drift_app::Command::Navigate {
                         id,
                         input: url.to_owned(),
                     })
@@ -885,12 +885,12 @@ mod product {
                 .1
                 .app_setting("search.engine")
                 .as_deref()
-                .and_then(zephium_core::search::SearchEngine::from_id)
+                .and_then(drift_core::search::SearchEngine::from_id)
                 .unwrap_or_default();
             let template = self.1.app_setting("search.custom-url").unwrap_or_default();
             engine
                 .configured_search(query, &template)
-                .or_else(|| zephium_core::search::SearchEngine::default().search(query))
+                .or_else(|| drift_core::search::SearchEngine::default().search(query))
                 .map(String::from)
         }
         fn profile(&self, space: &str) -> Option<ProfileId> {
@@ -927,9 +927,9 @@ mod product {
             focus: bool,
         ) -> BoxFuture<'a, Option<String>> {
             Box::pin(async move {
-                let space = zephium_core::ids::SpaceId::parse(space)?;
-                let after = after.and_then(zephium_core::ids::ItemId::parse);
-                let handle = self.0.state::<zephium_app::Handle>();
+                let space = drift_core::ids::SpaceId::parse(space)?;
+                let after = after.and_then(drift_core::ids::ItemId::parse);
+                let handle = self.0.state::<drift_app::Handle>();
                 tokio::time::timeout(
                     LOOKUP_WAIT,
                     handle.open_tab(*profile, space, after, url.to_owned(), focus),
@@ -943,7 +943,7 @@ mod product {
     }
 
     /// Conversations in the profile's store.
-    struct Chats(Arc<zephium_store::SqliteStore>);
+    struct Chats(Arc<drift_store::SqliteStore>);
 
     impl ConversationStore for Chats {
         fn list(&self, profile: &ProfileId, limit: u32) -> Vec<StoredConversation> {
@@ -978,7 +978,7 @@ mod product {
 
     /// Page styles in app settings, one key per profile and site, so no
     /// value outgrows the settings row.
-    struct SettingStyles(Arc<zephium_store::SqliteStore>);
+    struct SettingStyles(Arc<drift_store::SqliteStore>);
     /// The settings store takes values up to 64 KiB; stay clear of it.
     const MAX_SETTING_BYTES: usize = 60 * 1024;
 
@@ -1016,7 +1016,7 @@ mod product {
                 for row in rows {
                     // Stored CSS passes the validator again before it is used.
                     let Ok(valid) =
-                        zephium_work_composition::page_assist::core::css::validate(&row.css)
+                        drift_work_composition::page_assist::core::css::validate(&row.css)
                     else {
                         continue;
                     };
@@ -1082,11 +1082,11 @@ mod product {
 
     pub(crate) fn install(
         app: &tauri::AppHandle,
-        engine: Arc<zephium_engine::WebviewEngine>,
-        store: Arc<zephium_store::SqliteStore>,
+        engine: Arc<drift_engine::WebviewEngine>,
+        store: Arc<drift_store::SqliteStore>,
     ) {
         let _ = ENGINE.set(engine.clone());
-        zephium_engine::page_reader::set_diagnostics(super::work_provider::record_diagnostic);
+        drift_engine::page_reader::set_diagnostics(super::work_provider::record_diagnostic);
         reader_switch(
             app.try_state::<keymap::Keymap>()
                 .is_some_and(|keymap| keymap.ai_enabled()),
@@ -1140,7 +1140,7 @@ mod product {
             return;
         };
         if let Some(credits) =
-            zephium_work_composition::page_assist::core::cost::credits(charged, per)
+            drift_work_composition::page_assist::core::cost::credits(charged, per)
         {
             service.settle_hosted(&entry.1, entry.2, credits);
         }
@@ -1153,9 +1153,9 @@ pub(crate) use product::{
 };
 
 #[cfg(not(feature = "work-product"))]
-pub(crate) fn observe_items(_state: &zephium_ipc::ItemsState) {}
+pub(crate) fn observe_items(_state: &drift_ipc::ItemsState) {}
 #[cfg(not(feature = "work-product"))]
-pub(crate) fn observe_tab(_tab: &zephium_ipc::TabView) {}
+pub(crate) fn observe_tab(_tab: &drift_ipc::TabView) {}
 #[cfg(not(feature = "work-product"))]
 pub(crate) fn preference_changed(_key: &str, _value: &str) {}
 
@@ -1485,8 +1485,8 @@ pub(crate) async fn page_style_remove(
 }
 
 #[cfg(feature = "work-product")]
-fn profile_of(profile: &str) -> Option<zephium_core::ids::ProfileId> {
-    zephium_core::ids::ProfileId::parse(profile).filter(|id| id.to_string() == profile)
+fn profile_of(profile: &str) -> Option<drift_core::ids::ProfileId> {
+    drift_core::ids::ProfileId::parse(profile).filter(|id| id.to_string() == profile)
 }
 
 /// Every site's page styles in `profile`, for Settings.
@@ -1566,16 +1566,16 @@ mod tests {
 mod handoff {
     use super::*;
     use std::time::Duration;
-    use zephium_core::ids::{ItemId, ProfileId, SpaceId};
-    use zephium_core::work::authoring::WorkAuthoringIntent;
-    use zephium_core::work::context::{WorkContextSelectionItem, WorkContextSelectionV1};
-    use zephium_core::work::environment::{
+    use drift_core::ids::{ItemId, ProfileId, SpaceId};
+    use drift_core::work::authoring::WorkAuthoringIntent;
+    use drift_core::work::context::{WorkContextSelectionItem, WorkContextSelectionV1};
+    use drift_core::work::environment::{
         WorkEnvironmentCall, WorkEnvironmentEdit, WorkEnvironmentIntent, WorkEnvironmentReference,
         WorkEnvironmentReply, WorkEnvironmentSnapshot,
     };
-    use zephium_core::work::runtime::WorkRuntimeIntent;
-    use zephium_core::work::{WorkCommandId, WorkError};
-    use zephium_ipc::work::{
+    use drift_core::work::runtime::WorkRuntimeIntent;
+    use drift_core::work::{WorkCommandId, WorkError};
+    use drift_ipc::work::{
         WorkAuthoringCommandV1, WorkCallV1, WorkCommandV1, WorkOperationStateV1, WorkOperationV1,
         WorkReplyV1,
     };
@@ -1589,7 +1589,7 @@ mod handoff {
         call: WorkCallV1,
     ) -> Result<WorkReplyV1, WorkError> {
         let request = app
-            .state::<zephium_app::Handle>()
+            .state::<drift_app::Handle>()
             .work_call(profile, call)?;
         let response = tokio::time::timeout(TIMEOUT, request.response(profile))
             .await
@@ -1662,13 +1662,13 @@ mod handoff {
         app: &tauri::AppHandle,
         profile: ProfileId,
         space: &str,
-        start: &zephium_work_composition::page_assist::port::WorkStart,
+        start: &drift_work_composition::page_assist::port::WorkStart,
         tabs: &[(String, String)],
     ) -> Result<String, WorkError> {
         let space = SpaceId::parse(space).ok_or(WorkError::Invalid)?;
         let intent = begin_agent()?;
-        let title = zephium_work_composition::page_assist::core::text::bounded(
-            &zephium_work_composition::page_assist::core::text::clean(&start.title),
+        let title = drift_work_composition::page_assist::core::text::bounded(
+            &drift_work_composition::page_assist::core::text::clean(&start.title),
             MAX_TITLE_CHARS,
         );
         let mut snapshot = applied(

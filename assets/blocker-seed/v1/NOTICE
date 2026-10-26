@@ -1,7 +1,7 @@
-Zephium bundled blocker seed v1
+Drift bundled blocker seed v1
 
 This directory contains unmodified EasyList and EasyPrivacy subscription text.
-Zephium changes only the storage representation by applying deterministic gzip
+Drift changes only the storage representation by applying deterministic gzip
 compression; the decompressed source bytes are unchanged.
 
 Attribution: The EasyList authors (https://easylist.to/)
@@ -21,6 +21,6 @@ Version: 202610241529
 Commit: 4b693bf35311df7e750ee51884f620b29d480bcb
 Raw SHA-256: 8d388336752840d9bad9b843a3f93b07850c48b61bc815c149d4729de605ec8b
 
-The upstream authors do not endorse Zephium. Release engineering must regenerate
+The upstream authors do not endorse Drift. Release engineering must regenerate
 and verify this record with `cargo xtask update-blocker-seed` whenever either
 subscription changes.

@@ -16,7 +16,7 @@ use objc2_app_kit::{
 };
 use objc2_foundation::{NSPoint, NSRect, NSSize};
 use objc2_quartz_core::CAMediaTimingFunction;
-use zephium_ipc::{PanelLayout, PanelRect};
+use drift_ipc::{PanelLayout, PanelRect};
 
 use crate::material::Material;
 

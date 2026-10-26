@@ -1,9 +1,9 @@
 import type { AccountFaultV1, AccountSignupModeV1 } from "$shared/ipc/bindings";
 import * as m from "$shared/i18n/messages";
 
-export const TERMS_URL = "https://zephium.app/terms";
-export const PRIVACY_URL = "https://zephium.app/privacy";
-export const SUPPORT_MAIL = "mailto:support@zephium.app";
+export const TERMS_URL = "https://drift.app/terms";
+export const PRIVACY_URL = "https://drift.app/privacy";
+export const SUPPORT_MAIL = "mailto:support@drift.app";
 
 /** What a fault means to the person, in one sentence. */
 export function explainAccountFault(

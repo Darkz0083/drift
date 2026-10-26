@@ -18,29 +18,29 @@ use std::{
     time::{Duration, Instant},
 };
 use tauri::Manager;
-use zephium_agent_controller::{
+use drift_agent_controller::{
     AgentBrowserModel, AgentWorkAccountSource, AgentWorkEventKind, AgentWorkFailure,
     AgentWorkLocalActionPolicy,
 };
-use zephium_agent_provider_transport::{
+use drift_agent_provider_transport::{
     load_macos_probe_openai_credential, AgentProviderTransportConfig,
 };
-use zephium_agent_runtime::AgentRuntimeConfig;
-use zephium_agentic::*;
-use zephium_app::{
+use drift_agent_runtime::AgentRuntimeConfig;
+use drift_agentic::*;
+use drift_app::{
     AgentWorkApplicationConfig, AgentWorkProfileBinding, AgentWorkProfileReadiness,
     AgentWorkProfileRequest, RetainedWorkHandle, RetainedWorkPhase,
 };
-use zephium_work_composition::{
+use drift_work_composition::{
     PublicLocalActionWorkInvocation, PublicReadWorkAccount, PublicReadWorkInvocation,
     PublicReadWorkObjective, PublicReadWorkSettings,
 };
 
 const CONFIG_BYTES: u64 = 32 * 1024;
 const OUTPUT_BYTES: usize = 64 * 1024;
-const CONFIG_ENV: &str = "ZEPHIUM_WORK_REQUEST";
+const CONFIG_ENV: &str = "DRIFT_WORK_REQUEST";
 const FOREGROUND_GRACE: Duration = Duration::from_secs(10);
-const REVIEW_ENV: &str = "ZEPHIUM_WORK_REVIEW";
+const REVIEW_ENV: &str = "DRIFT_WORK_REVIEW";
 const REVIEW_BYTES: u64 = 1024;
 
 #[derive(Deserialize)]
@@ -59,7 +59,7 @@ enum ReviewDecision {
 
 fn parse_review(
     bytes: &[u8],
-) -> Result<(AgentWorkRecord, zephium_app::AgentWorkReviewDecision), &'static str> {
+) -> Result<(AgentWorkRecord, drift_app::AgentWorkReviewDecision), &'static str> {
     if bytes.len() as u64 > REVIEW_BYTES {
         return Err("review exceeds byte limit");
     }
@@ -80,9 +80,9 @@ fn parse_review(
         record,
         match request.decision {
             ReviewDecision::AcceptFreshAdmission => {
-                zephium_app::AgentWorkReviewDecision::AcceptFreshAdmission
+                drift_app::AgentWorkReviewDecision::AcceptFreshAdmission
             }
-            ReviewDecision::Reject => zephium_app::AgentWorkReviewDecision::Reject,
+            ReviewDecision::Reject => drift_app::AgentWorkReviewDecision::Reject,
         },
     ))
 }
@@ -286,7 +286,7 @@ struct Run {
     output_tokens: u64,
     cost_micro_usd: u64,
     #[cfg(feature = "macos-work-lifetime-diagnostic")]
-    resource_failure_cause: Option<zephium_engine::WorkResourceFailureCause>,
+    resource_failure_cause: Option<drift_engine::WorkResourceFailureCause>,
 }
 
 enum PreparedInvocation {
@@ -304,7 +304,7 @@ struct DevelopmentAccountSource {
 impl AgentWorkAccountSource for DevelopmentAccountSource {
     fn sample(&self, context: ContextJoin) -> Result<AgentContextAccountBinding, AgentWorkFailure> {
         let observed_at =
-            zephium_engine::work_browser_monotonic_now().ok_or(AgentWorkFailure::Contract)?;
+            drift_engine::work_browser_monotonic_now().ok_or(AgentWorkFailure::Contract)?;
         Ok(AgentContextAccountBinding::new(
             AgentAccountAttestationId::generate(),
             context,
@@ -937,7 +937,7 @@ impl Run {
                         self.next_profile_poll = Instant::now() + FOREGROUND_GRACE;
                         emit(json!({
                             "work_development":"prepared",
-                            "next":"focus_zephium",
+                            "next":"focus_drift",
                             "grace_millis":FOREGROUND_GRACE.as_millis()
                         }));
                         return Ok(());
@@ -1000,7 +1000,7 @@ impl Run {
         }
         let view = self.view.as_ref().ok_or("missing Work handle")?;
         let mut drained = 0;
-        for _ in 0..zephium_agent_controller::MAX_AGENT_WORK_EVENTS {
+        for _ in 0..drift_agent_controller::MAX_AGENT_WORK_EVENTS {
             let Some(event) = view.take_event() else {
                 break;
             };
@@ -1072,7 +1072,7 @@ impl Run {
         if matches!(
             snapshot.phase,
             RetainedWorkPhase::Terminal | RetainedWorkPhase::Refused | RetainedWorkPhase::Uncertain
-        ) && drained < zephium_agent_controller::MAX_AGENT_WORK_EVENTS
+        ) && drained < drift_agent_controller::MAX_AGENT_WORK_EVENTS
         {
             #[cfg(feature = "macos-work-lifetime-diagnostic")]
             emit(json!({
@@ -1231,9 +1231,9 @@ mod tests {
         )
         .unwrap();
         let nodes = if duplicate_result {
-            r#"[{"k":1,"r":"document","o":16},{"k":2,"p":0,"r":"dialog","n":"Search Notion"},{"k":3,"p":1,"r":"combobox","n":"Search","o":2,"v":{"k":"text","value":"Zephium Agent Qualification"}},{"k":4,"p":1,"r":"option","n":"Zephium Agent Qualification Current Page 3nigma • Edited 20h ago","o":5},{"k":5,"p":1,"r":"option","n":"Zephium Agent Qualification Current Page duplicate","o":5},{"k":6,"p":0,"r":"button","n":"Zephium Agent Qualification","o":1}]"#
+            r#"[{"k":1,"r":"document","o":16},{"k":2,"p":0,"r":"dialog","n":"Search Notion"},{"k":3,"p":1,"r":"combobox","n":"Search","o":2,"v":{"k":"text","value":"Drift Agent Qualification"}},{"k":4,"p":1,"r":"option","n":"Drift Agent Qualification Current Page 3nigma • Edited 20h ago","o":5},{"k":5,"p":1,"r":"option","n":"Drift Agent Qualification Current Page duplicate","o":5},{"k":6,"p":0,"r":"button","n":"Drift Agent Qualification","o":1}]"#
         } else {
-            r#"[{"k":1,"r":"document","o":16},{"k":2,"p":0,"r":"dialog","n":"Search Notion"},{"k":3,"p":1,"r":"combobox","n":"Search","o":2,"v":{"k":"text","value":"Zephium Agent Qualification"}},{"k":4,"p":1,"r":"option","n":"Zephium Agent Qualification Current Page 3nigma • Edited 20h ago","o":5},{"k":5,"p":0,"r":"button","n":"Zephium Agent Qualification","o":1}]"#
+            r#"[{"k":1,"r":"document","o":16},{"k":2,"p":0,"r":"dialog","n":"Search Notion"},{"k":3,"p":1,"r":"combobox","n":"Search","o":2,"v":{"k":"text","value":"Drift Agent Qualification"}},{"k":4,"p":1,"r":"option","n":"Drift Agent Qualification Current Page 3nigma • Edited 20h ago","o":5},{"k":5,"p":0,"r":"button","n":"Drift Agent Qualification","o":1}]"#
         };
         let wire = format!(r#"{{"v":1,"i":1,"g":1,"c":"complete","n":{nodes}}}"#);
         let snapshot = decode_semantic_snapshot(
@@ -1310,7 +1310,7 @@ mod tests {
                 }],
                 fills: vec![FillApproval {
                     target_name: "Search".into(),
-                    value: "Zephium Agent Qualification".into(),
+                    value: "Drift Agent Qualification".into(),
                 }],
             },
         )
@@ -1386,7 +1386,7 @@ mod tests {
                 }],
                 fills: vec![FillApproval {
                     target_name: "Search".into(),
-                    value: "Zephium Agent Qualification".into(),
+                    value: "Drift Agent Qualification".into(),
                 }],
             },
         )
@@ -1445,7 +1445,7 @@ mod tests {
                     ClickApproval {
                         target_name: None,
                         target_name_prefix: Some(
-                            "Zephium Agent Qualification Current Page ".into(),
+                            "Drift Agent Qualification Current Page ".into(),
                         ),
                         target_role: Some(ClickTargetRole::Option),
                         effect: ClickEffect::Read,
@@ -1454,7 +1454,7 @@ mod tests {
                 ],
                 fills: vec![FillApproval {
                     target_name: "Search".into(),
-                    value: "Zephium Agent Qualification".into(),
+                    value: "Drift Agent Qualification".into(),
                 }],
             },
         )
@@ -1507,7 +1507,7 @@ mod tests {
                     ClickApproval {
                         target_name: None,
                         target_name_prefix: Some(
-                            "Zephium Agent Qualification Current Page ".into(),
+                            "Drift Agent Qualification Current Page ".into(),
                         ),
                         target_role: Some(ClickTargetRole::Option),
                         effect: ClickEffect::Read,
@@ -1516,7 +1516,7 @@ mod tests {
                 ],
                 fills: vec![FillApproval {
                     target_name: "Search".into(),
-                    value: "Zephium Agent Qualification".into(),
+                    value: "Drift Agent Qualification".into(),
                 }],
             },
         )

@@ -1,9 +1,9 @@
 //! Settings and the canvas over what the agent remembers about the person and
 //! the skills it follows.
 use super::*;
-use zephium_core::ids::ProfileId;
-use zephium_core::work::WorkError;
-use zephium_ipc::work::{
+use drift_core::ids::ProfileId;
+use drift_core::work::WorkError;
+use drift_ipc::work::{
     WorkMemoryChangeV1, WorkMemoryQueryV1, WorkMemoryRefusalV1, WorkMemoryResponseV1,
     WorkSkillChangeV1, WorkSkillFaultV1, WorkSkillsResponseV1,
 };
@@ -39,9 +39,9 @@ async fn memories(
         let profile = admitted(&caller, &app, &expected_profile, "work_memories")?;
         #[cfg(feature = "work-product")]
         {
-            use zephium_app::work_personal as personal;
-            use zephium_core::work::personal::{check_memory, WorkMemoryFault};
-            let shell = app.state::<zephium_app::Handle>();
+            use drift_app::work_personal as personal;
+            use drift_core::work::personal::{check_memory, WorkMemoryFault};
+            let shell = app.state::<drift_app::Handle>();
             let text = match &change {
                 Some(
                     WorkMemoryChangeV1::Add { text, .. } | WorkMemoryChangeV1::Edit { text, .. },
@@ -120,9 +120,9 @@ pub(crate) async fn work_change_memory(
 }
 
 #[cfg(feature = "work-product")]
-fn row(row: zephium_app::work_personal::skills::SkillRow) -> zephium_ipc::work::WorkSkillRowV1 {
-    use zephium_core::work::model::WorkModelRole;
-    zephium_ipc::work::WorkSkillRowV1 {
+fn row(row: drift_app::work_personal::skills::SkillRow) -> drift_ipc::work::WorkSkillRowV1 {
+    use drift_core::work::model::WorkModelRole;
+    drift_ipc::work::WorkSkillRowV1 {
         name: row.name,
         description: row.description,
         builtin: row.builtin,
@@ -142,10 +142,10 @@ fn row(row: zephium_app::work_personal::skills::SkillRow) -> zephium_ipc::work::
 
 #[cfg(feature = "work-product")]
 fn fault(
-    fault: zephium_app::work_personal::skills::SkillChangeFault,
+    fault: drift_app::work_personal::skills::SkillChangeFault,
 ) -> Result<WorkSkillFaultV1, WorkError> {
-    use zephium_app::work_lead::skills::SkillFault;
-    use zephium_app::work_personal::skills::SkillChangeFault as Change;
+    use drift_app::work_lead::skills::SkillFault;
+    use drift_app::work_personal::skills::SkillChangeFault as Change;
     Ok(match fault {
         Change::Text(SkillFault::NoFrontmatter) => WorkSkillFaultV1::NoFrontmatter,
         Change::Text(SkillFault::Name) => WorkSkillFaultV1::Name,
@@ -175,11 +175,11 @@ async fn skills(
 ) -> WorkSkillsResponseV1 {
     let mut text = None;
     let mut refused = None;
-    let result: Result<Vec<zephium_ipc::work::WorkSkillRowV1>, WorkError> = (|| {
+    let result: Result<Vec<drift_ipc::work::WorkSkillRowV1>, WorkError> = (|| {
         let profile = admitted(&caller, &app, &expected_profile, "work_skills")?;
         #[cfg(feature = "work-product")]
         {
-            use zephium_app::work_personal::skills;
+            use drift_app::work_personal::skills;
             let outcome = match call {
                 SkillCall::List => Ok(()),
                 SkillCall::Read(name) => skills::read(profile, &name).map(|(read, _)| {

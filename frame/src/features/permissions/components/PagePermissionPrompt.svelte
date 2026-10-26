@@ -91,7 +91,7 @@
     aria-labelledby="page-permission-title"
     aria-describedby="page-permission-origin page-permission-detail"
     class="w-[min(390px,calc(100vw-32px))] rounded-panel border border-border-strong bg-raised p-4 text-start shadow-[var(--shadow-overlay)]"
-    data-zephium-page-permission-prompt
+    data-drift-page-permission-prompt
   >
     <div class="flex items-start gap-3">
       <span

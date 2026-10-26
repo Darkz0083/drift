@@ -14,6 +14,6 @@ vi.mock("$shared/ipc/bindings", async () => {
 test("with no menu bar, About names its documentation Help", async () => {
   const screen = await render(AboutLinks);
   await screen.getByRole("link", { name: "Help", exact: true }).click();
-  expect(native.open).toHaveBeenLastCalledWith("https://zephium.app/docs", true);
+  expect(native.open).toHaveBeenLastCalledWith("https://drift.app/docs", true);
   expect(screen.getByRole("link", { name: "Docs" }).query()).toBeNull();
 });

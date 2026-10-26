@@ -24,7 +24,7 @@ async function inspect(body: string, url = "https://public.test/"): Promise<[Pro
     (function(location){${inject("pixelPrivacyRuntime")}})(Object.freeze({href:${JSON.stringify(url)}}));
     ${inject("semanticMediaRuntime")}
     addEventListener("load",()=>{
-      const api=globalThis.__zephiumSemanticRuntimeV1;
+      const api=globalThis.__driftSemanticRuntimeV1;
       const before=JSON.parse(api.invoke("P1:privacy"));
       const publicProof=JSON.parse(api.invoke("P1:public"));
       const after=JSON.parse(api.invoke("P1:privacy"));

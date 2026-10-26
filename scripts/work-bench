@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Scenario bench for Work: live lead runs through the signed probe, one table.
 
-CARGO_TARGET_DIR defaults to /private/tmp/zephium-engine-target; WORK_BENCH_OUT
+CARGO_TARGET_DIR defaults to /private/tmp/drift-engine-target; WORK_BENCH_OUT
 can override its work-bench evidence folder. Exit 0 from run means operational
 completion (and applicable fixture checks), never semantic task correctness.
 
@@ -24,14 +24,14 @@ import time
 from datetime import datetime
 
 REPO = os.path.realpath(os.path.join(os.path.dirname(__file__), ".."))
-TARGET = os.path.abspath(os.path.join(REPO, os.environ.get("CARGO_TARGET_DIR", "/private/tmp/zephium-engine-target")))
+TARGET = os.path.abspath(os.path.join(REPO, os.environ.get("CARGO_TARGET_DIR", "/private/tmp/drift-engine-target")))
 PROBE = os.path.join(TARGET, "debug/macos-terra-agentic-probe")
 OUT = os.path.abspath(os.path.join(REPO, os.environ.get("WORK_BENCH_OUT", os.path.join(TARGET, "work-bench"))))
 SCHEMA = 2
-SETUP_ENV = ("ZEPHIUM_PROBE_PAGE_MODEL", "ZEPHIUM_PROBE_SEARCH_ENGINE",
-             "ZEPHIUM_PROBE_WORK_MEMORY", "ZEPHIUM_PROBE_WORK_MEMORY_CLEAR",
-             "ZEPHIUM_PROBE_PROFILE", "ZEPHIUM_PROBE_SEEDED_PROFILE")
-IDENTIFIER = "app.zephium.work-integration.probe"
+SETUP_ENV = ("DRIFT_PROBE_PAGE_MODEL", "DRIFT_PROBE_SEARCH_ENGINE",
+             "DRIFT_PROBE_WORK_MEMORY", "DRIFT_PROBE_WORK_MEMORY_CLEAR",
+             "DRIFT_PROBE_PROFILE", "DRIFT_PROBE_SEEDED_PROFILE")
+IDENTIFIER = "app.drift.work-integration.probe"
 
 # name -> (probe arguments, run by default, what it does)
 SCENARIOS = {
@@ -44,7 +44,7 @@ SCENARIOS = {
     "day": (["--loopback-site", "apps"], True, "plan the day against loopback Slack, Gmail, Calendar apps (scripted lead)"),
     "pricing": (["--live-lead", "pricing"], False, "how Linear, Height and Plane price"),
     "exam": (["--live-lead", "exam"], False, "prepare for an algorithms final (MIT 6.006)"),
-    "tasks": (["--live-lead", "day"], False, "plan the day from seeded Zephium tasks (real lead)"),
+    "tasks": (["--live-lead", "day"], False, "plan the day from seeded Drift tasks (real lead)"),
     "save": (["--live-lead", "save"], False, "save an answer in a folder the run asks for as it works"),
     "best": (["--live-lead", "best"], False, "an open request: one finished piece of real work"),
 }
@@ -98,7 +98,7 @@ def prepare_probe(directory):
 
 def build():
     env = dict(os.environ, CARGO_TARGET_DIR=TARGET)
-    if sh("cargo", "build", "-p", "zephium-terra-macos-probe", "--features", "durable-runtime", env=env).returncode:
+    if sh("cargo", "build", "-p", "drift-terra-macos-probe", "--features", "durable-runtime", env=env).returncode:
         die("probe build failed")
     print(f"Built {PROBE}; run will sign and retain a private copy.")
 
@@ -211,7 +211,7 @@ def run_one(name, logs, probe, probe_hash):
         row["fixture_verified"] = False if row["fixture_verified"] is not None else None
     row["args"] = SCENARIOS[name][0]
     source = "work_site.rs" if name == "day" else "acceptance.rs"
-    row["scenario_source"] = file_id(os.path.join(REPO, "crates/zephium-terra-macos-probe/src", source))
+    row["scenario_source"] = file_id(os.path.join(REPO, "crates/drift-terra-macos-probe/src", source))
     row["log"] = log_path
     return row
 

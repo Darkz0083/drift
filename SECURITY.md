@@ -1,6 +1,6 @@
 # Security Policy
 
-Zephium treats security as the top priority. A browser is a hostile environment by nature, and we'd rather hear about a problem privately than read about it publicly.
+Drift treats security as the top priority. A browser is a hostile environment by nature, and we'd rather hear about a problem privately than read about it publicly.
 
 ## Supported versions
 
@@ -17,8 +17,8 @@ Only the latest release receives security fixes.
 
 Report privately in either way:
 
-- Use GitHub's [private vulnerability reporting](https://github.com/zephium-browser/Zephium/security/advisories/new).
-- Email **security@zephium.app**.
+- Use GitHub's [private vulnerability reporting](https://github.com/drift-browser/Drift/security/advisories/new).
+- Email **security@drift.app**.
 
 Include:
 

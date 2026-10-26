@@ -35,16 +35,16 @@ test("Settings stands beside the tab rail and returns to the same web tab", asyn
   emitNativeEvent("itemsChanged", items);
   const screen = await render(Shell);
   emitNativeEvent("uiCommand", "browser.settings");
-  expect(screen.container.querySelector('[data-zephium-surface="settings"]')).not.toBeNull();
+  expect(screen.container.querySelector('[data-drift-surface="settings"]')).not.toBeNull();
   expect(screen.container.querySelector(".settings-sidebar-navigation")).not.toBeNull();
   // The tab stays one click away in the rail beside the settings panel.
-  expect(screen.container.querySelector(`[data-zephium-tab-id="${tab.id}"]`)).not.toBeNull();
+  expect(screen.container.querySelector(`[data-drift-tab-id="${tab.id}"]`)).not.toBeNull();
   emitNativeEvent("browserReturn", { ...items, projection_revision: revision(11) });
-  expect(screen.container.querySelector('[data-zephium-surface="browse"]')).not.toBeNull();
-  const rows = screen.container.querySelectorAll(`[data-zephium-tab-id="${tab.id}"]`);
+  expect(screen.container.querySelector('[data-drift-surface="browse"]')).not.toBeNull();
+  const rows = screen.container.querySelectorAll(`[data-drift-tab-id="${tab.id}"]`);
   expect(rows).toHaveLength(1);
-  expect(rows[0]?.querySelector("[data-zephium-tab-label]")?.textContent).toBe(tab.title);
-  expect(screen.container.querySelector<HTMLInputElement>("[data-zephium-address]")?.value).toBe(
+  expect(rows[0]?.querySelector("[data-drift-tab-label]")?.textContent).toBe(tab.title);
+  expect(screen.container.querySelector<HTMLInputElement>("[data-drift-address]")?.value).toBe(
     "example.com",
   );
 });
@@ -84,7 +84,7 @@ test("Work keeps the column as the rail of tabs, and a tab chosen there opens ov
   expect(screen.container.querySelector("aside")).toBe(column);
   expect(screen.container.querySelector(".shelf")).toBeNull();
   const row = screen.container.querySelector<HTMLElement>(
-    `[data-zephium-tab-id="${tab.id}"] button`,
+    `[data-drift-tab-id="${tab.id}"] button`,
   )!;
   expect(row).not.toBeNull();
   const { tabRequest } = await import("$session/work-tab.svelte");

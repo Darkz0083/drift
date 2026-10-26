@@ -79,7 +79,7 @@ pub(crate) fn capture(window: &WebviewWindow, expected: &tauri::Url, stage: &'st
         return;
     }
     let result = window.eval_with_callback(
-        "window.__zephiumStartupStyles?.() ?? null",
+        "window.__driftStartupStyles?.() ?? null",
         move |value| {
             let report = decode(&value);
             if let Some(report) = report {

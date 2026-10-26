@@ -1,13 +1,13 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Zephium Extensions QA",
-  "identifier": "app.zephium.webext-qa",
+  "productName": "Drift Extensions QA",
+  "identifier": "app.drift.webext-qa",
   "app": {
     "windows": [
       {
         "label": "main",
         "create": false,
-        "title": "Zephium Extensions QA",
+        "title": "Drift Extensions QA",
         "width": 1200,
         "height": 800,
         "minWidth": 680,

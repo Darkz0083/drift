@@ -10,7 +10,7 @@
   },
   "scope": "150 public tasks: original70 plus80 criteria-authored before running. Followups stay in the same Work. The original100-task baseline is immutable. Handoff correctness is separate from task answer correctness. Three attempts per task; no completion-based grading.",
   "tuned_inventory": {
-    "source_directory": "/private/tmp/zephium-tuned-matrix",
+    "source_directory": "/private/tmp/drift-tuned-matrix",
     "files": {
       "README.md": "0f8b5ed26cb24ca0c9e82c8fad3e058bc41b475a35d62292e2c6ee929011fd92",
       "matrix.sh": "fa8a899540e51c870174f5b0c2563f9f17d9518c4375e6a5cf5e4f0e0ebe6722",

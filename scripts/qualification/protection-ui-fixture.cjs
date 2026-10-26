@@ -23,7 +23,7 @@ const server = http.createServer((request, response) => {
       <button id="late">Insert a late ad</button><button id="check">Check results</button>
       <p id="late-status">Late ad not inserted</p><p id="diagnostic"></p>
       <script>
-        function check(){const api=globalThis.__zephium_content_style_v1__;document.getElementById('diagnostic').textContent='Token pull API: '+typeof api?.pullGeneric+'; subscription: '+(api?JSON.parse(api.inspectEncoded()).subscription:'missing')+'; sheets: '+document.adoptedStyleSheets.length;document.getElementById('initial-status').textContent='Initial ad: '+getComputedStyle(document.getElementById('initial')).display;
+        function check(){const api=globalThis.__drift_content_style_v1__;document.getElementById('diagnostic').textContent='Token pull API: '+typeof api?.pullGeneric+'; subscription: '+(api?JSON.parse(api.inspectEncoded()).subscription:'missing')+'; sheets: '+document.adoptedStyleSheets.length;document.getElementById('initial-status').textContent='Initial ad: '+getComputedStyle(document.getElementById('initial')).display;
           const late=document.getElementById('late-ad'); if(late) document.getElementById('late-status').textContent='Late ad: '+getComputedStyle(late).display}
         document.getElementById('late').onclick=()=>{if(!document.getElementById('late-ad')){const ad=document.createElement('div');ad.className='google-ad';ad.id='late-ad';ad.textContent='Late generic ad';document.body.append(ad)}setTimeout(check,500)};
         document.getElementById('check').onclick=check;

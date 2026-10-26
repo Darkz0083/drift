@@ -1,5 +1,5 @@
 {
-  "name": "zephium",
+  "name": "drift",
   "private": true,
   "engines": {
     "node": ">=24.18.0 <25"

@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Add Link…`)),n=((t={},n={})=>(n.locale??e(),`Bookmark This Page`)),r=((t={},n={})=>(n.locale??e(),`Add to Bookmarks`)),i=((t={},n={})=>(n.locale??e(),`New Folder`)),a=((t={},n={})=>(n.locale??e(),`Search bookmarks`));export{t as a,n as i,i as n,r,a as t};

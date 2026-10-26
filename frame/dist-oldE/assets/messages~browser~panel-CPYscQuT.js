@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`This view could not be displayed.`)),n=((t={},n={})=>(n.locale??e(),`Try again`));export{t as n,n as t};

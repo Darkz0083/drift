@@ -22,7 +22,7 @@ class Element {
   getBoundingClientRect(){return {...this.box,right:this.box.x+this.box.width,bottom:this.box.y+this.box.height,left:this.box.x,top:this.box.y};}
   querySelector(){return null;}
 }
-const asset=readFileSync(process.argv[2]||new URL('../crates/zephium-agentic/assets/semantic-record-media-v1.js',import.meta.url),'utf8');
+const asset=readFileSync(process.argv[2]||new URL('../crates/drift-agentic/assets/semantic-record-media-v1.js',import.meta.url),'utf8');
 assert.equal(asset.split('Object.freeze({evidence,invoke})').length,2);
 // Expose only the private revalidation predicate in this synthetic process.
 const program=asset.replace('Object.freeze({evidence,invoke})','Object.freeze({evidence,invoke,target})');
@@ -76,7 +76,7 @@ function fixture({other=false, metadata=true, duplicate=false, changedUrl=false,
     };
   }
   runInNewContext(program,context);
-  const api=context.__zephiumRecordMediaV1;
+  const api=context.__driftRecordMediaV1;
   const helpers={apply:Reflect.apply,read:(get,node)=>get.call(node),nodeContains:Element.prototype.contains,
     elementRect:node=>node.getBoundingClientRect(),tagName:node=>node.localName,nodeType:node=>node.nodeType,
     nodeParentGetter:function(){return this.parentNode;},imageCompleteGetter:function(){return this.complete;},
@@ -192,7 +192,7 @@ function cardFixture({mixed=false,wrapped=true,duplicateId=false,extraVisual=fal
     location:{origin:new URL(page).origin},setTimeout,clearTimeout,addEventListener(){},fetch(){throw Error('no network');},btoa(){throw Error('no pixels');},
     getComputedStyle(node,pseudo){return {display:'block',visibility:'visible',backgroundImage:pseudo?'none':node.attrs.background||'none',content:''};}};
   runInNewContext(program,context);
-  const api=context.__zephiumRecordMediaV1;
+  const api=context.__driftRecordMediaV1;
   const helpers={apply:Reflect.apply,read:(get,node)=>get.call(node),nodeContains:Element.prototype.contains,elementRect:node=>node.getBoundingClientRect(),tagName:node=>node.localName,nodeType:node=>node.nodeType,nodeParentGetter:function(){return this.parentNode;},imageCompleteGetter:function(){return this.complete;},imageNaturalWidthGetter:function(){return this.naturalWidth;},pageTitleText:()=>null};
   const rows=api.evidence(records,1,1,helpers);
   return {api,rows,cards};

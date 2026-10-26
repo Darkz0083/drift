@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`Notes are unavailable right now`));export{t};

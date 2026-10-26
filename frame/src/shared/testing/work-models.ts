@@ -32,7 +32,7 @@ const SLUG = {
   groq: "groq",
   cerebras: "cerebras",
   compatible: "compatible",
-  cloud: "zephium",
+  cloud: "drift",
 } as const;
 
 export function entry(

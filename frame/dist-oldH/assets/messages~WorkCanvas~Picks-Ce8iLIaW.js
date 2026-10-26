@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Ask`)),n=((t={},n={})=>(n.locale??e(),`Choose`)),r=((t={},n={})=>(n.locale??e(),`Decided`));export{n,t as r,r as t};

@@ -7,7 +7,7 @@ Read this before touching `frame/`. It is the working contract for UI work;
 
 - Svelte 5 runes + strict TypeScript + Vite 8.
 - Tailwind CSS v4, token-first. Bits UI supplies narrowly adopted accessible
-  behavior; Zephium owns every visual component.
+  behavior; Drift owns every visual component.
 - Icons come only from the MIT/free packages `@hugeicons/svelte` and
   `@hugeicons/core-free-icons`, wrapped by `src/shared/ui/Icon`.
 - Inter Variable are bundled through Fontsource and
@@ -56,7 +56,7 @@ the required behavior. Popovers must remain inside their owning chrome WebView.
    configured rectangle. Menus, context menus, and page-overlapping surfaces
    are native. A DOM popover is allowed only when fully contained in the
    sidebar; do not portal one across a WebView boundary.
-3. **`src/shared/ipc/bindings.ts` is generated** by `cargo test -p zephium-desktop
+3. **`src/shared/ipc/bindings.ts` is generated** by `cargo test -p drift-desktop
 export_typescript_bindings`. Never edit it by hand.
 4. **Favicons stay fixed raster.** `shared/ui/FavIcon` accepts only the bounded
    `rgba32:` payload produced by Rust and paints a 32 × 32 `ImageData` canvas.
@@ -74,7 +74,7 @@ export_typescript_bindings`. Never edit it by hand.
 
 ## Native presentation barrier
 
-Rust dispatches `zephium:presentation-tab` and inspects committed DOM in the
+Rust dispatches `drift:presentation-tab` and inspects committed DOM in the
 same synchronous expression before revealing raw page content. This is a
 security boundary, not a rendering optimization.
 
@@ -86,16 +86,16 @@ security boundary, not a rendering optimization.
   an application re-entrancy guard; Svelte 5 supports nested synchronous
   flushing and a guard could reject a valid newer presentation.
 - Keep exactly one shell with a direct
-  `data-zephium-active-tab={active ?? ""}` binding.
+  `data-drift-active-tab={active ?? ""}` binding.
 - Render tab rows in an ID-keyed `{#each}` block. Every authoritative row
-  directly binds `data-zephium-tab-id`, `data-zephium-tab-url`, and
-  `data-zephium-projection-revision`.
+  directly binds `data-drift-tab-id`, `data-drift-tab-url`, and
+  `data-drift-projection-revision`.
 - The label sentinel's sole child is `{tab.title}`. Do not add hidden text,
   icons, badges, or literal whitespace inside it.
 - The address is a real `HTMLInputElement` with one-way `value={...}` and an
   explicit `input` handler. Accept native synthetic input; never gate it on
   `event.isTrusted` and never navigate from that handler.
-- `data-zephium-new-tab` is conditional markup with no outro. Never leave a
+- `data-drift-new-tab` is conditional markup with no outro. Never leave a
   transitioning or hidden sentinel behind.
 - Do not virtualize away an active/presenting row or create drag/responsive
   duplicates carrying any sentinel attribute.
@@ -112,7 +112,7 @@ security boundary, not a rendering optimization.
   emit and enforce `frame/reports/bootstrap-report.json`, which also fails if the panel can
   reach an editor or tool view at all; do not add browser features to the panel.
 - `onboarding.html` is a first run's page in the main window. Native picks it
-  over `browser.html` before either loads (`zephium_app::onboarding_due`), and
+  over `browser.html` before either loads (`drift_app::onboarding_due`), and
   `onboarding_finish` replaces it with the browser in the same window: the
   chrome view stays hidden until the browser passes the same `uiReady` gate as a
   normal launch. It is built separately (`vite.onboarding.config.ts`) so it never
@@ -261,7 +261,7 @@ the current product surface for inspecting controls; Interface Studio is removed
 The old unused `shared/ui/work` kit has been removed. Future entity presentations
 share one UI kit and gain folders only with their real runtime contracts.
 
-The retained logo asset is `assets/brand/zephium-logo.png`, outside the shipped bundle. Its placement in the
+The retained logo asset is `assets/brand/drift-logo.png`, outside the shipped bundle. Its placement in the
 product belongs to the visual refinement work; this migration does not substitute
 it for the existing wordmark or change its pixels.
 

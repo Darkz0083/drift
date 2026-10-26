@@ -46,9 +46,9 @@
 -->
 <li
   data-motion-key={`tab:${tab.id}`}
-  data-zephium-tab-id={tab.id}
-  data-zephium-tab-url={tab.url ?? ""}
-  data-zephium-projection-revision={tab.projection_revision}
+  data-drift-tab-id={tab.id}
+  data-drift-tab-url={tab.url ?? ""}
+  data-drift-projection-revision={tab.projection_revision}
   class={["essential", className]}
   data-split-candidate={splitCandidate}
 >
@@ -73,7 +73,7 @@
       lit
       fallback={Globe02Icon}
     />
-    <span data-zephium-tab-label class="sr-only">{tab.title}</span>
+    <span data-drift-tab-label class="sr-only">{tab.title}</span>
   </button>
   {#if tab.capture}
     <span class="capture-badge">

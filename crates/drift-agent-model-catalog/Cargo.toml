@@ -1,0 +1,10 @@
+[package]
+name = "drift-agent-model-catalog"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+build = false
+
+[dependencies]
+drift-agentic.workspace = true

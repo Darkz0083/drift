@@ -92,7 +92,7 @@ pub(super) fn cancel_prepared(app: &tauri::AppHandle) {
         std::mem::take(&mut gate.flushed)
     };
     for (label, token) in flushed {
-        super::emit_to_privileged(app, &label, "zephium:resource-close-cancelled", &token);
+        super::emit_to_privileged(app, &label, "drift:resource-close-cancelled", &token);
     }
 }
 
@@ -132,7 +132,7 @@ fn request_inner(app: tauri::AppHandle, terminal: bool, done: impl FnOnce(bool) 
         if app.get_webview_window(label).is_none() {
             continue;
         }
-        let token = zephium_core::ids::ResourceId::generate().to_string();
+        let token = drift_core::ids::ResourceId::generate().to_string();
         let (send, receive) = tokio::sync::oneshot::channel();
         gate.pending.insert(label.into(), (token.clone(), send));
         receivers.push(receive);
@@ -143,7 +143,7 @@ fn request_inner(app: tauri::AppHandle, terminal: bool, done: impl FnOnce(bool) 
         panel.wake();
     }
     for (label, token) in &requests {
-        super::emit_to_privileged(&app, label, "zephium:resource-close", token);
+        super::emit_to_privileged(&app, label, "drift:resource-close", token);
     }
     tauri::async_runtime::spawn(async move {
         let completed = tokio::time::timeout(std::time::Duration::from_secs(15), async move {
@@ -185,7 +185,7 @@ fn request_inner(app: tauri::AppHandle, terminal: bool, done: impl FnOnce(bool) 
             request_inner(app, terminal, done);
         } else if !super::shutdown_started(&app) {
             for (label, token) in requests {
-                super::emit_to_privileged(&app, label, "zephium:resource-close-cancelled", &token);
+                super::emit_to_privileged(&app, label, "drift:resource-close-cancelled", &token);
             }
             if let Some(panel) = app.try_state::<super::overlay::Overlay>() {
                 if !panel.snapshot().visible {

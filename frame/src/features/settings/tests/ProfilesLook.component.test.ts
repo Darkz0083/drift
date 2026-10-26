@@ -119,8 +119,8 @@ const signedIn = (): AccountV1 => ({
 const shots = "../../../../../target/look/profiles";
 const settle = (ms = 450) => new Promise((done) => setTimeout(done, ms));
 const looks: [string, "dark" | "light", string | null][] = [
-  ["zephium", "dark", null],
-  ["zephium", "light", null],
+  ["drift", "dark", null],
+  ["drift", "light", null],
   ["nord", "dark", "nord"],
 ];
 

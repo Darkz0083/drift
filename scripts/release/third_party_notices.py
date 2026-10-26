@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write the third-party notices shipped inside Zephium's installers.
+"""Write the third-party notices shipped inside Drift's installers.
 
 Covers every non-workspace crate linked into the desktop app for the release
 targets (including the vendored forks) and every production npm package in the
@@ -107,7 +107,7 @@ def rust_packages() -> dict[tuple[str, str], dict]:
         by_id = {package["id"]: package for package in metadata["packages"]}
         nodes = {node["id"]: node for node in metadata["resolve"]["nodes"]}
         members = set(metadata["workspace_members"])
-        root = next(id for id in members if by_id[id]["name"] == "zephium-desktop")
+        root = next(id for id in members if by_id[id]["name"] == "drift-desktop")
         # Only normal dependencies end up in the shipped binary.
         stack, seen = [root], {root}
         while stack:
@@ -165,8 +165,8 @@ def main() -> int:
                                 package["homepage"], license_texts(package["path"])))
 
     header = (
-        "Zephium third-party notices\n\n"
-        "Zephium is licensed under the Mozilla Public License 2.0. It includes the\n"
+        "Drift third-party notices\n\n"
+        "Drift is licensed under the Mozilla Public License 2.0. It includes the\n"
         "following third-party software, each under its own license. The bundled\n"
         "EasyList and EasyPrivacy filter lists are covered by licenses/blocker/.\n"
     )

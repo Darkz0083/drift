@@ -9,7 +9,7 @@ const require = createRequire(
 const { chromium } = require("playwright");
 const source = await readFile(
   new URL(
-    "../crates/zephium-terra-macos-probe/src/work_app_editors.rs",
+    "../crates/drift-terra-macos-probe/src/work_app_editors.rs",
     import.meta.url,
   ),
   "utf8",

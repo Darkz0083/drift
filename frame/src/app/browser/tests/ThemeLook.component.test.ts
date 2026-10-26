@@ -31,7 +31,7 @@ afterEach(() => {
   surface.dispose();
   tabs.dispose();
   preferences.dispose();
-  themed("zephium");
+  themed("drift");
   document.getElementById("wallpaper")?.remove();
   document.body.style.background = "";
 });
@@ -41,7 +41,7 @@ const shoot = (name: string) =>
 
 // The chrome in each theme the brief names, in both modes, over the glass and
 // solid: the column and the new tab, the tools menu, and Settings' cards.
-for (const id of ["zephium", "paper", "nord", "dracula", "catppuccin"])
+for (const id of ["drift", "paper", "nord", "dracula", "catppuccin"])
   for (const mode of ["light", "dark"] as const)
     for (const material of ["liquid_glass", "none"] as const)
       test(`${id} ${mode} over ${material}`, async () => {

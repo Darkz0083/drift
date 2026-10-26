@@ -1,0 +1,59 @@
+[package]
+name = "drift-terra-macos-probe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+build = "build.rs"
+
+[features]
+default = []
+decision-eval = ["live-probe", "dep:drift-agent-model-catalog", "dep:drift-decision", "drift-decision/evals"]
+durable-runtime = ["live-probe", "drift-agentic/probe-harness", "drift-work-composition/durable-runtime", "drift-work-composition/retained-lifetime-diagnostic", "dep:drift-agent-model-catalog", "dep:drift-private-fs"]
+live-probe = [
+    "dep:drift-app",
+    "drift-agent-controller/probe-harness",
+    "drift-agent-provider-transport/probe-harness",
+    "drift-engine/native-agentic-semantic-probe",
+    "drift-engine/agentic-browser-qa",
+    "drift-work-composition/public-qualification",
+    "drift-work-composition/navigation-qualification",
+]
+
+[[bin]]
+name = "macos-terra-agentic-probe"
+path = "src/main.rs"
+required-features = ["live-probe"]
+
+[[bin]]
+name = "windows-work-probe"
+path = "src/windows_main.rs"
+required-features = ["durable-runtime"]
+
+[dependencies]
+image = { version = "=0.25.10", default-features = false, features = ["png"] }
+drift-agent-model-catalog = { workspace = true, optional = true }
+serde_json.workspace = true
+sha2 = "=0.10.9"
+drift-ipc.workspace = true
+drift-agent-controller.workspace = true
+drift-agent-provider-transport.workspace = true
+drift-agentic.workspace = true
+drift-decision = { workspace = true, optional = true }
+drift-engine.workspace = true
+drift-agent-runtime.workspace = true
+drift-store.workspace = true
+drift-core.workspace = true
+drift-app = { workspace = true, optional = true }
+drift-work-composition.workspace = true
+drift-blocker.workspace = true
+drift-blocker-service.workspace = true
+tempfile.workspace = true
+tokio = { workspace = true, features = ["rt", "time", "process", "io-util"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+drift-blocker = { workspace = true, features = ["webkit"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+drift-blocker = { workspace = true, features = ["runtime"] }
+drift-private-fs = { workspace = true, optional = true, features = ["windows-work-test-fixtures"] }

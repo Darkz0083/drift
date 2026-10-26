@@ -213,7 +213,7 @@ updates:
 
   - package-ecosystem: cargo
     # The sanitizer harness is an independent, explicitly pinned test graph.
-    directory: /crates/zephium-blocker/fuzz
+    directory: /crates/drift-blocker/fuzz
     ignore:
       # Pinned by the blocker supply-chain check.
       - dependency-name: flate2

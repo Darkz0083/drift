@@ -2,7 +2,7 @@
   import { accountSession as session } from "$domain/account";
   import { commands } from "$shared/ipc/bindings";
   import * as m from "$shared/i18n/messages";
-  import ZephiumTile from "$shared/ui/ZephiumTile";
+  import DriftTile from "$shared/ui/DriftTile";
   import Button from "$shared/ui/Button";
   import Field from "$shared/ui/Field";
   import {
@@ -90,7 +90,7 @@
 </script>
 
 <div class="welcome">
-  <div class="mark"><ZephiumTile size={76} /></div>
+  <div class="mark"><DriftTile size={76} /></div>
   {#if !pendingEmail}
     <h2>{m.account_welcome_title()}</h2>
     <p class="body">{m.account_welcome_body()}</p>

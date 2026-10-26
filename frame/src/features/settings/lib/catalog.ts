@@ -84,7 +84,7 @@ export const fields = {
     section: "appearance",
     label: m.look_theme,
     description: m.look_theme_desc,
-    initial: "zephium",
+    initial: "drift",
   },
   "appearance.colors": {
     section: "appearance",

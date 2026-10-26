@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t,n={})=>(n.locale??e(),`For your security, confirm it’s you first. We’ll email a sign-in code to ${t?.email}.`)),n=((t={},n={})=>(n.locale??e(),`Sign-in code`)),r=((t={},n={})=>(n.locale??e(),`Confirm`)),i=((t={},n={})=>(n.locale??e(),`Email me a sign-in code`));export{t as i,r as n,n as r,i as t};

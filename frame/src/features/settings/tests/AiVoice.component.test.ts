@@ -24,7 +24,7 @@ afterEach(() => vi.clearAllMocks());
 
 const status = (rest: Partial<VoiceStatusV1> = {}): VoiceStatusV1 => ({
   version: 1,
-  engines: ["on_device", "zephium", "open_ai"],
+  engines: ["on_device", "drift", "open_ai"],
   chosen: null,
   effective: "on_device",
   language: null,
@@ -56,7 +56,7 @@ test("Voice lists only usable engines and says where audio goes, in both themes"
   await shoot("on-device");
 
   native.language.mockResolvedValue(
-    status({ language: "pl-PL", on_device: null, effective: "zephium" }),
+    status({ language: "pl-PL", on_device: null, effective: "drift" }),
   );
   await page.getByRole("button", { name: "Language" }).click();
   await page.getByRole("option", { name: "Polish (Poland)" }).click();
@@ -64,7 +64,7 @@ test("Voice lists only usable engines and says where audio goes, in both themes"
   await expect
     .element(
       page.getByText(
-        "This device can’t recognize Polish (Poland), so dictation in it uses Zephium AI.",
+        "This device can’t recognize Polish (Poland), so dictation in it uses Drift AI.",
       ),
     )
     .toBeVisible();
@@ -90,7 +90,7 @@ test("with no engine on Windows the row says how to set one up", async () => {
   );
   const screen = await render(VoiceRowStage);
   await expect
-    .element(page.getByText("Sign in to Zephium AI or add an OpenAI or Groq key to dictate."))
+    .element(page.getByText("Sign in to Drift AI or add an OpenAI or Groq key to dictate."))
     .toBeVisible();
   await expect.element(page.getByRole("button", { name: "Dictation" })).toBeDisabled();
   await shoot("none");

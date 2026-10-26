@@ -14,8 +14,8 @@ use tauri::Manager;
     feature = "macos-work-resource-probe",
     feature = "macos-work-retained-controller-probe"
 )))]
-use zephium_engine as witness;
-use zephium_engine::{
+use drift_engine as witness;
+use drift_engine::{
     ForegroundAdmissionWake, ForegroundRenderingAdmission, ForegroundRenderingWitnessReport,
     WebviewEngine,
 };
@@ -24,7 +24,7 @@ use zephium_engine::{
     not(feature = "macos-work-retained-controller-probe")
 ))]
 mod witness {
-    pub use zephium_engine::{
+    pub use drift_engine::{
         cancel_work_resource_witness as cancel_foreground_rendering_witness,
         start_work_resource_witness as start_foreground_rendering_witness,
         work_resource_native_drain as foreground_rendering_native_drain,
@@ -33,7 +33,7 @@ mod witness {
 }
 #[cfg(feature = "macos-work-retained-controller-probe")]
 mod witness {
-    pub use zephium_work_composition::retained_qualification::{
+    pub use drift_work_composition::retained_qualification::{
         cancel_retained_controller_witness as cancel_foreground_rendering_witness,
         retained_controller_native_drain as foreground_rendering_native_drain,
         retained_controller_native_failures as foreground_rendering_native_failures,
@@ -71,7 +71,7 @@ struct State {
     active: AtomicBool,
     report: Mutex<Option<ForegroundRenderingWitnessReport>>,
     #[cfg(feature = "macos-work-retained-controller-probe")]
-    store: Mutex<Option<Arc<zephium_store::SqliteStore>>>,
+    store: Mutex<Option<Arc<drift_store::SqliteStore>>>,
 }
 
 #[derive(Default)]
@@ -83,7 +83,7 @@ struct AdmissionWait {
 pub(super) fn install(
     app: &tauri::AppHandle,
     engine: Arc<WebviewEngine>,
-    _store: Arc<zephium_store::SqliteStore>,
+    _store: Arc<drift_store::SqliteStore>,
 ) -> bool {
     app.manage(State {
         engine: Mutex::new(Some(engine)),
@@ -143,7 +143,7 @@ pub(super) fn on_run_event(app: &tauri::AppHandle, event: &tauri::RunEvent) -> b
         }
         tauri::RunEvent::Exit => {
             #[cfg(feature = "macos-work-retained-controller-probe")]
-            let original_owner_closed = zephium_work_composition::retained_qualification::retained_controller_shutdown_complete();
+            let original_owner_closed = drift_work_composition::retained_qualification::retained_controller_shutdown_complete();
             #[cfg(not(feature = "macos-work-retained-controller-probe"))]
             let original_owner_closed = true;
             let shutdown_clean = app
@@ -185,7 +185,7 @@ fn exact_foreground_main(app: &tauri::AppHandle) -> Option<ForegroundRenderingAd
     // SAFETY: Tauri owns this exact NSWindow for the retained main surface;
     // the synchronous main-thread call retains the checked owner before return.
     let expected_main = unsafe { native.cast::<NSWindow>().as_ref() }?;
-    zephium_engine::capture_foreground_rendering_admission(expected_main)
+    drift_engine::capture_foreground_rendering_admission(expected_main)
 }
 
 fn advance_admission(app: &tauri::AppHandle) {
@@ -290,7 +290,7 @@ fn advance_admission(app: &tauri::AppHandle) {
                 if waiting.wake.is_some() {
                     return true;
                 }
-                waiting.wake = zephium_engine::schedule_foreground_admission_wake(move || {
+                waiting.wake = drift_engine::schedule_foreground_admission_wake(move || {
                     if let Some(state) = wake_app.try_state::<State>() {
                         if let Ok(mut waiting) = state.admission.lock() {
                             waiting.wake.take();
@@ -425,10 +425,10 @@ fn record_report(
 
 #[cfg(feature = "macos-work-retained-controller-probe")]
 fn trace_retained(
-    trace: zephium_work_composition::retained_qualification::RetainedProbeTrace,
+    trace: drift_work_composition::retained_qualification::RetainedProbeTrace,
 ) -> bool {
     use std::io::Write as _;
-    use zephium_work_composition::retained_qualification::RetainedProbeTrace as Trace;
+    use drift_work_composition::retained_qualification::RetainedProbeTrace as Trace;
     // Public event metadata contains counts/classes only, never provider text,
     // request bodies, source quotes, URLs, account data or credentials.
     let result = match trace {

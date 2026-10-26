@@ -161,7 +161,7 @@ fn observe(event: &NSEvent) {
         let detail = serde_json::to_string(&detail).ok()?;
         Some((
             chrome,
-            format!("window.dispatchEvent(new CustomEvent('zephium:swipe',{{detail:{detail}}}))"),
+            format!("window.dispatchEvent(new CustomEvent('drift:swipe',{{detail:{detail}}}))"),
         ))
     });
     if let Some((chrome, script)) = script {

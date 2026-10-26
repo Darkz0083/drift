@@ -1147,6 +1147,545 @@ dependencies = [
 ]
 
 [[package]]
+name = "drift-account"
+version = "0.1.0"
+dependencies = [
+ "drift-credentials",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
+ "url",
+ "zeroize",
+]
+
+[[package]]
+name = "drift-agent-controller"
+version = "0.1.0"
+dependencies = [
+ "drift-agent-model-catalog",
+ "drift-agent-provider-transport",
+ "drift-agent-runtime",
+ "drift-agentic",
+ "drift-decision",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+]
+
+[[package]]
+name = "drift-agent-model-catalog"
+version = "0.1.0"
+dependencies = [
+ "drift-agentic",
+]
+
+[[package]]
+name = "drift-agent-provider-transport"
+version = "0.1.0"
+dependencies = [
+ "drift-agentic",
+]
+
+[[package]]
+name = "drift-agent-runtime"
+version = "0.1.0"
+dependencies = [
+ "crossbeam-queue",
+ "drift-agentic",
+ "thiserror 2.0.18",
+ "tokio",
+]
+
+[[package]]
+name = "drift-agentic"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "crc32fast",
+ "dirs",
+ "dom_query 0.28.0",
+ "drift-core",
+ "drift-credentials",
+ "drift-decision",
+ "futures-util",
+ "httpdate",
+ "proptest",
+ "psl",
+ "reqwest",
+ "rig-core",
+ "security-framework",
+ "security-framework-sys",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "thiserror 2.0.18",
+ "tokio",
+ "ulid",
+ "url",
+ "zeroize",
+]
+
+[[package]]
+name = "drift-app"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "chrono",
+ "drift-agent-controller",
+ "drift-agent-model-catalog",
+ "drift-agent-provider-transport",
+ "drift-agent-runtime",
+ "drift-agentic",
+ "drift-core",
+ "drift-ipc",
+ "drift-mcp",
+ "drift-private-fs",
+ "drift-store",
+ "flate2",
+ "globset",
+ "grep-matcher",
+ "grep-regex",
+ "grep-searcher",
+ "ignore",
+ "libc",
+ "lopdf",
+ "objc2",
+ "objc2-foundation",
+ "psl",
+ "regex",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha1",
+ "sha2 0.10.9",
+ "similar",
+ "socket2",
+ "tempfile",
+ "tokio",
+ "url",
+ "windows",
+ "windows-core 0.61.2",
+]
+
+[[package]]
+name = "drift-blocker"
+version = "0.1.0"
+dependencies = [
+ "adblock",
+ "drift-core",
+ "flate2",
+ "idna",
+ "proptest",
+ "regex",
+ "rustix",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "thiserror 2.0.18",
+ "url",
+ "windows",
+]
+
+[[package]]
+name = "drift-blocker-service"
+version = "0.1.0"
+dependencies = [
+ "drift-blocker",
+ "drift-blocker-update",
+ "drift-core",
+ "flate2",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "drift-blocker-update"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "aws-lc-rs",
+ "drift-blocker",
+ "drift-core",
+ "drift-update-transport",
+ "jiff",
+ "rustix",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "thiserror 2.0.18",
+ "tokio",
+ "tough",
+ "url",
+ "windows",
+]
+
+[[package]]
+name = "drift-core"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "proptest",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "specta",
+ "tempfile",
+ "ulid",
+ "url",
+ "winreg",
+]
+
+[[package]]
+name = "drift-credentials"
+version = "0.1.0"
+dependencies = [
+ "dirs",
+ "security-framework",
+ "security-framework-sys",
+ "windows-sys 0.61.2",
+ "zeroize",
+]
+
+[[package]]
+name = "drift-decision"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "drift-desktop"
+version = "1.0.3"
+dependencies = [
+ "async-io",
+ "base64 0.22.1",
+ "block2",
+ "dispatch2",
+ "drift-account",
+ "drift-agent-controller",
+ "drift-agent-model-catalog",
+ "drift-agent-provider-transport",
+ "drift-agent-runtime",
+ "drift-agentic",
+ "drift-app",
+ "drift-blocker",
+ "drift-blocker-service",
+ "drift-core",
+ "drift-engine",
+ "drift-import",
+ "drift-ipc",
+ "drift-notes",
+ "drift-store",
+ "drift-voice",
+ "drift-webext",
+ "drift-webext-macos",
+ "drift-work-composition",
+ "futures-lite",
+ "getrandom 0.3.4",
+ "gtk",
+ "image",
+ "json-patch",
+ "libc",
+ "minisign-verify 0.3.0",
+ "objc2",
+ "objc2-app-kit",
+ "objc2-foundation",
+ "objc2-quartz-core",
+ "objc2-service-management",
+ "objc2-user-notifications",
+ "objc2-web-kit",
+ "raw-window-handle",
+ "reqwest",
+ "rfd",
+ "serde",
+ "serde_json",
+ "specta",
+ "specta-typescript",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-updater",
+ "tauri-specta",
+ "tauri-utils",
+ "tempfile",
+ "tokio",
+ "webkit2gtk",
+ "webview2-com",
+ "window-vibrancy 0.8.0",
+ "windows",
+ "x11rb",
+ "xkeysym",
+ "zbus",
+]
+
+[[package]]
+name = "drift-engine"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "block2",
+ "dirs",
+ "dispatch2",
+ "drift-agentic",
+ "drift-blocker",
+ "drift-core",
+ "drift-webext",
+ "drift-webext-macos",
+ "flate2",
+ "gtk",
+ "image",
+ "libc",
+ "objc2",
+ "objc2-app-kit",
+ "objc2-authentication-services",
+ "objc2-core-foundation",
+ "objc2-core-graphics",
+ "objc2-foundation",
+ "objc2-quartz-core",
+ "objc2-security",
+ "objc2-web-kit",
+ "raw-window-handle",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "url",
+ "webkit2gtk",
+ "webview2-com",
+ "windows",
+ "windows-core 0.61.2",
+ "windows-numerics",
+ "windows-sys 0.61.2",
+ "wry",
+ "zeroize",
+]
+
+[[package]]
+name = "drift-import"
+version = "0.1.0"
+dependencies = [
+ "drift-core",
+ "plist",
+ "rusqlite",
+ "serde_json",
+ "tempfile",
+ "url",
+]
+
+[[package]]
+name = "drift-ipc"
+version = "0.1.0"
+dependencies = [
+ "drift-core",
+ "serde",
+ "serde_json",
+ "specta",
+ "specta-serde",
+ "specta-typescript",
+]
+
+[[package]]
+name = "drift-mcp"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "drift-credentials",
+ "libc",
+ "reqwest",
+ "rmcp",
+ "security-framework",
+ "security-framework-sys",
+ "serde_json",
+ "sha2 0.10.9",
+ "tokio",
+ "ulid",
+ "url",
+ "windows",
+ "zeroize",
+]
+
+[[package]]
+name = "drift-notes"
+version = "0.1.0"
+dependencies = [
+ "drift-core",
+ "notify",
+ "proptest",
+ "pulldown-cmark",
+ "rusqlite",
+ "rustix",
+ "sha2 0.10.9",
+ "tempfile",
+ "tracing",
+ "unicode-normalization",
+]
+
+[[package]]
+name = "drift-page-assist"
+version = "0.1.0"
+dependencies = [
+ "cssparser 0.37.0",
+ "drift-ipc",
+ "proptest",
+]
+
+[[package]]
+name = "drift-private-fs"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "rustix",
+ "tempfile",
+ "thiserror 2.0.18",
+ "unicode-normalization",
+ "windows",
+]
+
+[[package]]
+name = "drift-store"
+version = "0.1.0"
+dependencies = [
+ "drift-agentic",
+ "drift-core",
+ "drift-private-fs",
+ "image",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "ulid",
+ "url",
+ "windows",
+]
+
+[[package]]
+name = "drift-terra-macos-probe"
+version = "0.1.0"
+dependencies = [
+ "drift-agent-controller",
+ "drift-agent-model-catalog",
+ "drift-agent-provider-transport",
+ "drift-agent-runtime",
+ "drift-agentic",
+ "drift-app",
+ "drift-blocker",
+ "drift-blocker-service",
+ "drift-core",
+ "drift-decision",
+ "drift-engine",
+ "drift-ipc",
+ "drift-private-fs",
+ "drift-store",
+ "drift-work-composition",
+ "image",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "tokio",
+]
+
+[[package]]
+name = "drift-update-transport"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "futures-util",
+ "reqwest",
+ "thiserror 2.0.18",
+ "time",
+ "tough",
+ "url",
+]
+
+[[package]]
+name = "drift-voice"
+version = "0.1.0"
+dependencies = [
+ "block2",
+ "embed_plist",
+ "objc2",
+ "objc2-avf-audio",
+ "objc2-foundation",
+ "objc2-speech",
+ "windows",
+]
+
+[[package]]
+name = "drift-webext"
+version = "0.1.0"
+dependencies = [
+ "flate2",
+ "ring",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "thiserror 2.0.18",
+ "url",
+ "zip",
+]
+
+[[package]]
+name = "drift-webext-macos"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "block2",
+ "dispatch2",
+ "drift-webext",
+ "objc2",
+ "objc2-app-kit",
+ "objc2-foundation",
+ "objc2-web-kit",
+ "serde_json",
+]
+
+[[package]]
+name = "drift-webext-windows"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "drift-webext",
+ "raw-window-handle",
+ "serde_json",
+ "sha2 0.10.9",
+ "webview2-com",
+ "windows",
+ "wry",
+]
+
+[[package]]
+name = "drift-work-composition"
+version = "0.1.0"
+dependencies = [
+ "drift-agent-controller",
+ "drift-agent-provider-transport",
+ "drift-agent-runtime",
+ "drift-agentic",
+ "drift-app",
+ "drift-core",
+ "drift-engine",
+ "drift-ipc",
+ "drift-page-assist",
+ "drift-store",
+ "serde_json",
+ "sha2 0.10.9",
+ "tokio",
+]
+
+[[package]]
 name = "dtoa"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7184,6 +7723,8 @@ name = "xtask"
 version = "0.1.0"
 dependencies = [
  "base64 0.22.1",
+ "drift-blocker",
+ "drift-core",
  "flate2",
  "libc",
  "ring",
@@ -7192,8 +7733,6 @@ dependencies = [
  "sha2 0.10.9",
  "tempfile",
  "toml 0.9.12+spec-1.1.0",
- "zephium-blocker",
- "zephium-core",
 ]
 
 [[package]]
@@ -7278,545 +7817,6 @@ dependencies = [
  "serde",
  "winnow 1.0.3",
  "zvariant",
-]
-
-[[package]]
-name = "zephium-account"
-version = "0.1.0"
-dependencies = [
- "reqwest",
- "serde",
- "serde_json",
- "tokio",
- "url",
- "zephium-credentials",
- "zeroize",
-]
-
-[[package]]
-name = "zephium-agent-controller"
-version = "0.1.0"
-dependencies = [
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "zephium-agent-model-catalog",
- "zephium-agent-provider-transport",
- "zephium-agent-runtime",
- "zephium-agentic",
- "zephium-decision",
-]
-
-[[package]]
-name = "zephium-agent-model-catalog"
-version = "0.1.0"
-dependencies = [
- "zephium-agentic",
-]
-
-[[package]]
-name = "zephium-agent-provider-transport"
-version = "0.1.0"
-dependencies = [
- "zephium-agentic",
-]
-
-[[package]]
-name = "zephium-agent-runtime"
-version = "0.1.0"
-dependencies = [
- "crossbeam-queue",
- "thiserror 2.0.18",
- "tokio",
- "zephium-agentic",
-]
-
-[[package]]
-name = "zephium-agentic"
-version = "0.1.0"
-dependencies = [
- "base64 0.22.1",
- "crc32fast",
- "dirs",
- "dom_query 0.28.0",
- "futures-util",
- "httpdate",
- "proptest",
- "psl",
- "reqwest",
- "rig-core",
- "security-framework",
- "security-framework-sys",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "thiserror 2.0.18",
- "tokio",
- "ulid",
- "url",
- "zephium-core",
- "zephium-credentials",
- "zephium-decision",
- "zeroize",
-]
-
-[[package]]
-name = "zephium-app"
-version = "0.1.0"
-dependencies = [
- "base64 0.22.1",
- "chrono",
- "flate2",
- "globset",
- "grep-matcher",
- "grep-regex",
- "grep-searcher",
- "ignore",
- "libc",
- "lopdf",
- "objc2",
- "objc2-foundation",
- "psl",
- "regex",
- "reqwest",
- "serde",
- "serde_json",
- "sha1",
- "sha2 0.10.9",
- "similar",
- "socket2",
- "tempfile",
- "tokio",
- "url",
- "windows",
- "windows-core 0.61.2",
- "zephium-agent-controller",
- "zephium-agent-model-catalog",
- "zephium-agent-provider-transport",
- "zephium-agent-runtime",
- "zephium-agentic",
- "zephium-core",
- "zephium-ipc",
- "zephium-mcp",
- "zephium-private-fs",
- "zephium-store",
-]
-
-[[package]]
-name = "zephium-blocker"
-version = "0.1.0"
-dependencies = [
- "adblock",
- "flate2",
- "idna",
- "proptest",
- "regex",
- "rustix",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tempfile",
- "thiserror 2.0.18",
- "url",
- "windows",
- "zephium-core",
-]
-
-[[package]]
-name = "zephium-blocker-service"
-version = "0.1.0"
-dependencies = [
- "flate2",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tempfile",
- "thiserror 2.0.18",
- "zephium-blocker",
- "zephium-blocker-update",
- "zephium-core",
-]
-
-[[package]]
-name = "zephium-blocker-update"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "aws-lc-rs",
- "jiff",
- "rustix",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tempfile",
- "thiserror 2.0.18",
- "tokio",
- "tough",
- "url",
- "windows",
- "zephium-blocker",
- "zephium-core",
- "zephium-update-transport",
-]
-
-[[package]]
-name = "zephium-core"
-version = "0.1.0"
-dependencies = [
- "base64 0.22.1",
- "proptest",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "specta",
- "tempfile",
- "ulid",
- "url",
- "winreg",
-]
-
-[[package]]
-name = "zephium-credentials"
-version = "0.1.0"
-dependencies = [
- "dirs",
- "security-framework",
- "security-framework-sys",
- "windows-sys 0.61.2",
- "zeroize",
-]
-
-[[package]]
-name = "zephium-decision"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "zephium-desktop"
-version = "1.0.3"
-dependencies = [
- "async-io",
- "base64 0.22.1",
- "block2",
- "dispatch2",
- "futures-lite",
- "getrandom 0.3.4",
- "gtk",
- "image",
- "json-patch",
- "libc",
- "minisign-verify 0.3.0",
- "objc2",
- "objc2-app-kit",
- "objc2-foundation",
- "objc2-quartz-core",
- "objc2-service-management",
- "objc2-user-notifications",
- "objc2-web-kit",
- "raw-window-handle",
- "reqwest",
- "rfd",
- "serde",
- "serde_json",
- "specta",
- "specta-typescript",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-single-instance",
- "tauri-plugin-updater",
- "tauri-specta",
- "tauri-utils",
- "tempfile",
- "tokio",
- "webkit2gtk",
- "webview2-com",
- "window-vibrancy 0.8.0",
- "windows",
- "x11rb",
- "xkeysym",
- "zbus",
- "zephium-account",
- "zephium-agent-controller",
- "zephium-agent-model-catalog",
- "zephium-agent-provider-transport",
- "zephium-agent-runtime",
- "zephium-agentic",
- "zephium-app",
- "zephium-blocker",
- "zephium-blocker-service",
- "zephium-core",
- "zephium-engine",
- "zephium-import",
- "zephium-ipc",
- "zephium-notes",
- "zephium-store",
- "zephium-voice",
- "zephium-webext",
- "zephium-webext-macos",
- "zephium-work-composition",
-]
-
-[[package]]
-name = "zephium-engine"
-version = "0.1.0"
-dependencies = [
- "base64 0.22.1",
- "block2",
- "dirs",
- "dispatch2",
- "flate2",
- "gtk",
- "image",
- "libc",
- "objc2",
- "objc2-app-kit",
- "objc2-authentication-services",
- "objc2-core-foundation",
- "objc2-core-graphics",
- "objc2-foundation",
- "objc2-quartz-core",
- "objc2-security",
- "objc2-web-kit",
- "raw-window-handle",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tempfile",
- "url",
- "webkit2gtk",
- "webview2-com",
- "windows",
- "windows-core 0.61.2",
- "windows-numerics",
- "windows-sys 0.61.2",
- "wry",
- "zephium-agentic",
- "zephium-blocker",
- "zephium-core",
- "zephium-webext",
- "zephium-webext-macos",
- "zeroize",
-]
-
-[[package]]
-name = "zephium-import"
-version = "0.1.0"
-dependencies = [
- "plist",
- "rusqlite",
- "serde_json",
- "tempfile",
- "url",
- "zephium-core",
-]
-
-[[package]]
-name = "zephium-ipc"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "specta",
- "specta-serde",
- "specta-typescript",
- "zephium-core",
-]
-
-[[package]]
-name = "zephium-mcp"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "libc",
- "reqwest",
- "rmcp",
- "security-framework",
- "security-framework-sys",
- "serde_json",
- "sha2 0.10.9",
- "tokio",
- "ulid",
- "url",
- "windows",
- "zephium-credentials",
- "zeroize",
-]
-
-[[package]]
-name = "zephium-notes"
-version = "0.1.0"
-dependencies = [
- "notify",
- "proptest",
- "pulldown-cmark",
- "rusqlite",
- "rustix",
- "sha2 0.10.9",
- "tempfile",
- "tracing",
- "unicode-normalization",
- "zephium-core",
-]
-
-[[package]]
-name = "zephium-page-assist"
-version = "0.1.0"
-dependencies = [
- "cssparser 0.37.0",
- "proptest",
- "zephium-ipc",
-]
-
-[[package]]
-name = "zephium-private-fs"
-version = "0.1.0"
-dependencies = [
- "libc",
- "rustix",
- "tempfile",
- "thiserror 2.0.18",
- "unicode-normalization",
- "windows",
-]
-
-[[package]]
-name = "zephium-store"
-version = "0.1.0"
-dependencies = [
- "image",
- "rusqlite",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tempfile",
- "ulid",
- "url",
- "windows",
- "zephium-agentic",
- "zephium-core",
- "zephium-private-fs",
-]
-
-[[package]]
-name = "zephium-terra-macos-probe"
-version = "0.1.0"
-dependencies = [
- "image",
- "serde_json",
- "sha2 0.10.9",
- "tempfile",
- "tokio",
- "zephium-agent-controller",
- "zephium-agent-model-catalog",
- "zephium-agent-provider-transport",
- "zephium-agent-runtime",
- "zephium-agentic",
- "zephium-app",
- "zephium-blocker",
- "zephium-blocker-service",
- "zephium-core",
- "zephium-decision",
- "zephium-engine",
- "zephium-ipc",
- "zephium-private-fs",
- "zephium-store",
- "zephium-work-composition",
-]
-
-[[package]]
-name = "zephium-update-transport"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "futures-util",
- "reqwest",
- "thiserror 2.0.18",
- "time",
- "tough",
- "url",
-]
-
-[[package]]
-name = "zephium-voice"
-version = "0.1.0"
-dependencies = [
- "block2",
- "embed_plist",
- "objc2",
- "objc2-avf-audio",
- "objc2-foundation",
- "objc2-speech",
- "windows",
-]
-
-[[package]]
-name = "zephium-webext"
-version = "0.1.0"
-dependencies = [
- "flate2",
- "ring",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tempfile",
- "thiserror 2.0.18",
- "url",
- "zip",
-]
-
-[[package]]
-name = "zephium-webext-macos"
-version = "0.1.0"
-dependencies = [
- "base64 0.22.1",
- "block2",
- "dispatch2",
- "objc2",
- "objc2-app-kit",
- "objc2-foundation",
- "objc2-web-kit",
- "serde_json",
- "zephium-webext",
-]
-
-[[package]]
-name = "zephium-webext-windows"
-version = "0.1.0"
-dependencies = [
- "base64 0.22.1",
- "raw-window-handle",
- "serde_json",
- "sha2 0.10.9",
- "webview2-com",
- "windows",
- "wry",
- "zephium-webext",
-]
-
-[[package]]
-name = "zephium-work-composition"
-version = "0.1.0"
-dependencies = [
- "serde_json",
- "sha2 0.10.9",
- "tokio",
- "zephium-agent-controller",
- "zephium-agent-provider-transport",
- "zephium-agent-runtime",
- "zephium-agentic",
- "zephium-app",
- "zephium-core",
- "zephium-engine",
- "zephium-ipc",
- "zephium-page-assist",
- "zephium-store",
 ]
 
 [[package]]

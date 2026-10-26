@@ -13,7 +13,7 @@ async function identityFixture(rebind: boolean) {
   frame.srcdoc = `<button style="width:120px;height:40px">Save changes</button><script>${inject("semanticMediaRuntime")}
   addEventListener("load",async()=>{
     try{
-      const api=globalThis.__zephiumSemanticRuntimeV1;
+      const api=globalThis.__driftSemanticRuntimeV1;
       const b={n:128,t:16384,w:65536,x:4096,geo:true};
       const observe=(i,g)=>JSON.parse(api.invoke(JSON.stringify({v:1,i,g,s:{k:"initial"},b})));
       const first=observe(1,1), original=first.n.find(n=>n.r==="button");
@@ -75,7 +75,7 @@ test("actual PARK resets semantic keys inside the same document and private runt
   frame.height = "600";
   frame.srcdoc = `<button>Save changes</button><script>
     let pendingPull=null;let parked=false;
-    Object.defineProperty(globalThis,"webkit",{value:{messageHandlers:{zephiumSemanticRuntimeV1:{postMessage(message){
+    Object.defineProperty(globalThis,"webkit",{value:{messageHandlers:{driftSemanticRuntimeV1:{postMessage(message){
       if(message==="P1")return new Promise(resolve=>pendingPull=resolve);
       if(message==="K1:A"){parked=true;return Promise.resolve("A1");}
       throw new Error("unexpected synthetic channel message");
@@ -83,7 +83,7 @@ test("actual PARK resets semantic keys inside the same document and private runt
   </script><script>${inject("semanticMediaRuntime")}
     addEventListener("load",async()=>{
       try{
-        const api=globalThis.__zephiumSemanticRuntimeV1;
+        const api=globalThis.__driftSemanticRuntimeV1;
         const capture=(i)=>JSON.parse(api.invoke(JSON.stringify({v:1,i,g:i,s:{k:"initial"},b:{n:128,t:16384,w:65536,x:4096,geo:true}}))).n.find(n=>n.r==="button").k;
         const before=capture(1);const original=document.querySelector("button");
         if(!pendingPull)throw new Error("missing native idle pull");
@@ -92,7 +92,7 @@ test("actual PARK resets semantic keys inside the same document and private runt
         if(!parked)throw new Error("missing park acknowledgement");
         original.replaceWith(original.cloneNode(true));
         const after=capture(2);
-        document.documentElement.dataset.trace=JSON.stringify({parked,sameRuntime:api===globalThis.__zephiumSemanticRuntimeV1,reusedKey:before===after,differentNode:original!==document.querySelector("button")});
+        document.documentElement.dataset.trace=JSON.stringify({parked,sameRuntime:api===globalThis.__driftSemanticRuntimeV1,reusedKey:before===after,differentNode:original!==document.querySelector("button")});
       }catch(error){document.documentElement.dataset.error=String(error);}
     });</script>`;
   document.body.append(frame);
@@ -121,7 +121,7 @@ test("a new document can reuse semantic numbers but not a runtime instance", asy
   frame.width = "800";
   frame.height = "600";
   const body = `<button>Save changes</button><script>${inject("semanticMediaRuntime")}
-    addEventListener("load",()=>document.documentElement.dataset.key=String(JSON.parse(globalThis.__zephiumSemanticRuntimeV1.invoke(JSON.stringify({v:1,i:1,g:1,s:{k:"initial"},b:{n:128,t:16384,w:65536,x:4096,geo:true}}))).n.find(n=>n.r==="button").k));</script>`;
+    addEventListener("load",()=>document.documentElement.dataset.key=String(JSON.parse(globalThis.__driftSemanticRuntimeV1.invoke(JSON.stringify({v:1,i:1,g:1,s:{k:"initial"},b:{n:128,t:16384,w:65536,x:4096,geo:true}}))).n.find(n=>n.r==="button").k));</script>`;
   const load = () =>
     new Promise<void>((done) => frame.addEventListener("load", () => done(), { once: true }));
   let loaded = load();
@@ -132,13 +132,13 @@ test("a new document can reuse semantic numbers but not a runtime instance", asy
     const firstDocument = frame.contentDocument!;
     const firstKey = firstDocument.documentElement.dataset.key;
     const firstRuntime = (frame.contentWindow as unknown as Record<string, unknown>)
-      .__zephiumSemanticRuntimeV1;
+      .__driftSemanticRuntimeV1;
     loaded = load();
     frame.srcdoc = body;
     await loaded;
     expect(frame.contentDocument === firstDocument).toBe(false);
     expect(
-      (frame.contentWindow as unknown as Record<string, unknown>).__zephiumSemanticRuntimeV1 ===
+      (frame.contentWindow as unknown as Record<string, unknown>).__driftSemanticRuntimeV1 ===
         firstRuntime,
     ).toBe(false);
     expect(frame.contentDocument!.documentElement.dataset.key === firstKey).toBe(true);

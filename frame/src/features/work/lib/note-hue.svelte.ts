@@ -3,7 +3,7 @@ import { SvelteMap } from "svelte/reactivity";
 export const NOTE_HUES = ["lemon", "sky", "mint", "peach", "lilac", "rose"] as const;
 export type NoteHue = (typeof NOTE_HUES)[number];
 
-const KEY = "zephium.work.note-hues";
+const KEY = "drift.work.note-hues";
 const chosen = new SvelteMap<string, NoteHue>();
 try {
   const saved = JSON.parse(globalThis.localStorage?.getItem(KEY) ?? "{}") as Record<string, string>;

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Loopback-only file workflow fixture. Never serves arbitrary local files.
 
-Run with --files /private/tmp/zephium-upload-fixtures. The printed URL and
+Run with --files /private/tmp/drift-upload-fixtures. The printed URL and
 generated files are sufficient for an actual-product picker/upload test.
 Received bodies are bounded, compared against fixed fixture bytes and discarded.
 """
@@ -20,13 +20,13 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 FILES = {
-    "zephium-upload.txt": b"Zephium native upload fixture\n\x00exact bytes\n",
+    "drift-upload.txt": b"Drift native upload fixture\n\x00exact bytes\n",
     "second-α.txt": "Second file: Unicode α\n".encode(),
     "folder/nested/third.txt": b"Nested directory fixture\n",
 }
 MAX_BODY = 1024 * 1024
-RESUME_BYTES = b"Zephium resumable fixture\n" * 32768
-GZIP_BYTES = b"Zephium decoded attachment fixture\n" * 8192
+RESUME_BYTES = b"Drift resumable fixture\n" * 32768
+GZIP_BYTES = b"Drift decoded attachment fixture\n" * 8192
 
 
 def verify_upload(content_type, body):
@@ -72,12 +72,12 @@ class FixtureHandler(BaseHTTPRequestHandler):
             self.send_body(200,"image/png",base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aZ1kAAAAASUVORK5CYII="))
             return
         if self.path == base + "/empty":
-            self.send_attachment("zephium-empty.txt", b"")
+            self.send_attachment("drift-empty.txt", b"")
             return
         if self.path == base + "/truncated":
             self.send_response(200)
             self.send_header("Content-Type", "application/octet-stream")
-            self.send_header("Content-Disposition", 'attachment; filename="zephium-truncated.bin"')
+            self.send_header("Content-Disposition", 'attachment; filename="drift-truncated.bin"')
             self.send_header("Content-Length", "1048576")
             self.send_header("Connection", "close")
             self.end_headers()
@@ -88,7 +88,7 @@ class FixtureHandler(BaseHTTPRequestHandler):
         if self.path == base + "/unknown-length":
             self.send_response(200)
             self.send_header("Content-Type", "application/octet-stream")
-            self.send_header("Content-Disposition", 'attachment; filename="zephium-unknown-length.txt"')
+            self.send_header("Content-Disposition", 'attachment; filename="drift-unknown-length.txt"')
             self.send_header("Connection", "close")
             self.end_headers()
             self.wfile.write(b"Unknown-length fixture\n")
@@ -98,7 +98,7 @@ class FixtureHandler(BaseHTTPRequestHandler):
             if f"fixture_session={self.server.token}" not in self.headers.get("Cookie", "").split("; "):
                 self.send_body(403, "text/plain", b"Fixture cookie missing")
                 return
-            self.send_attachment("zephium-authenticated.txt", b"Cookie-authenticated fixture\n")
+            self.send_attachment("drift-authenticated.txt", b"Cookie-authenticated fixture\n")
             return
         if self.path == base + "/resumable":
             value = self.headers.get("Range", "")
@@ -116,9 +116,9 @@ class FixtureHandler(BaseHTTPRequestHandler):
                 self.server.resume_interrupted = True
             self.send_response(206 if value else 200)
             self.send_header("Content-Type", "application/octet-stream")
-            self.send_header("Content-Disposition", 'attachment; filename="zephium-resumable.bin"')
+            self.send_header("Content-Disposition", 'attachment; filename="drift-resumable.bin"')
             self.send_header("Accept-Ranges", "bytes")
-            self.send_header("ETag", '"zephium-resume-v1"')
+            self.send_header("ETag", '"drift-resume-v1"')
             self.send_header("Content-Length", str(len(RESUME_BYTES) - start))
             self.send_header("Connection", "close")
             if value:
@@ -132,7 +132,7 @@ class FixtureHandler(BaseHTTPRequestHandler):
             wire = gzip.compress(GZIP_BYTES, mtime=0)
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")
-            self.send_header("Content-Disposition", 'attachment; filename="zephium-decoded.txt"')
+            self.send_header("Content-Disposition", 'attachment; filename="drift-decoded.txt"')
             self.send_header("Content-Encoding", "gzip")
             self.send_header("Content-Length", str(len(wire)))
             self.end_headers()
@@ -146,12 +146,12 @@ class FixtureHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 return
             slow = self.path.endswith("/slow")
-            data = b"Zephium native download fixture\n"
+            data = b"Drift native download fixture\n"
             data = (data * (65536 // len(data) + 1))[:65536] if slow else data
             count = 512 if slow else 1
             self.send_response(200)
             self.send_header("Content-Type", "application/octet-stream")
-            self.send_header("Content-Disposition", 'attachment; filename="zephium-slow.bin"' if slow else 'attachment; filename="zephium-download.txt"')
+            self.send_header("Content-Disposition", 'attachment; filename="drift-slow.bin"' if slow else 'attachment; filename="drift-download.txt"')
             self.send_header("Content-Length", str(len(data) * count))
             self.end_headers()
             try:
@@ -171,7 +171,7 @@ class FixtureHandler(BaseHTTPRequestHandler):
             return
         frame = self.path.endswith("/frame")
         nested = "" if frame else f'<iframe title="Cross-origin upload" src="http://localhost:{self.server.server_port}{base}/frame"></iframe>'
-        page = r'''<!doctype html><meta charset="utf-8"><title>Zephium file workflow fixture</title>
+        page = r'''<!doctype html><meta charset="utf-8"><title>Drift file workflow fixture</title>
 <style>body{font:16px system-ui;margin:32px;max-width:850px}label{display:block;margin:20px 0}button{padding:8px 16px}pre{white-space:pre-wrap}iframe{width:100%;height:360px}#drop{padding:20px;border:2px dashed #888}</style>
 <h1>Native file uploads</h1>
 <p><a href="__BASE__/linked">Ordinary link</a> · <a target="_blank" rel="noreferrer" href="__BASE__/linked">New-tab link</a> · <a target="_blank" rel="noreferrer" href="__BASE__/download">New-tab attachment</a></p>
@@ -206,14 +206,14 @@ document.querySelector('#native-popup').onclick=()=> {
 };
 document.querySelector('#delayed-popup').onclick=()=>setTimeout(()=>{const child=window.open('__BASE__/linked');result.textContent=child ? 'FAIL: delayed popup opened' : 'PASS: delayed popup blocked';},6000);
 document.querySelector('#blob').onclick = () => {
-  const url = URL.createObjectURL(new Blob(['Zephium generated download fixture\n'], {type:'text/plain'}));
-  const link = document.createElement('a'); link.href=url; link.download='zephium-generated.txt'; link.click();
+  const url = URL.createObjectURL(new Blob(['Drift generated download fixture\n'], {type:'text/plain'}));
+  const link = document.createElement('a'); link.href=url; link.download='drift-generated.txt'; link.click();
   setTimeout(() => URL.revokeObjectURL(url),60000);
 };
 document.querySelector('#data').onclick = () => {
   const link = document.createElement('a');
-  link.href='data:text/plain;charset=utf-8,'+encodeURIComponent('Zephium data URL fixture\n'.repeat(1024));
-  link.download='zephium-data.txt';link.click();
+  link.href='data:text/plain;charset=utf-8,'+encodeURIComponent('Drift data URL fixture\n'.repeat(1024));
+  link.download='drift-data.txt';link.click();
 };
 async function send(data) {
   try {
@@ -250,7 +250,7 @@ drop.ondrop = event => {event.preventDefault();const data=new FormData();for(con
             if self.headers.get("Content-Length") != "17" or self.rfile.read(17) != b"fixture=generated":
                 self.send_body(400, "text/plain", b"Invalid generated export request")
                 return
-            self.send_attachment("zephium-post-export.txt", b"POST export fixture\n")
+            self.send_attachment("drift-post-export.txt", b"POST export fixture\n")
             return
         if self.path != base + "/upload" or self.headers.get("Origin") not in origins:
             self.send_body(403, "text/plain", b"Forbidden")

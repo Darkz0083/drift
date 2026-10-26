@@ -39,7 +39,7 @@
   }
 </script>
 
-<div class="page-request" role="alertdialog" aria-label={title} data-zephium-page-request>
+<div class="page-request" role="alertdialog" aria-label={title} data-drift-page-request>
   <div class="head">
     <Icon icon={app ? LinkSquare02Icon : Alert02Icon} size={14} />
     <div class="words">

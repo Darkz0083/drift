@@ -47,11 +47,11 @@ class InputEvent extends Event {
 class EventTarget {
   constructor() { this._listeners = new Map(); }
   addEventListener(type, listener) {
-    if (type === "zephium-fill-result-v1" && this._relaySetupThrow) throw Error("native listen failure");
+    if (type === "drift-fill-result-v1" && this._relaySetupThrow) throw Error("native listen failure");
     const listeners = this._listeners.get(type) || [];
     listeners.push(listener);
     this._listeners.set(type, listeners);
-    if (type === "zephium-fill-result-v1") terminalObservers.add(listener);
+    if (type === "drift-fill-result-v1") terminalObservers.add(listener);
   }
   removeEventListener(type, listener) {
     this._listeners.set(type, (this._listeners.get(type) || []).filter(value => value !== listener));
@@ -561,9 +561,9 @@ for (const target of [textInput, searchInput, textarea, contentEditable, editabl
   target.addEventListener("blur", (event) => fillChanges.set(target, [...(fillChanges.get(target) || []), event]));
 }
 
-const relayReady = "data-zephium-fill-relay-ready-v1";
-const relayCommand = "data-zephium-fill-relay-command-v1";
-const relayTerminal = "data-zephium-fill-relay-terminal-v1";
+const relayReady = "data-drift-fill-relay-ready-v1";
+const relayCommand = "data-drift-fill-relay-command-v1";
+const relayTerminal = "data-drift-fill-relay-terminal-v1";
 let relayMode = "normal";
 html.attributes[relayReady] = "1";
 
@@ -575,9 +575,9 @@ let releasePreparedFill = null;
 let preparationRequests = 0;
 globalThis.webkit = {
   messageHandlers: {
-    zephiumSemanticRuntimeV1: {
+    driftSemanticRuntimeV1: {
       postMessage(message) {
-        if(message==='ZEPHIUM_PREPARED_FILL_WAIT_V1') {
+        if(message==='DRIFT_PREPARED_FILL_WAIT_V1') {
           preparationRequests++;
           return new Promise(resolve=>{releasePreparedFill=resolve;});
         }
@@ -649,24 +649,24 @@ button.getAttribute = () => "poisoned";
 button.getBoundingClientRect = () => ({ x: 0, y: 0, width: 0, height: 0 });
 
 const sourcePath = path.resolve(
-  process.argv[2] || "crates/zephium-agentic/assets/semantic-runtime-v1.js"
+  process.argv[2] || "crates/drift-agentic/assets/semantic-runtime-v1.js"
 );
 const negativeControl = process.argv[3] === "--without-document-parent-brand";
 const readonlyViewerCase = process.argv[3] === "--readonly-viewer";
 const commandCase = process.argv[3]?.startsWith('--isolated-command=') ? process.argv[3].slice('--isolated-command='.length) : null;
-const preparationOnly = process.env.ZEPHIUM_LOCAL_ISOLATED_FILL_PREPARATION_ONLY_PROBE === '1';
+const preparationOnly = process.env.DRIFT_LOCAL_ISOLATED_FILL_PREPARATION_ONLY_PROBE === '1';
 assert(process.argv.length <= 4 && (process.argv[3] === undefined || negativeControl || commandCase || readonlyViewerCase || process.argv[3] === "--credential-comments" || process.argv[3] === "--owned-options"), "unknown smoke mode");
 let source = fs.readFileSync(sourcePath, "utf8");
 if (commandCase) {
   const anchor = '  function runFixedFill(target, descriptor, request) {';
   const finishAnchor = 'const result = runFixedFill(target, descriptor, request);';
   assert(source.split(anchor).length === 2 && source.split(finishAnchor).length === 2, 'candidate insertion anchors changed');
-  const candidate = fs.readFileSync('crates/zephium-engine/src/platform/macos/agentic_isolated_fill_candidate.js','utf8');
+  const candidate = fs.readFileSync('crates/drift-engine/src/platform/macos/agentic_isolated_fill_candidate.js','utf8');
   source = source.replace(anchor, candidate + '\n  function runSyntheticFill(target, descriptor, request) {')
     .replace(finishAnchor, finishAnchor+'\n      if (typeof result !== "string") return apply(promiseThen, result, [finishFill, () => actionFault("applied_unverified_postcondition")]);');
   if(preparationOnly) source=source.replace('const commandPreparationOnly = false;', 'const commandPreparationOnly = true;');
   if(commandCase.startsWith('prepare-'))source=source.replace('  async function serveNativeInvocations(channel, post) {',
-    '  async function serveNativeInvocations(channel, post) {\n    commandPreparationBarrier = () => apply(post, channel, ["ZEPHIUM_PREPARED_FILL_WAIT_V1"]);');
+    '  async function serveNativeInvocations(channel, post) {\n    commandPreparationBarrier = () => apply(post, channel, ["DRIFT_PREPARED_FILL_WAIT_V1"]);');
 }
 if (negativeControl) {
   // Mutate only this process's program string. Exactly one known guard must
@@ -701,11 +701,11 @@ globalThis.InputEvent = function PoisonedInputEvent() {
   throw new Error("global InputEvent poison");
 };
 
-const runtime = globalThis.__zephiumSemanticRuntimeV1;
+const runtime = globalThis.__driftSemanticRuntimeV1;
 assert(runtime && typeof runtime.invoke === "function", "runtime missing");
 
 let mediaDispatches = 0;
-Object.defineProperty(globalThis, "__zephiumRecordMediaV1", {configurable:true, value:{invoke(encoded,privacy){
+Object.defineProperty(globalThis, "__driftRecordMediaV1", {configurable:true, value:{invoke(encoded,privacy){
   assert(typeof privacy === "function", "media dispatch lost its native privacy provider");
   mediaDispatches++;
   return "fixture:" + encoded;
@@ -715,11 +715,11 @@ for (const prefix of ["M1:","V1:","U1:"]) {
   assert(runtime.invoke(call)==="fixture:"+call,"record-media protocol was not routed to its source owner: "+prefix);
 }
 assert(runtime.invoke('X1:{"i":1}')==="E1:invalid_request" && mediaDispatches===3,"unknown media protocol reached its owner");
-delete globalThis.__zephiumRecordMediaV1;
+delete globalThis.__driftRecordMediaV1;
 assert(runtime.invoke("H1:survey")==="E1:survey","human survey without its helper did not fail closed");
-Object.defineProperty(globalThis, "__zephiumHumanSurveyV1", {configurable:true, value:{survey(){return "7";}}});
+Object.defineProperty(globalThis, "__driftHumanSurveyV1", {configurable:true, value:{survey(){return "7";}}});
 assert(runtime.invoke("H1:survey")==="7" && runtime.invoke("H1:survey ")==="E1:invalid_request","human survey was not routed by its exact closed pull");
-delete globalThis.__zephiumHumanSurveyV1;
+delete globalThis.__driftHumanSurveyV1;
 
 const invoke = (invocation, generation, scope, budget = {}) => runtime.invoke(JSON.stringify({
   v: 1,
@@ -985,7 +985,7 @@ assert(
   "reattached stable identity changed"
 );
 
-const globalDescriptor = Object.getOwnPropertyDescriptor(globalThis, "__zephiumSemanticRuntimeV1");
+const globalDescriptor = Object.getOwnPropertyDescriptor(globalThis, "__driftSemanticRuntimeV1");
 assert(!globalDescriptor.writable && !globalDescriptor.configurable && !globalDescriptor.enumerable, "global mutable");
 assert(Object.isFrozen(runtime) && [runtime.invoke, runtime.prepareCdpAction, runtime.nextCdpAction].every(Object.isFrozen), "runtime mutable");
 assert(Object.keys(runtime).join(",") === "invoke,prepareCdpAction,nextCdpAction", "unexpected runtime API");
@@ -1085,7 +1085,7 @@ async function finishCommandSmoke() {
     if(commandCase==='prepare-readonly')root.attributes['aria-readonly']='true';
     if(commandCase==='prepare-spine')root.attributes.contenteditable='plaintext-only';
     if(commandCase==='prepare-occlusion')document._hit=decoy;
-    releasePreparedFill(commandCase==='prepare-denied'?'stop':'ZEPHIUM_PREPARED_FILL_CONTINUE_V1');
+    releasePreparedFill(commandCase==='prepare-denied'?'stop':'DRIFT_PREPARED_FILL_CONTINUE_V1');
   }
   const rawResult=await pendingResult;
   const preparationRefusal=commandCase.startsWith('prepare-')&&commandCase!=='prepare-normal';
@@ -1410,13 +1410,13 @@ async function finish() {
   editableCombobox.attributes.type = "text";
 
   document._hit = textInput;
-  const textFill = JSON.parse(await runtime.invoke(fillRequest(textNode, "Zephium fixed text", 8)));
+  const textFill = JSON.parse(await runtime.invoke(fillRequest(textNode, "Drift fixed text", 8)));
   assert(
     textFill.a === 8 && textFill.b === "fixed_semantic_recipe" && textFill.r === "form" &&
-      textInput._value === "Zephium fixed text",
+      textInput._value === "Drift fixed text",
     "captured native text-input fill failed"
   );
-  assertInputEvent(textInput, "Zephium fixed text");
+  assertInputEvent(textInput, "Drift fixed text");
 
   document._hit = searchInput;
   const searchFill = JSON.parse(await runtime.invoke(fillRequest(searchNode, "", 9)));
@@ -1428,7 +1428,7 @@ async function finish() {
   assertInputEvent(searchInput, "");
 
   document._hit = textarea;
-  const textareaValue = "  Zephium  fixed textarea\nline two  ";
+  const textareaValue = "  Drift  fixed textarea\nline two  ";
   const textareaFill = JSON.parse(await runtime.invoke(fillRequest(textareaNode, textareaValue, 10)));
   assert(
     textareaFill.a === 10 && textareaFill.b === "fixed_semantic_recipe" &&
@@ -3151,7 +3151,7 @@ async function finish() {
     surrounding_source_quote_fidelity: true,
     surrounding_fragment_coalescing: true,
     surrounding_bidirectional_admission: true,
-    schema: "zephium.agentic.semantic-runtime-smoke.v1",
+    schema: "drift.agentic.semantic-runtime-smoke.v1",
     initial_nodes: initial.n.length,
     expanded_nodes: expansion.n.length,
     initial_bytes: Buffer.byteLength(initialWire),

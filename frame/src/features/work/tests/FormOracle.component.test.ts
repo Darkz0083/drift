@@ -165,14 +165,14 @@ test("document-start passive receipt observes prevented submits without navigati
     let fetched=0;
     document.querySelector("form").addEventListener("submit",event=>{event.preventDefault();fetched++;void fetch("data:text/plain,synthetic-form-handler");});
     document.querySelector("button").click();
-    return {no_submit:globalThis.__zephiumPublicFormSubmitReceiptV1(), fetched, still_here:true};`,
+    return {no_submit:globalThis.__driftPublicFormSubmitReceiptV1(), fetched, still_here:true};`,
   );
   expect(result).toEqual({ no_submit: false, fetched: 1, still_here: true });
   expect(
     await runFixture(
       bindSubmit(),
       "<form></form>",
-      "return globalThis.__zephiumPublicFormSubmitReceiptV1();",
+      "return globalThis.__driftPublicFormSubmitReceiptV1();",
     ),
   ).toBe(true);
 });
@@ -184,21 +184,21 @@ test("missing, late, overflowing and child-frame submit coverage stay unknown", 
     await runFixture(
       bindSubmit(),
       "<form></form>",
-      `for(let i=0;i<257;i++)document.querySelector("form").dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));return globalThis.__zephiumPublicFormSubmitReceiptV1();`,
+      `for(let i=0;i<257;i++)document.querySelector("form").dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));return globalThis.__driftPublicFormSubmitReceiptV1();`,
     ),
   ).toBeNull();
   expect(
     await runFixture(
       bindSubmit(),
       "<iframe></iframe>",
-      "return globalThis.__zephiumPublicFormSubmitReceiptV1();",
+      "return globalThis.__driftPublicFormSubmitReceiptV1();",
     ),
   ).toBeNull();
   expect(
     await runFixture(
       "",
       "",
-      `const source=${JSON.stringify(submitSource())};Object.defineProperty(document,"readyState",{value:"complete"});Function("location",source)({href:"https://httpbin.org/forms/post"});return globalThis.__zephiumPublicFormSubmitReceiptV1();`,
+      `const source=${JSON.stringify(submitSource())};Object.defineProperty(document,"readyState",{value:"complete"});Function("location",source)({href:"https://httpbin.org/forms/post"});return globalThis.__driftPublicFormSubmitReceiptV1();`,
     ),
   ).toBeNull();
 });
@@ -239,7 +239,7 @@ test("a transient removed frame leaves sticky unknown submit coverage", async ()
     frame.contentDocument.querySelector("form").addEventListener("submit",event=>{event.preventDefault();void fetch("data:text/plain,synthetic-child-handler");});
     frame.contentDocument.querySelector("button").click();
     frame.remove();
-    return globalThis.__zephiumPublicFormSubmitReceiptV1();
+    return globalThis.__driftPublicFormSubmitReceiptV1();
   `,
     ),
   ).toBeNull();
@@ -271,12 +271,12 @@ test("open shadow attached to an already inspected host cannot qualify no-submit
       bindSubmit(),
       '<div id="host"></div>',
       `
-    globalThis.__zephiumPublicFormSubmitReceiptV1();
+    globalThis.__driftPublicFormSubmitReceiptV1();
     const root=document.querySelector("#host").attachShadow({mode:"open"});
     root.innerHTML="<form><button>Submit</button></form>";
     root.querySelector("form").addEventListener("submit",event=>event.preventDefault());
     root.querySelector("button").click();
-    return globalThis.__zephiumPublicFormSubmitReceiptV1();
+    return globalThis.__driftPublicFormSubmitReceiptV1();
   `,
     ),
   ).toBeNull();

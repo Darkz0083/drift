@@ -8,34 +8,34 @@ use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 use tauri::Manager;
 #[cfg(not(feature = "macos-work-retained-product-probe"))]
-use zephium_app::AgentWorkApplicationHandle;
+use drift_app::AgentWorkApplicationHandle;
 #[cfg(feature = "macos-work-retained-product-probe")]
-use zephium_app::RetainedWorkHandle as AgentWorkApplicationHandle;
+use drift_app::RetainedWorkHandle as AgentWorkApplicationHandle;
 #[cfg(feature = "macos-work-discovery-probe")]
-use zephium_work_composition::discovery_qualification::{
+use drift_work_composition::discovery_qualification::{
     self as qualifier, ApplicationObserver, ApplicationReport,
 };
 #[cfg(not(any(
     feature = "macos-work-discovery-probe",
     feature = "macos-work-retained-product-probe"
 )))]
-use zephium_work_composition::navigation_qualification::{
+use drift_work_composition::navigation_qualification::{
     self as qualifier, ApplicationObserver, ApplicationReport,
 };
 #[cfg(feature = "macos-work-retained-action-probe")]
-use zephium_work_composition::retained_action_qualification::{
+use drift_work_composition::retained_action_qualification::{
     self as qualifier, ApplicationObserver, ApplicationReport,
 };
 #[cfg(feature = "macos-work-retained-back-probe")]
-use zephium_work_composition::retained_back_qualification::{
+use drift_work_composition::retained_back_qualification::{
     self as qualifier, ApplicationObserver, ApplicationReport,
 };
 #[cfg(feature = "macos-work-retained-notion-probe")]
-use zephium_work_composition::retained_notion_qualification::{
+use drift_work_composition::retained_notion_qualification::{
     self as qualifier, ApplicationObserver, ApplicationReport,
 };
 #[cfg(feature = "macos-work-retained-notion-write-probe")]
-use zephium_work_composition::retained_notion_write_qualification::{
+use drift_work_composition::retained_notion_write_qualification::{
     self as qualifier, ApplicationObserver, ApplicationReport,
 };
 #[cfg(all(
@@ -45,7 +45,7 @@ use zephium_work_composition::retained_notion_write_qualification::{
     not(feature = "macos-work-retained-notion-probe"),
     not(feature = "macos-work-retained-notion-write-probe")
 ))]
-use zephium_work_composition::retained_product_qualification::{
+use drift_work_composition::retained_product_qualification::{
     self as qualifier, ApplicationObserver, ApplicationReport,
 };
 
@@ -66,7 +66,7 @@ const OBSERVER_HANDOFF: Duration = Duration::from_secs(160);
     feature = "macos-work-retained-notion-probe",
     feature = "macos-work-retained-notion-write-probe"
 ))]
-const ENROLLED_PROFILE_MARKER: &[u8] = b"zephium-authenticated-qualification-profile-v1\n";
+const ENROLLED_PROFILE_MARKER: &[u8] = b"drift-authenticated-qualification-profile-v1\n";
 
 #[derive(Default)]
 struct Control {
@@ -388,11 +388,11 @@ fn wait_for_profile(
     app: &tauri::AppHandle,
     control: &Control,
     started: Instant,
-    mut pinned: Option<zephium_app::AgentWorkProfileBinding>,
-) -> Result<zephium_app::AgentWorkProfileBinding, &'static str> {
-    use zephium_app::AgentWorkProfileReadiness as Readiness;
+    mut pinned: Option<drift_app::AgentWorkProfileBinding>,
+) -> Result<drift_app::AgentWorkProfileBinding, &'static str> {
+    use drift_app::AgentWorkProfileReadiness as Readiness;
     let shell = app
-        .try_state::<zephium_app::Handle>()
+        .try_state::<drift_app::Handle>()
         .ok_or("profile_owner")?;
     let mut pending = None;
     let mut prior = None;

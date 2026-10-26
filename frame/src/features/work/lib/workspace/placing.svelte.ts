@@ -174,9 +174,9 @@ export class CanvasPlacing {
           : null;
       void this.#drop(paths.slice(0, 8), at);
     };
-    window.addEventListener("zephium:work-paths-dropped", dropped);
+    window.addEventListener("drift:work-paths-dropped", dropped);
     return () => {
-      window.removeEventListener("zephium:work-paths-dropped", dropped);
+      window.removeEventListener("drift:work-paths-dropped", dropped);
       clearTimeout(this.#notice);
     };
   }

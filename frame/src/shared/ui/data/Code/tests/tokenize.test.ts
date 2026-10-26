@@ -125,12 +125,12 @@ test("calls, types and properties", () => {
 });
 
 test("keys are properties in data", () => {
-  expect(kinds(tokenize("json", '{"name": "zephium", "n": 1}')[0], "property")).toEqual([
+  expect(kinds(tokenize("json", '{"name": "drift", "n": 1}')[0], "property")).toEqual([
     '"name"',
     '"n"',
   ]);
-  expect(kinds(tokenize("json", '{"name": "zephium"}')[0], "string")).toEqual(['"zephium"']);
-  expect(kinds(tokenize("yaml", "name: zephium")[0], "property")).toEqual(["name"]);
+  expect(kinds(tokenize("json", '{"name": "drift"}')[0], "string")).toEqual(['"drift"']);
+  expect(kinds(tokenize("yaml", "name: drift")[0], "property")).toEqual(["name"]);
   expect(kinds(tokenize("toml", 'name = "z"')[0], "property")).toEqual(["name"]);
 });
 

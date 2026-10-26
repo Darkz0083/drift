@@ -108,7 +108,7 @@ describe("commands on the trail", () => {
 });
 
 describe("link titles", () => {
-  const url = "https://example.com/guide?utm_source=zephium";
+  const url = "https://example.com/guide?utm_source=drift";
   const read = (status: WorkStepFact["status"], title: string | null): WorkStepFact => ({
     id: `read-${status}`,
     turn: 1,

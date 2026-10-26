@@ -12,8 +12,8 @@ function Invoke-Checked {
 try {
     if (-not $IsWindows -and $env:OS -ne 'Windows_NT') { throw 'Run on Windows.' }
     Invoke-Checked 'cargo' @('test', '--manifest-path', 'vendor/wry/Cargo.toml', '--lib', '--locked')
-    Invoke-Checked 'cargo' @('test', '-p', 'zephium-core', '-p', 'zephium-store', '-p', 'zephium-engine', '--lib', '--locked', '--', '--test-threads=1')
-    Invoke-Checked 'cargo' @('test', '-p', 'zephium-desktop', '--locked', '--', '--test-threads=1')
+    Invoke-Checked 'cargo' @('test', '-p', 'drift-core', '-p', 'drift-store', '-p', 'drift-engine', '--lib', '--locked', '--', '--test-threads=1')
+    Invoke-Checked 'cargo' @('test', '-p', 'drift-desktop', '--locked', '--', '--test-threads=1')
     Invoke-Checked 'pnpm.cmd' @('-C', 'frame', 'check')
     Invoke-Checked 'pnpm.cmd' @('-C', 'frame', 'test:component')
     Invoke-Checked 'pnpm.cmd' @('-C', 'frame', 'build')

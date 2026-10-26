@@ -22,7 +22,7 @@ test("native stop preserves the capture indicator until the host changes state",
   await expect.poll(() => native.stop.mock.calls.length).toBe(1);
   await expect.element(stop).toBeEnabled();
   await expect.element(stop).toHaveAttribute("title", "Camera in use");
-  expect(screen.container.querySelector("[data-zephium-capture-control]")).not.toBeNull();
+  expect(screen.container.querySelector("[data-drift-capture-control]")).not.toBeNull();
 });
 
 test("muted native capture is labelled truthfully and failed stop offers recovery", async () => {

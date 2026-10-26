@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`Checking…`)),n=((t={},n={})=>(n.locale??e(),`Included usage used`)),r=((t={},n={})=>(n.locale??e(),`Not included in this plan`)),i=((t={},n={})=>(n.locale??e(),`Included credits`));export{t as i,r as n,n as r,i as t};

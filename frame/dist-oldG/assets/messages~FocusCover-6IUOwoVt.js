@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Allow 5 minutes`)),n=((t,n={})=>(n.locale??e(),`${t?.site} stays shut until this round ends.`)),r=((t={},n={})=>(n.locale??e(),`End focus`)),i=((t={},n={})=>(n.locale??e(),`left in this round`)),a=((t={},n={})=>(n.locale??e(),`Paused for focus`));export{t as a,n as i,i as n,r,a as t};

@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Ask about this`)),n=((t={},n={})=>(n.locale??e(),`What it connects to`));export{t as n,n as t};

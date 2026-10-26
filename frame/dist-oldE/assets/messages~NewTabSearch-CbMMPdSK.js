@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`Clear search`)),n=((t={},n={})=>(n.locale??e(),`Search the web or enter an address`)),r=((t={},n={})=>(n.locale??e(),`Search or enter an address`));export{n,t as r,r as t};

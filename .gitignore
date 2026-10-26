@@ -2,10 +2,10 @@ node_modules
 .pnpm-store/
 dist
 /target
-/crates/zephium-engine/target/
+/crates/drift-engine/target/
 /vendor/adblock/target/
-/crates/zephium-blocker/fuzz/artifacts/
-/crates/zephium-blocker/fuzz/target/
+/crates/drift-blocker/fuzz/artifacts/
+/crates/drift-blocker/fuzz/target/
 gen/schemas
 .DS_Store
 *.log

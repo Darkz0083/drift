@@ -74,7 +74,7 @@ function release(snapshot: Snapshot) {
   const { column, host, rect } = snapshot;
   for (const node of [column, ...column.querySelectorAll<HTMLElement>("*")]) {
     for (const name of node.getAttributeNames()) {
-      if (name.startsWith("data-zephium-") || name === KEY || name === "id") {
+      if (name.startsWith("data-drift-") || name === KEY || name === "id") {
         node.removeAttribute(name);
       }
     }

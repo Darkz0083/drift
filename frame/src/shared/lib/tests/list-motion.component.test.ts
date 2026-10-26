@@ -27,11 +27,11 @@ function list(keys: string[]): HTMLUListElement {
 function item(key: string): HTMLLIElement {
   const element = document.createElement("li");
   element.dataset.motionKey = key;
-  element.dataset.zephiumTabId = key;
+  element.dataset.driftTabId = key;
   element.style.cssText = "height:36px;list-style:none";
   const mark = document.createElement("span");
   mark.dataset.favicon = "";
-  mark.dataset.zephiumTabLabel = "";
+  mark.dataset.driftTabLabel = "";
   mark.style.cssText = "display:block;width:16px;height:16px";
   element.append(mark);
   return element;
@@ -53,10 +53,10 @@ test("a departed item returns only as an anonymous, unreachable ghost", async ()
   expect(ghost).not.toBeNull();
   expect(ghost!.inert).toBe(true);
   // Native resolves tabs through these; a departed tab must never be found.
-  expect(ghost!.querySelector("[data-zephium-tab-label]")).toBeNull();
-  expect(ghost!.hasAttribute("data-zephium-tab-id")).toBe(false);
+  expect(ghost!.querySelector("[data-drift-tab-label]")).toBeNull();
+  expect(ghost!.hasAttribute("data-drift-tab-id")).toBe(false);
   expect(ghost!.hasAttribute("data-motion-key")).toBe(false);
-  expect(container.querySelectorAll("[data-zephium-tab-id]")).toHaveLength(2);
+  expect(container.querySelectorAll("[data-drift-tab-id]")).toHaveLength(2);
 
   // The item after it closes the gap rather than jumping.
   expect(byKey(container, "c").getAnimations()).not.toHaveLength(0);

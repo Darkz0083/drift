@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`New note`)),n=((t={},n={})=>(n.locale??e(),`Layout preview`)),r=((t={},n={})=>(n.locale??e(),`Clear search`));export{n,t as r,r as t};

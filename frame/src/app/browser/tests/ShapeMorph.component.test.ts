@@ -79,8 +79,8 @@ test("collapsing carries every mark into the rail and lets the list go as a ghos
   expect(ghost.inert).toBe(true);
   // Native resolves the address and every tab through these; the ghost must
   // be invisible to it.
-  expect(ghost.querySelector("[data-zephium-address], [data-zephium-tab-id]")).toBeNull();
-  expect(document.querySelectorAll("[data-zephium-address]")).toHaveLength(1);
+  expect(ghost.querySelector("[data-drift-address], [data-drift-tab-id]")).toBeNull();
+  expect(document.querySelectorAll("[data-drift-address]")).toHaveLength(1);
 
   const rail = document.querySelector<HTMLElement>(
     ".sidebar-columns > .sidebar-browser-column:not([aria-hidden])",

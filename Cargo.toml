@@ -15,32 +15,32 @@ version = "0.1.0"
 edition = "2021"
 license = "MPL-2.0"
 authors = ["crynta"]
-repository = "https://github.com/zephium/zephium"
+repository = "https://github.com/drift/drift"
 
 [workspace.dependencies]
-zephium-agentic = { path = "crates/zephium-agentic", version = "=0.1.0" }
-zephium-decision = { path = "crates/zephium-decision", version = "=0.1.0" }
-zephium-agent-model-catalog = { path = "crates/zephium-agent-model-catalog", version = "=0.1.0" }
-zephium-agent-runtime = { path = "crates/zephium-agent-runtime", version = "=0.1.0" }
-zephium-agent-provider-transport = { path = "crates/zephium-agent-provider-transport", version = "=0.1.0" }
-zephium-agent-controller = { path = "crates/zephium-agent-controller", version = "=0.1.0" }
-zephium-blocker = { path = "crates/zephium-blocker", version = "=0.1.0", default-features = false }
-zephium-blocker-service = { path = "crates/zephium-blocker-service", version = "=0.1.0", default-features = false }
-zephium-blocker-update = { path = "crates/zephium-blocker-update", version = "=0.1.0", default-features = false }
-zephium-account = { path = "crates/zephium-account", version = "=0.1.0" }
-zephium-core = { path = "crates/zephium-core", version = "=0.1.0" }
-zephium-credentials = { path = "crates/zephium-credentials", version = "=0.1.0" }
-zephium-ipc = { path = "crates/zephium-ipc", version = "=0.1.0" }
-zephium-engine = { path = "crates/zephium-engine", version = "=0.1.0" }
-zephium-notes = { path = "crates/zephium-notes", version = "=0.1.0" }
-zephium-import = { path = "crates/zephium-import", version = "=0.1.0" }
-zephium-private-fs = { path = "crates/zephium-private-fs", version = "=0.1.0" }
-zephium-store = { path = "crates/zephium-store", version = "=0.1.0" }
-zephium-voice = { path = "crates/zephium-voice", version = "=0.1.0" }
-zephium-update-transport = { path = "crates/zephium-update-transport", version = "=0.1.0", default-features = false }
-zephium-app = { path = "crates/zephium-app", version = "=0.1.0" }
-zephium-work-composition = { path = "crates/zephium-work-composition", version = "=0.1.0" }
-zephium-page-assist = { path = "crates/zephium-page-assist", version = "=0.1.0" }
+drift-agentic = { path = "crates/drift-agentic", version = "=0.1.0" }
+drift-decision = { path = "crates/drift-decision", version = "=0.1.0" }
+drift-agent-model-catalog = { path = "crates/drift-agent-model-catalog", version = "=0.1.0" }
+drift-agent-runtime = { path = "crates/drift-agent-runtime", version = "=0.1.0" }
+drift-agent-provider-transport = { path = "crates/drift-agent-provider-transport", version = "=0.1.0" }
+drift-agent-controller = { path = "crates/drift-agent-controller", version = "=0.1.0" }
+drift-blocker = { path = "crates/drift-blocker", version = "=0.1.0", default-features = false }
+drift-blocker-service = { path = "crates/drift-blocker-service", version = "=0.1.0", default-features = false }
+drift-blocker-update = { path = "crates/drift-blocker-update", version = "=0.1.0", default-features = false }
+drift-account = { path = "crates/drift-account", version = "=0.1.0" }
+drift-core = { path = "crates/drift-core", version = "=0.1.0" }
+drift-credentials = { path = "crates/drift-credentials", version = "=0.1.0" }
+drift-ipc = { path = "crates/drift-ipc", version = "=0.1.0" }
+drift-engine = { path = "crates/drift-engine", version = "=0.1.0" }
+drift-notes = { path = "crates/drift-notes", version = "=0.1.0" }
+drift-import = { path = "crates/drift-import", version = "=0.1.0" }
+drift-private-fs = { path = "crates/drift-private-fs", version = "=0.1.0" }
+drift-store = { path = "crates/drift-store", version = "=0.1.0" }
+drift-voice = { path = "crates/drift-voice", version = "=0.1.0" }
+drift-update-transport = { path = "crates/drift-update-transport", version = "=0.1.0", default-features = false }
+drift-app = { path = "crates/drift-app", version = "=0.1.0" }
+drift-work-composition = { path = "crates/drift-work-composition", version = "=0.1.0" }
+drift-page-assist = { path = "crates/drift-page-assist", version = "=0.1.0" }
 
 tauri = { version = "=2.11.3", features = ["macos-private-api"] }
 tauri-build = "2"

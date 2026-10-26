@@ -51,7 +51,7 @@ test("a link's admitted picture is its image, never a media card of its own", ()
 });
 
 test("a pasted YouTube link becomes the video it is, starting where it points", () => {
-  const poster = { src: "zephium-media://p/d", width: 480, height: 360 };
+  const poster = { src: "drift-media://p/d", width: 480, height: 360 };
   expect(
     linkVideo("e1", "https://youtu.be/dQw4w9WgXcQ?t=1m30s", { title: "Talk", poster }),
   ).toEqual({

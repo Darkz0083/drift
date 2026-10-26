@@ -17,7 +17,7 @@ export function bootstrapReport(pages: readonly Page[]): Plugin {
   const surfaceStyles = new Map<string, Set<string>>();
   let recording = false;
   return {
-    name: "zephium-bootstrap-boundaries",
+    name: "drift-bootstrap-boundaries",
     apply: "build",
     configResolved(config) {
       recording = config.mode === "budgets";

@@ -9,10 +9,10 @@ use tauri::menu::{
 use tauri::{AppHandle, Manager, State, WebviewWindow};
 
 use crate::menu_text;
-use zephium_app::{Command, Handle, SpaceCommand};
-use zephium_core::ids::{ItemId, SpaceId};
-use zephium_core::spaces::{SpaceIcon, SpaceLook, SpaceTheme};
-use zephium_ipc::{ItemsState, OperationAdmission, SpaceIconView, SpaceThemeView};
+use drift_app::{Command, Handle, SpaceCommand};
+use drift_core::ids::{ItemId, SpaceId};
+use drift_core::spaces::{SpaceIcon, SpaceLook, SpaceTheme};
+use drift_ipc::{ItemsState, OperationAdmission, SpaceIconView, SpaceThemeView};
 
 const SWITCH: &str = "space.switch=";
 const MOVE_ACTIVE: &str = "space.moveActive=";
@@ -111,14 +111,14 @@ pub(crate) fn follow(app: &AppHandle, state: &ItemsState) {
         private: state
             .profile
             .as_ref()
-            .is_some_and(|profile| profile.kind == zephium_ipc::ProfileKindView::Incognito),
+            .is_some_and(|profile| profile.kind == drift_ipc::ProfileKindView::Incognito),
     };
     let theme = active
         .and_then(|space| space.theme.as_ref())
         .map(|theme| match theme {
             SpaceThemeView::Preset { id } => (id.clone(), None),
             SpaceThemeView::Custom { seeds } => {
-                (zephium_core::theme::CUSTOM.to_owned(), Some(seeds.clone()))
+                (drift_core::theme::CUSTOM.to_owned(), Some(seeds.clone()))
             }
         });
     let (menus, ground) = {
@@ -420,7 +420,7 @@ fn space_items(
     overrides: &std::collections::HashMap<String, String>,
     shown: &Shown,
 ) -> tauri::Result<Items> {
-    let resolved = zephium_core::commands::resolve(overrides);
+    let resolved = drift_core::commands::resolve(overrides);
     let mut items: Items = Vec::new();
     for (index, (id, name)) in shown.spaces.iter().enumerate() {
         let command = format!("space.select.{}", index + 1);
@@ -467,7 +467,7 @@ pub(crate) fn build_menu_section(
     overrides: &std::collections::HashMap<String, String>,
 ) -> tauri::Result<Submenu<tauri::Wry>> {
     let shown = shown();
-    let resolved = zephium_core::commands::resolve(overrides);
+    let resolved = drift_core::commands::resolve(overrides);
     let item = |id: &str| super::build_command_menu_item(handle, &resolved, id);
     let enabled = !shown.private && !shown.spaces.is_empty();
     let spaces = space_items(handle, overrides, &shown)?;

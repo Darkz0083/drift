@@ -11,7 +11,7 @@ type Data = WorkArtifactV1["data"];
 type Stage = "done" | "working" | "handoff";
 
 const PROFILE = "01J8Z7V6Q5N4M3K2H1G0F9E8D7";
-const ROOT = "/Users/ada/Code/zephium";
+const ROOT = "/Users/ada/Code/drift";
 const LIMITS = {
   model_tokens: 400_000,
   cost_micro_usd: 2_000_000,
@@ -22,7 +22,7 @@ const LIMITS = {
 const ISSUE =
   "`--allow-forking=false` not interpreted correctly if forking disabled at organization level";
 
-const FAILED_RUN = `   Compiling zephium-core v0.1.0
+const FAILED_RUN = `   Compiling drift-core v0.1.0
     Finished test [unoptimized + debuginfo] target(s) in 4.12s
      Running unittests src/lib.rs
 running 43 tests
@@ -40,8 +40,8 @@ assertion \`left == right\` failed
 test result: FAILED. 42 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out`;
 const PASSED_RUN = `running 43 tests
 test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s`;
-const LIVE_RUN = `   Compiling zephium-core v0.1.0 (/Users/ada/Code/zephium/crates/zephium-core)
-   Compiling zephium-store v0.1.0 (/Users/ada/Code/zephium/crates/zephium-store)`;
+const LIVE_RUN = `   Compiling drift-core v0.1.0 (/Users/ada/Code/drift/crates/drift-core)
+   Compiling drift-store v0.1.0 (/Users/ada/Code/drift/crates/drift-store)`;
 const CODEX_STREAM = [
   { type: "thread.started", thread_id: "t" },
   { type: "item.completed", item: { type: "agent_message", text: "Reading the duration module." } },
@@ -49,7 +49,7 @@ const CODEX_STREAM = [
     type: "item.started",
     item: {
       type: "file_change",
-      changes: [{ path: `${ROOT}/crates/zephium-core/src/work/duration.rs` }],
+      changes: [{ path: `${ROOT}/crates/drift-core/src/work/duration.rs` }],
     },
   },
 ]
@@ -143,7 +143,7 @@ export function fixScene(stage: Stage): BoardScene {
       {
         kind: "run_command",
         cwd: ROOT,
-        command: "ls crates/zephium-core/src/time",
+        command: "ls crates/drift-core/src/time",
         timeout_secs: 10,
       },
       "failed",
@@ -151,13 +151,13 @@ export function fixScene(stage: Stage): BoardScene {
     ),
     step("c-3", "code", {
       kind: "read_file",
-      path: `${ROOT}/crates/zephium-core/src/work/duration.rs`,
+      path: `${ROOT}/crates/drift-core/src/work/duration.rs`,
       offset: 1,
       limit: 400,
     }),
     step("c-4", "code", {
       kind: "read_file",
-      path: `${ROOT}/crates/zephium-core/src/work/tests.rs`,
+      path: `${ROOT}/crates/drift-core/src/work/tests.rs`,
       offset: 60,
       limit: 80,
     }),
@@ -167,7 +167,7 @@ export function fixScene(stage: Stage): BoardScene {
       {
         kind: "run_command",
         cwd: ROOT,
-        command: "cargo test -p zephium-core duration",
+        command: "cargo test -p drift-core duration",
         timeout_secs: 120,
       },
       "failed",
@@ -178,7 +178,7 @@ export function fixScene(stage: Stage): BoardScene {
       "code",
       {
         kind: "edit_file",
-        path: `${ROOT}/crates/zephium-core/src/work/duration.rs`,
+        path: `${ROOT}/crates/drift-core/src/work/duration.rs`,
         old: "seconds / 60",
         new: "(seconds + 30) / 60",
         decision: stage === "working" ? null : true,
@@ -199,7 +199,7 @@ export function fixScene(stage: Stage): BoardScene {
         "code",
         {
           kind: "write_file",
-          path: `${ROOT}/crates/zephium-core/src/work/tests.rs`,
+          path: `${ROOT}/crates/drift-core/src/work/tests.rs`,
           content: "",
           decision: true,
         },
@@ -245,7 +245,7 @@ export function fixScene(stage: Stage): BoardScene {
         {
           kind: "run_command",
           cwd: ROOT,
-          command: "cargo test -p zephium-core duration",
+          command: "cargo test -p drift-core duration",
           timeout_secs: 120,
         },
         done ? "succeeded" : "running",
@@ -270,7 +270,7 @@ export function fixScene(stage: Stage): BoardScene {
     attempt: "attempt",
     command: {
       cwd: ROOT,
-      command: "cargo test -p zephium-core duration",
+      command: "cargo test -p drift-core duration",
       exit,
       signal: null,
       elapsed_ms: ms,
@@ -305,7 +305,7 @@ export function fixScene(stage: Stage): BoardScene {
           "duration.rs",
           {
             kind: "diff",
-            path: "crates/zephium-core/src/work/duration.rs",
+            path: "crates/drift-core/src/work/duration.rs",
             language: "rust",
             summary: "Round to the nearest minute instead of down",
             hunks: [
@@ -349,7 +349,7 @@ export function fixScene(stage: Stage): BoardScene {
     provider_evidence: [],
     user_artifacts: [],
     command_evidence: [
-      record("rec-0", "ls: crates/zephium-core/src/time: No such file or directory\n", 1, 12),
+      record("rec-0", "ls: crates/drift-core/src/time: No such file or directory\n", 1, 12),
       record("rec-1", FAILED_RUN, 101, 4_830),
       ...(done ? [record("rec-2", PASSED_RUN, 0, 3_210)] : []),
     ],

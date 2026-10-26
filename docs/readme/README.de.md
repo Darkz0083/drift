@@ -1,11 +1,11 @@
 <div align="center">
-  <img src="../../.github/assets/logo.png" width="112" height="112" alt="Zephium" />
-  <h1>Zephium</h1>
+  <img src="../../.github/assets/logo.png" width="112" height="112" alt="Drift" />
+  <h1>Drift</h1>
 
   <p><strong>Ein schneller, voll ausgestatteter Browser samt Arbeitsumgebung,<br />neu gedacht für dich und deine Agenten.</strong></p>
 
   <p>
-    <a href="https://github.com/zephium-browser/Zephium/releases"><img src="https://img.shields.io/github/v/release/zephium-browser/Zephium?include_prereleases&label=release&color=blue" alt="Neueste Version" /></a>
+    <a href="https://github.com/drift-browser/Drift/releases"><img src="https://img.shields.io/github/v/release/drift-browser/Drift?include_prereleases&label=release&color=blue" alt="Neueste Version" /></a>
     <a href="../../LICENSE"><img src="https://img.shields.io/badge/license-MPL--2.0-blue" alt="Lizenz: MPL-2.0" /></a>
     <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey" alt="Plattformen: macOS und Windows" />
     <a href="https://discord.gg/tyveTUyEp7"><img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white" alt="Discord" /></a>
@@ -14,10 +14,10 @@
   </p>
 
   <p>
-    <a href="https://zephium.app">Website</a> ·
-    <a href="https://zephium.app/docs">Dokumentation</a> ·
+    <a href="https://drift.app">Website</a> ·
+    <a href="https://drift.app/docs">Dokumentation</a> ·
     <a href="https://youtu.be/QbSarcWspvw">Launch-Film</a> ·
-    <a href="https://github.com/zephium-browser/Zephium/releases/latest">Download</a>
+    <a href="https://github.com/drift-browser/Drift/releases/latest">Download</a>
   </p>
 </div>
 
@@ -41,7 +41,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="../../.github/assets/browse-dark.webp" />
-    <img src="../../.github/assets/browse-light.webp" alt="Der neue Tab von Zephium: Das Fenster öffnet sich zum Himmel, am unteren Rand stehen der Name, Uhrzeit und Datum und die Zahlen des Tages" width="960" />
+    <img src="../../.github/assets/browse-light.webp" alt="Der neue Tab von Drift: Das Fenster öffnet sich zum Himmel, am unteren Rand stehen der Name, Uhrzeit und Datum und die Zahlen des Tages" width="960" />
   </picture>
 </p>
 
@@ -54,7 +54,7 @@
 
 ---
 
-Zephium ist ein Open-Source-Browser, in Rust gebaut auf der Web-Engine deines
+Drift ist ein Open-Source-Browser, in Rust gebaut auf der Web-Engine deines
 Betriebssystems: WebKit unter macOS, der Engine von Safari, und WebView2 unter
 Windows. Er ist kein Fork von Chromium oder Firefox. Er blockiert Werbung und
 Tracker nativ, führt Chrome-Erweiterungen aus und legt Aufgaben, Notizen und
@@ -72,7 +72,7 @@ vergleichen, ein System entwerfen, einen Bug beheben. Work übernimmt von dort
 auf einer Arbeitsfläche, und du siehst jeden Schritt.
 
 <p align="center">
-  <img src="../../.github/assets/work.webp" alt="Ein ganzer Work-Durchlauf in Zephium: Helfer lesen Uptime Kuma, Gatus und OpenStatus auf deren eigenen Seiten, ein lokaler Helfer prüft die Endpunkte, dann folgen die Antwort, eine Vergleichstabelle samt Diagrammen, ein Schaubild, die Konfiguration und vier Aufgaben" width="960" />
+  <img src="../../.github/assets/work.webp" alt="Ein ganzer Work-Durchlauf in Drift: Helfer lesen Uptime Kuma, Gatus und OpenStatus auf deren eigenen Seiten, ein lokaler Helfer prüft die Endpunkte, dann folgen die Antwort, eine Vergleichstabelle samt Diagrammen, ein Schaubild, die Konfiguration und vier Aufgaben" width="960" />
 </p>
 <p align="center"><sub>Auf die Bitte um eine Statusseite liest Work drei Monitoring-Tools auf deren eigenen Seiten, prüft deine Endpunkte von deinem Rechner aus, baut die Empfehlung zusammen und lässt Vergleich, Konfiguration und Aufgaben auf der Arbeitsfläche liegen.</sub></p>
 
@@ -100,15 +100,15 @@ auf einer Arbeitsfläche, und du siehst jeden Schritt.
   OpenAI, Google Gemini, DeepSeek oder OpenRouter, oder betreibe ein Modell
   lokal über Ollama, LM Studio oder einen beliebigen OpenAI-kompatiblen Server.
   Die Schlüssel liegen in der Schlüsselverwaltung deines Systems.
-  Oder melde dich bei Zephium AI an und verzichte auf die Schlüssel: Es wählt für
+  Oder melde dich bei Drift AI an und verzichte auf die Schlüssel: Es wählt für
   jeden Schritt das passende Modell, und du startest mit Gratis-Guthaben
-  ([Preise](https://zephium.app/pricing)).
+  ([Preise](https://drift.app/pricing)).
 
 Work wird mit 25 Skills ausgeliefert, darunter Reiseplanung, Recherche,
 Vergleichen und Entscheiden, meinen Tag planen, einen Bug beheben und
 Wochenstatus. Du kannst eigene schreiben.
 
-## Ask Zephium
+## Ask Drift
 
 Ein Assistent in der Seitenleiste, aufrufbar mit `⌘ E` (`Ctrl E` unter Windows).
 Er liest die Seite, auf der du gerade bist, und beantwortet Fragen dazu, zeigt,
@@ -119,7 +119,7 @@ Aufgabe über einen Chat hinaus, nimmt **Continue in Work** sie samt Seite mit a
 die Arbeitsfläche.
 
 <p align="center">
-  <img src="../../.github/assets/ask.webp" alt="Ask Zephium neben Hacker News: drei Beiträge ausgewählt, in neuen Tabs geöffnet und die Startseite als ruhige Karten neu gesetzt" width="960" />
+  <img src="../../.github/assets/ask.webp" alt="Ask Drift neben Hacker News: drei Beiträge ausgewählt, in neuen Tabs geöffnet und die Startseite als ruhige Karten neu gesetzt" width="960" />
 </p>
 <p align="center"><sub>Auf die Frage, was sich zu lesen lohnt, wählt er drei Beiträge aus, öffnet sie und setzt die Startseite als ruhige Karten neu.</sub></p>
 
@@ -152,7 +152,7 @@ die Arbeitsfläche.
 ### Erweiterungen
 
 Installiere Erweiterungen direkt aus dem Chrome Web Store. Zwanzig beliebte sind
-darauf geprüft, in Zephium gut zu funktionieren, und liegen in der
+darauf geprüft, in Drift gut zu funktionieren, und liegen in der
 Erweiterungsverwaltung einen Klick entfernt, darunter 1Password, Bitwarden,
 Grammarly, DeepL, Dark Reader, Vimium, SponsorBlock, Raindrop.io, Notion Web
 Clipper und Refined GitHub.
@@ -173,13 +173,13 @@ und Edge.
   <tr>
     <td valign="top"><strong>Tasks</strong><br /><sub>Schreib sie so, wie du sie sagen würdest, etwa "Anna morgen um 15 Uhr anrufen". Listen, Prioritäten, Fristen, Unteraufgaben, und die Seite, auf der du warst, bleibt verknüpft.</sub></td>
     <td valign="top"><strong>Time</strong><br /><sub>Sieh, wohin deine Zeit im Web geht, gezählt nur auf diesem Gerät. Starte eine Focus-Runde, und die Websites, die du wählst, bleiben bis zur Pause gesperrt.</sub></td>
-    <td valign="top"><strong>Notes</strong><br /><sub>Notizen neben der Seite, jede eine Markdown-Datei, die dir gehört. Änderungen aus anderen Apps erscheinen in Zephium.</sub></td>
+    <td valign="top"><strong>Notes</strong><br /><sub>Notizen neben der Seite, jede eine Markdown-Datei, die dir gehört. Änderungen aus anderen Apps erscheinen in Drift.</sub></td>
   </tr>
 </table>
 
 ## Standardmäßig privat
 
-- **Keine Telemetrie.** Zephium erfasst und sendet nichts darüber, wie du surfst.
+- **Keine Telemetrie.** Drift erfasst und sendet nichts darüber, wie du surfst.
 - **Kein Konto nötig.** Verlauf, Aufgaben, Notizen, Erinnerungen und Zeit bleiben auf
   deinem Gerät.
 - **Private Fenster behalten nichts**, sobald sie geschlossen werden.
@@ -188,22 +188,22 @@ und Edge.
 
 | Plattform | Architektur | Installer | Voraussetzung |
 | --------- | ----------- | --------- | ------------- |
-| macOS | Apple Silicon | [`Zephium-macOS-arm64.dmg`](https://github.com/zephium-browser/Zephium/releases/latest/download/Zephium-macOS-arm64.dmg) | macOS Sonoma 14 oder neuer |
-| Windows | x64 | [`Zephium-Windows-x64-setup.exe`](https://github.com/zephium-browser/Zephium/releases/latest/download/Zephium-Windows-x64-setup.exe) | Windows 10 oder 11 |
+| macOS | Apple Silicon | [`Drift-macOS-arm64.dmg`](https://github.com/drift-browser/Drift/releases/latest/download/Drift-macOS-arm64.dmg) | macOS Sonoma 14 oder neuer |
+| Windows | x64 | [`Drift-Windows-x64-setup.exe`](https://github.com/drift-browser/Drift/releases/latest/download/Drift-Windows-x64-setup.exe) | Windows 10 oder 11 |
 
 Windows-Builds sind noch nicht code-signiert, daher zeigt SmartScreen
 möglicherweise "Der Computer wurde durch Windows geschützt". Wähle **Weitere
 Informationen** und dann **Trotzdem ausführen**. Die Signierung ist in Arbeit.
 
-Zephium lädt Updates im Hintergrund herunter und installiert sie, sobald du
+Drift lädt Updates im Hintergrund herunter und installiert sie, sobald du
 **Relaunch to update** wählst. Alle Releases findest du auf der
-[Releases-Seite](https://github.com/zephium-browser/Zephium/releases).
+[Releases-Seite](https://github.com/drift-browser/Drift/releases).
 
 ## Wie es weitergeht
 
 - Linux und Intel-Macs.
 - Code-signierte Windows-Builds.
-- Mehr Erweiterungen, die nachweislich funktionieren, und native Erweiterungen direkt in Zephium.
+- Mehr Erweiterungen, die nachweislich funktionieren, und native Erweiterungen direkt in Drift.
 - Und vieles mehr.
 
 ## Aus dem Quellcode bauen
@@ -220,14 +220,14 @@ Voraussetzungen:
   Build Tools und WebView2 unter Windows.
 
 ```sh
-git clone https://github.com/zephium-browser/Zephium.git
-cd Zephium
+git clone https://github.com/drift-browser/Drift.git
+cd Drift
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Entwicklungs-Builds verwenden ein eigenes Profil `app.zephium.dev` und berühren
-deshalb nicht die Daten eines installierten Zephium. Linux wird noch nicht
+Entwicklungs-Builds verwenden ein eigenes Profil `app.drift.dev` und berühren
+deshalb nicht die Daten eines installierten Drift. Linux wird noch nicht
 unterstützt. Lies [CONTRIBUTING.md](../../CONTRIBUTING.md), bevor du einen Pull
 Request öffnest.
 
@@ -236,7 +236,7 @@ Request öffnest.
 - Nicht vertrauenswürdige Seiten laufen in rohen nativen WebViews, getrennt von
   der privilegierten Svelte-Oberfläche, die den Browser zeichnet.
 - Ein Rust-Kern verwaltet Tabs, Speicher, den Blocker, Erweiterungen und Agenten.
-- Jedes Profil hat eigene, isolierte Website-Daten sowie von Zephium verwaltete
+- Jedes Profil hat eigene, isolierte Website-Daten sowie von Drift verwaltete
   Daten für Verlauf, Sitzung und Favicons.
 - Der Netzwerk-Blocker ist nativ und auf Braves
   [adblock-rust](https://github.com/brave/adblock-rust) aufgebaut.
@@ -248,7 +248,7 @@ Mehr dazu in [docs/architecture.md](../architecture.md) und
 
 ## Mitwirken
 
-Zephium wird von einer einzelnen Person mit klarer Produktrichtung gepflegt.
+Drift wird von einer einzelnen Person mit klarer Produktrichtung gepflegt.
 Bitte besprich größere Änderungen, bevor du sie schreibst.
 [CONTRIBUTING.md](../../CONTRIBUTING.md) erklärt, was übernommen wird und wie.
 Fragen und Ideen sind auf [Discord](https://discord.gg/tyveTUyEp7) willkommen.
@@ -260,17 +260,17 @@ Bitte melde Sicherheitslücken privat und nicht in einem öffentlichen Issue. Si
 
 ## Lizenz
 
-Zephium steht unter der [Mozilla Public License 2.0](../../LICENSE).
+Drift steht unter der [Mozilla Public License 2.0](../../LICENSE).
 
 Die mitgelieferten Filterlisten EasyList und EasyPrivacy werden unter
 [CC BY-SA 3.0](../../assets/blocker-seed/v1/LICENSE-CC-BY-SA-3.0.txt) verwendet;
 die Angaben zur Namensnennung stehen in
 [diesem Hinweis](../../assets/blocker-seed/v1/NOTICE).
 
-Name und Logo von Zephium sind nicht unter der MPL lizenziert.
+Name und Logo von Drift sind nicht unter der MPL lizenziert.
 
 ## Danksagung
 
-Zephium baut auf [Tauri](https://tauri.app), [Wry](https://github.com/tauri-apps/wry),
+Drift baut auf [Tauri](https://tauri.app), [Wry](https://github.com/tauri-apps/wry),
 Braves [adblock-rust](https://github.com/brave/adblock-rust) und
 [EasyList](https://easylist.to).

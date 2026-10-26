@@ -21,7 +21,7 @@ export function voiceProblem(
   problem: VoiceProblem,
   engine: VoiceEngineV1 | null,
 ): { message: string; remedy: VoiceRemedy } {
-  const name = engine ? engineName(engine) : m.voice_engine_zephium();
+  const name = engine ? engineName(engine) : m.voice_engine_drift();
   switch (problem) {
     case "microphone_denied":
       return { message: m.voice_problem_microphone(), remedy: "microphone" };
@@ -45,7 +45,7 @@ export function voiceProblem(
     case "out_of_credit":
       return {
         message: m.voice_problem_credit({ engine: name }),
-        remedy: engine === "zephium" || engine === null ? "plans" : "settings",
+        remedy: engine === "drift" || engine === null ? "plans" : "settings",
       };
     case "plan_required":
       return { message: m.voice_problem_plan(), remedy: "plans" };

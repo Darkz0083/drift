@@ -29,7 +29,7 @@ const look = {
   fontSize: "13",
   codeFont: "system",
 };
-afterEach(() => theme.applyCustomization({ ...look, theme: "zephium" }));
+afterEach(() => theme.applyCustomization({ ...look, theme: "drift" }));
 
 // Native paints the window's ground from the same seeds in Rust; the CSS
 // ladder and that ground have to be one colour or a solid window seams.
@@ -49,12 +49,12 @@ test("the chrome rung matches the ground native paints for every preset", () => 
 });
 
 test("graphite keeps its literal tokens and a theme derives its own", () => {
-  theme.applyCustomization({ ...look, theme: "zephium" });
+  theme.applyCustomization({ ...look, theme: "drift" });
   expect(document.documentElement.hasAttribute("data-palette")).toBe(false);
   expect(chrome("dark")).toBe("1f1f22");
-  theme.applyCustomization({ ...look, theme: "zephium", contrast: true });
+  theme.applyCustomization({ ...look, theme: "drift", contrast: true });
   expect(document.documentElement.hasAttribute("data-palette")).toBe(true);
-  theme.applyCustomization({ ...look, theme: "zephium", level: "70" });
+  theme.applyCustomization({ ...look, theme: "drift", level: "70" });
   expect(document.documentElement.style.getPropertyValue("--seed-contrast")).toBe("70");
   theme.applyCustomization({ ...look, theme: "nord" });
   expect(document.documentElement.style.getPropertyValue("--seed-dark-bg")).toBe("#2e3440");

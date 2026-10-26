@@ -1,6 +1,6 @@
 //! The account picture: picked natively, framed by the person in chrome, then
 //! cropped, encoded and uploaded here. Chrome only ever sees image bytes that
-//! `zephium-media` serves; never the service's address for them or the bearer.
+//! `drift-media` serves; never the service's address for them or the bearer.
 use super::*;
 use image::imageops::FilterType;
 use image::{DynamicImage, ImageDecoder, ImageFormat};
@@ -128,7 +128,7 @@ fn framed(image: &DynamicImage, crop: AccountAvatarCropV1) -> Option<Vec<u8>> {
         target,
         FilterType::Lanczos3,
     );
-    encode(&square).filter(|bytes| bytes.len() <= zephium_account::MAX_AVATAR_UPLOAD_BYTES)
+    encode(&square).filter(|bytes| bytes.len() <= drift_account::MAX_AVATAR_UPLOAD_BYTES)
 }
 
 /// Opens the system's picker and stages the picture for framing.
@@ -173,7 +173,7 @@ pub(crate) async fn account_avatar_pick(
     let Some((image, preview)) = prepared else {
         return Ok(AccountAvatarPickV1::Unsupported);
     };
-    let token = zephium_core::ids::ProfileId::generate().to_string();
+    let token = drift_core::ids::ProfileId::generate().to_string();
     let (width, height) = (image.width(), image.height());
     *staged() = Some(Staged {
         token: token.clone(),

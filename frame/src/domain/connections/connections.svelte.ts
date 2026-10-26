@@ -78,9 +78,9 @@ export class ConnectionsSession {
   async start() {
     if (this.active) return;
     this.active = true;
-    window.addEventListener("zephium:connection-sign-in", this.signInEvent);
+    window.addEventListener("drift:connection-sign-in", this.signInEvent);
     window.addEventListener("online", this.recover);
-    window.addEventListener("zephium:connections-resume", this.recover);
+    window.addEventListener("drift:connections-resume", this.recover);
     this.lastTick = Date.now();
     this.timer = setInterval(() => {
       const now = Date.now();
@@ -108,10 +108,10 @@ export class ConnectionsSession {
 
   dispose() {
     this.active = false;
-    window.removeEventListener("zephium:connection-sign-in", this.signInEvent);
+    window.removeEventListener("drift:connection-sign-in", this.signInEvent);
     this.flows = {};
     window.removeEventListener("online", this.recover);
-    window.removeEventListener("zephium:connections-resume", this.recover);
+    window.removeEventListener("drift:connections-resume", this.recover);
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
     this.generation += 1;

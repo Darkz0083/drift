@@ -8,9 +8,9 @@ import { commands } from "$shared/ipc/bindings";
  * are left or the screen has been still.
  */
 const BUDGET = 16 * 1024 * 1024;
-const MEDIA = /^(?:zephium-media:\/\/localhost|http:\/\/zephium-media\.localhost(?::\d+)?)\//u;
+const MEDIA = /^(?:drift-media:\/\/localhost|http:\/\/drift-media\.localhost(?::\d+)?)\//u;
 const FRAME =
-  /^(?:zephium-media:\/\/localhost|http:\/\/zephium-media\.localhost(?::\d+)?)\/frame\//u;
+  /^(?:drift-media:\/\/localhost|http:\/\/drift-media\.localhost(?::\d+)?)\/frame\//u;
 
 /** A picture's address asking for the copy `width` CSS pixels wide, as sharp as the screen shows it. */
 export function thumbSrc(url: string, width: number): string {

@@ -16,7 +16,7 @@ describe("versions", () => {
 
   it("links a version's release notes", () => {
     expect(releaseNotesUrl("1.0.0-beta.2")).toBe(
-      "https://github.com/zephium-browser/Zephium/releases/tag/v1.0.0-beta.2",
+      "https://github.com/drift-browser/Drift/releases/tag/v1.0.0-beta.2",
     );
   });
 
@@ -24,14 +24,14 @@ describe("versions", () => {
     expect(systemUpdateTarget([])).toBeNull();
     expect(
       systemUpdateTarget([
-        { kind: "review_overdue", update_target: "zephium" },
+        { kind: "review_overdue", update_target: "drift" },
         { kind: "unreviewed_runtime", update_target: "browser_runtime" },
-        { kind: "update_recommended", update_target: "zephium" },
+        { kind: "update_recommended", update_target: "drift" },
       ]),
     ).toBeNull();
     expect(
       systemUpdateTarget([
-        { kind: "review_overdue", update_target: "zephium" },
+        { kind: "review_overdue", update_target: "drift" },
         { kind: "update_recommended", update_target: "operating_system" },
       ]),
     ).toBe("operating_system");

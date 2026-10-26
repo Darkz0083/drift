@@ -5,11 +5,11 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Mutex, OnceLock};
 use std::time::Duration;
 use tauri::{Manager, WebviewWindow};
-use zephium_app::{Command, Handle};
-use zephium_core::notes::{NoteCall, NoteQuery, NoteResponse};
-use zephium_core::ports::store::Store;
-use zephium_core::search::{remote_query_allowed, scoped_query, SearchEngine, SearchScope};
-use zephium_ipc::{SearchAction, SearchContext, SearchResult};
+use drift_app::{Command, Handle};
+use drift_core::notes::{NoteCall, NoteQuery, NoteResponse};
+use drift_core::ports::store::Store;
+use drift_core::search::{remote_query_allowed, scoped_query, SearchEngine, SearchScope};
+use drift_ipc::{SearchAction, SearchContext, SearchResult};
 
 struct Pending {
     token: u64,

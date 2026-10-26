@@ -133,7 +133,7 @@ fn inspection_composition(retained: &str, discovery: &str, observer: &str) -> Re
 fn commerce_selection(desktop: &str, composition: &str, retained: &str) -> Result<(), String> {
     // Specialization must inherit the exact debug/isolated/retained entry and
     // public-retention gates, not introduce an independent launcher or runtime.
-    require(desktop, &["macos-work-retained-commerce-probe = [\"macos-work-retained-product-probe\", \"zephium-work-composition/retained-commerce-qualification\"]"])?;
+    require(desktop, &["macos-work-retained-commerce-probe = [\"macos-work-retained-product-probe\", \"drift-work-composition/retained-commerce-qualification\"]"])?;
     require(
         composition,
         &["retained-commerce-qualification = [\"retained-product-qualification\"]"],
@@ -153,7 +153,7 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
         fs::read_to_string(root.join(path))
             .map_err(|_| format!("missing Work composition source {path}"))
     };
-    let native = read("crates/zephium-work-composition/src/native.rs")?;
+    let native = read("crates/drift-work-composition/src/native.rs")?;
     require(
         &native,
         &[
@@ -163,27 +163,27 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
             "prepared.with_browser_profile(binding)",
         ],
     )?;
-    require(&read("crates/zephium-app/src/work.rs")?, &[
+    require(&read("crates/drift-app/src/work.rs")?, &[
         "self.controller.profile_storage_binding()? != (binding.profile(), binding.storage_class())",
         "profile == Some(crate::AgentWorkProfileReadiness::Ready(binding))",
         "if !profile_valid { self.stopping = true; self.fail(crate::contract_failure!()); self.abort_staged(); }",
     ])?;
-    require(&read("crates/zephium-app/src/shell/mod.rs")?, &[
+    require(&read("crates/drift-app/src/shell/mod.rs")?, &[
         "let profile = self.work_profile_binding(); if let Some(work) = &mut self.work { work.admit(submission, Some(profile)); }",
     ])?;
     ordinary_navigation_observer(&read("desktop/src/navigation_probe.rs")?)?;
     commerce_selection(
         &read("desktop/Cargo.toml")?,
-        &read("crates/zephium-work-composition/Cargo.toml")?,
-        &read("crates/zephium-work-composition/src/retained_product_qualification.rs")?,
+        &read("crates/drift-work-composition/Cargo.toml")?,
+        &read("crates/drift-work-composition/src/retained_product_qualification.rs")?,
     )?;
     inspection_composition(
-        &read("crates/zephium-work-composition/src/retained_product_qualification.rs")?,
-        &read("crates/zephium-work-composition/src/discovery_qualification.rs")?,
-        &read("crates/zephium-work-composition/src/navigation_qualification_observer.rs")?,
+        &read("crates/drift-work-composition/src/retained_product_qualification.rs")?,
+        &read("crates/drift-work-composition/src/discovery_qualification.rs")?,
+        &read("crates/drift-work-composition/src/navigation_qualification_observer.rs")?,
     )?;
     require(&read("desktop/Cargo.toml")?, &[
-        "macos-work-navigation-probe = [\"macos-work\", \"zephium-work-composition/navigation-qualification\", \"tauri/custom-protocol\"]",
+        "macos-work-navigation-probe = [\"macos-work\", \"drift-work-composition/navigation-qualification\", \"tauri/custom-protocol\"]",
     ])?;
     require(
         &read("desktop/build.rs")?,
@@ -243,10 +243,10 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
     )?;
     preparation_precedes_attachment(&desktop)?;
     require(&read("desktop/src/lib.rs")?, &["#[cfg(feature = \"macos-work\")] mod work;", "#[cfg(feature = \"macos-work\")] if !work::install(app.handle(), engine.clone(), store.clone())"])?;
-    require(&read("desktop/Cargo.toml")?, &["macos-work = [\"dep:zephium-work-composition\", \"zephium-work-composition/macos-work\"]", "zephium-work-composition = { workspace = true, optional = true }"])?;
-    let manifest = read("crates/zephium-work-composition/Cargo.toml")?;
+    require(&read("desktop/Cargo.toml")?, &["macos-work = [\"dep:drift-work-composition\", \"drift-work-composition/macos-work\"]", "drift-work-composition = { workspace = true, optional = true }"])?;
+    let manifest = read("crates/drift-work-composition/Cargo.toml")?;
     require(
-        &read("crates/zephium-engine/Cargo.toml")?,
+        &read("crates/drift-engine/Cargo.toml")?,
         &[
             "native-agentic-public-resource-probe = [\"native-agentic-work-resource-probe\"]",
             "native-agentic-work-resource-probe = [\"native-agentic-foreground-probe\"]",
@@ -256,11 +256,11 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
         &manifest,
         &[
             "default = []",
-            "native-work = [\"dep:zephium-app\", \"dep:zephium-engine\", \"dep:zephium-store\", \"dep:zephium-agent-controller\", \"dep:zephium-agent-provider-transport\", \"dep:zephium-agentic\"]",
+            "native-work = [\"dep:drift-app\", \"dep:drift-engine\", \"dep:drift-store\", \"dep:drift-agent-controller\", \"dep:drift-agent-provider-transport\", \"dep:drift-agentic\"]",
             "macos-work = [\"native-work\"]",
-            "navigation-qualification = [\"macos-work\", \"dep:zephium-agentic\", \"dep:zephium-core\", \"dep:zephium-agent-runtime\"]",
-            "public-qualification = [\"macos-work\", \"zephium-app/work-execution-probe\", \"zephium-agent-provider-transport/probe-harness\",]",
-            "retained-public-qualification = [\"retained-qualification\", \"zephium-engine/native-agentic-public-resource-probe\"]",
+            "navigation-qualification = [\"macos-work\", \"dep:drift-agentic\", \"dep:drift-core\", \"dep:drift-agent-runtime\"]",
+            "public-qualification = [\"macos-work\", \"drift-app/work-execution-probe\", \"drift-agent-provider-transport/probe-harness\",]",
+            "retained-public-qualification = [\"retained-qualification\", \"drift-engine/native-agentic-public-resource-probe\"]",
         ],
     )?;
     let parsed: toml::Value =
@@ -276,7 +276,7 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
         return Err("composition dependencies must stay dormant".into());
     }
     require(
-        &read("crates/zephium-work-composition/src/lib.rs")?,
+        &read("crates/drift-work-composition/src/lib.rs")?,
         &[
             "#[cfg(feature = \"native-work\")] mod native;",
             "#[cfg(feature = \"native-work\")] pub use native::{NativeWorkComposition, TrustedWorkRequest};",
@@ -289,7 +289,7 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
         ],
     )?;
     require(
-        &read("crates/zephium-app/src/work.rs")?,
+        &read("crates/drift-app/src/work.rs")?,
         &[
             "#[cfg(feature = \"work-execution-probe\")] #[path = \"work_probe.rs\"] mod probe;",
             "!Arc::ptr_eq(&run.engine, &self.engine)",
@@ -298,28 +298,28 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
         ],
     )?;
     require(
-        &read("crates/zephium-app/src/shell/mod.rs")?,
+        &read("crates/drift-app/src/shell/mod.rs")?,
         &[
             "!work.belongs_to_engine(&self.engine)",
             "!work.accepts_predecessor(self.work.as_deref())",
             "previous.retire_projection()",
         ],
     )?;
-    require(&read("crates/zephium-app/Cargo.toml")?, &["work-execution-probe = [\"work-execution\", \"zephium-agent-controller/probe-harness\"]"])?;
+    require(&read("crates/drift-app/Cargo.toml")?, &["work-execution-probe = [\"work-execution\", \"drift-agent-controller/probe-harness\"]"])?;
     require(
-        &read("crates/zephium-app/src/work_probe.rs")?,
+        &read("crates/drift-app/src/work_probe.rs")?,
         &[
             "#[cfg(not(debug_assertions))] compile_error!",
             "AgentBrowserRetention::InspectablePublicData",
             "Self::from_controller(controller, handle, config.runtime, ports)",
         ],
     )?;
-    let qualifier = read("crates/zephium-terra-macos-probe/src/work_application.rs")?;
+    let qualifier = read("crates/drift-terra-macos-probe/src/work_application.rs")?;
     combined_result_qualification(&qualifier)?;
     require(
         &qualifier,
         &[
-            "zephium_app::spawn_suspended(",
+            "drift_app::spawn_suspended(",
             "MacosWorkComposition::new(engine.clone(), store.clone())",
             "composition.prepare_public_qualification(request)",
             "shell.shutdown_with_deadline(",
@@ -363,9 +363,9 @@ mod tests {
     #[test]
     fn commerce_selection_cannot_bypass_original_qualification_or_retained_entry() {
         let desktop = include_str!("../../desktop/Cargo.toml");
-        let composition = include_str!("../../crates/zephium-work-composition/Cargo.toml");
+        let composition = include_str!("../../crates/drift-work-composition/Cargo.toml");
         let retained = include_str!(
-            "../../crates/zephium-work-composition/src/retained_product_qualification.rs"
+            "../../crates/drift-work-composition/src/retained_product_qualification.rs"
         );
         commerce_selection(desktop, composition, retained).unwrap();
         assert!(commerce_selection(
@@ -405,12 +405,12 @@ mod tests {
     #[test]
     fn exact_discovery_wrappers_and_observers_cannot_drop_inspection() {
         let retained = include_str!(
-            "../../crates/zephium-work-composition/src/retained_product_qualification.rs"
+            "../../crates/drift-work-composition/src/retained_product_qualification.rs"
         );
         let discovery =
-            include_str!("../../crates/zephium-work-composition/src/discovery_qualification.rs");
+            include_str!("../../crates/drift-work-composition/src/discovery_qualification.rs");
         let observer = include_str!(
-            "../../crates/zephium-work-composition/src/navigation_qualification_observer.rs"
+            "../../crates/drift-work-composition/src/navigation_qualification_observer.rs"
         );
         inspection_composition(retained, discovery, observer).unwrap();
         assert!(inspection_composition(
@@ -477,7 +477,7 @@ mod tests {
     }
     #[test]
     fn retained_public_retention_is_excluded_and_shipping_selection_is_stateless() {
-        let controller = include_str!("../../crates/zephium-agent-controller/src/work_retained.rs");
+        let controller = include_str!("../../crates/drift-agent-controller/src/work_retained.rs");
         require(
             controller,
             &[
@@ -487,9 +487,9 @@ mod tests {
             ],
         )
         .unwrap();
-        let product = include_str!("../../crates/zephium-app/src/work_resources_product.rs");
+        let product = include_str!("../../crates/drift-app/src/work_resources_product.rs");
         require(product, &["#[cfg(feature = \"work-execution-probe\")] #[path = \"work_resources_public_product.rs\"] mod public_qualification;"]).unwrap();
-        let actor = include_str!("../../crates/zephium-app/src/work_resources_application.rs");
+        let actor = include_str!("../../crates/drift-app/src/work_resources_application.rs");
         require(actor, &["#[cfg(feature = \"work-execution-probe\")] #[path = \"work_resources_public_actor.rs\"] mod public_qualification;"]).unwrap();
         for (source, token) in [
             (controller, "AgentBrowserRetention::Stateless"),
@@ -501,7 +501,7 @@ mod tests {
     }
     #[test]
     fn combined_qualification_requires_verified_effects_and_exact_post_action_source() {
-        let source = include_str!("../../crates/zephium-terra-macos-probe/src/work_application.rs");
+        let source = include_str!("../../crates/drift-terra-macos-probe/src/work_application.rs");
         combined_result_qualification(source).unwrap();
         for boundary in [
             "super::work_actor::combined_input(started)?",
@@ -518,7 +518,7 @@ mod tests {
     #[test]
     fn production_composition_has_no_task_policy_or_probe_authority() {
         for source in [
-            include_str!("../../crates/zephium-work-composition/src/native.rs"),
+            include_str!("../../crates/drift-work-composition/src/native.rs"),
             include_str!("../../desktop/src/work.rs"),
         ] {
             production(source).unwrap();

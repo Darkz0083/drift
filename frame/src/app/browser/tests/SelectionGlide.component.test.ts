@@ -42,7 +42,7 @@ const select = (active: string, space: string | null = null, only = open) => {
   flushSync();
 };
 const row = (id: string) =>
-  document.querySelector<HTMLElement>(`.browse-tab[data-zephium-tab-id="${id}"]`)!;
+  document.querySelector<HTMLElement>(`.browse-tab[data-drift-tab-id="${id}"]`)!;
 
 test("the current tab's plate travels to the next one and hands itself back", async () => {
   await page.viewport(900, 700);

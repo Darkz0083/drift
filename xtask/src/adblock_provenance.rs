@@ -175,7 +175,7 @@ fn validate_records(fork_source: &str, inventory_source: &str) -> Result<Reviewe
     require_string(
         production,
         "default_features",
-        "not used by Zephium production builds",
+        "not used by Drift production builds",
     )?;
     require_string(
         production,
@@ -191,7 +191,7 @@ fn validate_records(fork_source: &str, inventory_source: &str) -> Result<Reviewe
     require_string(
         lock_alignment,
         "policy",
-        "every registry package reachable from the union of Zephium production graphs must have the same version, source, and checksum in the standalone and application lockfiles",
+        "every registry package reachable from the union of Drift production graphs must have the same version, source, and checksum in the standalone and application lockfiles",
     )?;
     require_string(
         lock_alignment,
@@ -386,7 +386,7 @@ fn validate_release_gates(gates: &toml::Table) -> Result<(), String> {
         ),
         (
             "adapter_tests",
-            "check, test, and Clippy each runtime-only, runtime-exact, WebKit-only, runtime+WebKit, and runtime-exact+WebKit zephium-blocker graph",
+            "check, test, and Clippy each runtime-only, runtime-exact, WebKit-only, runtime+WebKit, and runtime-exact+WebKit drift-blocker graph",
         ),
         (
             "feature_matrix",
@@ -691,11 +691,11 @@ fn validate_manifests(repository: &Path, fork_root: &Path) -> Result<(), String>
         .ok_or_else(|| "root manifest does not patch crates.io adblock".to_owned())?;
     require_key_set(patch, &["path"], "root adblock patch")?;
     require_string(patch, "path", "vendor/adblock")?;
-    validate_zephium_feature_manifests(repository, &root)?;
+    validate_drift_feature_manifests(repository, &root)?;
     Ok(())
 }
 
-fn validate_zephium_feature_manifests(repository: &Path, root: &toml::Table) -> Result<(), String> {
+fn validate_drift_feature_manifests(repository: &Path, root: &toml::Table) -> Result<(), String> {
     let workspace_dependencies = require_table(root, "workspace")?
         .get("dependencies")
         .and_then(toml::Value::as_table)
@@ -705,30 +705,30 @@ fn validate_zephium_feature_manifests(repository: &Path, root: &toml::Table) -> 
         "root workspace dependency table",
         &["adblock"],
         &[
-            "zephium-blocker",
-            "zephium-blocker-service",
-            "zephium-blocker-update",
-            "zephium-update-transport",
+            "drift-blocker",
+            "drift-blocker-service",
+            "drift-blocker-update",
+            "drift-update-transport",
         ],
     )?;
     let blocker_workspace = workspace_dependencies
-        .get("zephium-blocker")
+        .get("drift-blocker")
         .and_then(toml::Value::as_table)
-        .ok_or_else(|| "root workspace has no structured zephium-blocker dependency".to_owned())?;
+        .ok_or_else(|| "root workspace has no structured drift-blocker dependency".to_owned())?;
     require_key_set(
         blocker_workspace,
         &["default-features", "path", "version"],
-        "root zephium-blocker dependency",
+        "root drift-blocker dependency",
     )?;
-    require_string(blocker_workspace, "path", "crates/zephium-blocker")?;
+    require_string(blocker_workspace, "path", "crates/drift-blocker")?;
     require_string(blocker_workspace, "version", "=0.1.0")?;
     require_bool(blocker_workspace, "default-features", false)?;
     for (name, path) in [
-        ("zephium-blocker-service", "crates/zephium-blocker-service"),
-        ("zephium-blocker-update", "crates/zephium-blocker-update"),
+        ("drift-blocker-service", "crates/drift-blocker-service"),
+        ("drift-blocker-update", "crates/drift-blocker-update"),
         (
-            "zephium-update-transport",
-            "crates/zephium-update-transport",
+            "drift-update-transport",
+            "crates/drift-update-transport",
         ),
     ] {
         let dependency = workspace_dependencies
@@ -757,14 +757,14 @@ fn validate_zephium_feature_manifests(repository: &Path, root: &toml::Table) -> 
     require_bool(tough, "default-features", false)?;
 
     let blocker = parse_table(
-        &read_text(&repository.join("crates/zephium-blocker/Cargo.toml"))?,
-        "zephium-blocker Cargo.toml",
+        &read_text(&repository.join("crates/drift-blocker/Cargo.toml"))?,
+        "drift-blocker Cargo.toml",
     )?;
     let blocker_features = require_table(&blocker, "features")?;
     require_key_set(
         blocker_features,
         &["default", "runtime", "runtime-exact", "webkit"],
-        "zephium-blocker feature table",
+        "drift-blocker feature table",
     )?;
     require_string_array(
         blocker_features,
@@ -781,11 +781,11 @@ fn validate_zephium_feature_manifests(repository: &Path, root: &toml::Table) -> 
     let blocker_adblock = require_table(&blocker, "dependencies")?
         .get("adblock")
         .and_then(toml::Value::as_table)
-        .ok_or_else(|| "zephium-blocker has no structured adblock dependency".to_owned())?;
+        .ok_or_else(|| "drift-blocker has no structured adblock dependency".to_owned())?;
     require_key_set(
         blocker_adblock,
         &["default-features", "features", "version"],
-        "zephium-blocker adblock dependency",
+        "drift-blocker adblock dependency",
     )?;
     require_string(blocker_adblock, "version", "=0.13.2")?;
     require_bool(blocker_adblock, "default-features", false)?;
@@ -800,7 +800,7 @@ fn validate_zephium_feature_manifests(repository: &Path, root: &toml::Table) -> 
     )?;
     reject_dependency_aliases(
         require_table(&blocker, "dependencies")?,
-        "zephium-blocker dependency table",
+        "drift-blocker dependency table",
         &[],
         &["adblock"],
     )?;
@@ -817,7 +817,7 @@ fn validate_zephium_feature_manifests(repository: &Path, root: &toml::Table) -> 
     for kind in ["dependencies", "build-dependencies", "dev-dependencies"] {
         if let Some(dependencies) = desktop.get(kind).and_then(toml::Value::as_table) {
             let allowed = if kind == "dependencies" {
-                ["zephium-blocker-service"].as_slice()
+                ["drift-blocker-service"].as_slice()
             } else {
                 [].as_slice()
             };
@@ -832,13 +832,13 @@ fn validate_zephium_feature_manifests(repository: &Path, root: &toml::Table) -> 
     }
     let desktop_dependencies = require_table(&desktop, "dependencies")?;
     let service = desktop_dependencies
-        .get("zephium-blocker-service")
+        .get("drift-blocker-service")
         .and_then(toml::Value::as_table)
-        .ok_or_else(|| "desktop has no structured zephium-blocker-service dependency".to_owned())?;
+        .ok_or_else(|| "desktop has no structured drift-blocker-service dependency".to_owned())?;
     require_key_set(
         service,
         &["features", "workspace"],
-        "desktop zephium-blocker-service dependency",
+        "desktop drift-blocker-service dependency",
     )?;
     require_bool(service, "workspace", true)?;
     require_string_array(service, "features", &["official-https"])?;
@@ -861,13 +861,13 @@ fn validate_zephium_feature_manifests(repository: &Path, root: &toml::Table) -> 
                 if matches!(
                     package,
                     "adblock"
-                        | "zephium-blocker-service"
-                        | "zephium-blocker-update"
-                        | "zephium-update-transport"
-                ) || (package == "zephium-blocker"
+                        | "drift-blocker-service"
+                        | "drift-blocker-update"
+                        | "drift-update-transport"
+                ) || (package == "drift-blocker"
                     && (!reviewed_targets.contains(target.as_str())
                         || kind != "dependencies"
-                        || name != "zephium-blocker"))
+                        || name != "drift-blocker"))
                 {
                     return Err(format!(
                         "desktop target `{target}` {kind} contains unreviewed `{name}` -> `{package}`"
@@ -889,15 +889,15 @@ fn validate_zephium_feature_manifests(repository: &Path, root: &toml::Table) -> 
             .and_then(toml::Value::as_table)
             .and_then(|table| table.get("dependencies"))
             .and_then(toml::Value::as_table)
-            .and_then(|dependencies| dependencies.get("zephium-blocker"))
+            .and_then(|dependencies| dependencies.get("drift-blocker"))
             .and_then(toml::Value::as_table)
             .ok_or_else(|| {
-                format!("desktop target `{target}` has no structured zephium-blocker dependency")
+                format!("desktop target `{target}` has no structured drift-blocker dependency")
             })?;
         require_key_set(
             dependency,
             &["features", "workspace"],
-            &format!("desktop `{target}` zephium-blocker dependency"),
+            &format!("desktop `{target}` drift-blocker dependency"),
         )?;
         require_bool(dependency, "workspace", true)?;
         require_string_array(dependency, "features", expected_features)?;
@@ -907,16 +907,16 @@ fn validate_zephium_feature_manifests(repository: &Path, root: &toml::Table) -> 
 
 fn validate_blocker_update_manifest(repository: &Path) -> Result<(), String> {
     let update = parse_table(
-        &read_text(&repository.join("crates/zephium-blocker-update/Cargo.toml"))?,
-        "zephium-blocker-update Cargo.toml",
+        &read_text(&repository.join("crates/drift-blocker-update/Cargo.toml"))?,
+        "drift-blocker-update Cargo.toml",
     )?;
     let package = require_table(&update, "package")?;
-    require_string(package, "name", "zephium-blocker-update")?;
+    require_string(package, "name", "drift-blocker-update")?;
     let features = require_table(&update, "features")?;
     require_key_set(
         features,
         &["default", "official-https", "tuf"],
-        "zephium-blocker-update feature table",
+        "drift-blocker-update feature table",
     )?;
     require_string_array(features, "default", &[])?;
     require_string_array(
@@ -928,8 +928,8 @@ fn validate_blocker_update_manifest(repository: &Path) -> Result<(), String> {
             "dep:tokio",
             "dep:tough",
             "dep:windows",
-            "dep:zephium-update-transport",
-            "zephium-update-transport/tough",
+            "dep:drift-update-transport",
+            "drift-update-transport/tough",
         ],
     )?;
 
@@ -940,7 +940,7 @@ fn validate_blocker_update_manifest(repository: &Path) -> Result<(), String> {
             "dep:rustix",
             "dep:tokio",
             "dep:windows",
-            "dep:zephium-update-transport",
+            "dep:drift-update-transport",
         ],
     )?;
     let dependencies = require_table(&update, "dependencies")?;
@@ -955,15 +955,15 @@ fn validate_blocker_update_manifest(repository: &Path) -> Result<(), String> {
             "tokio",
             "tough",
             "url",
-            "zephium-update-transport",
+            "drift-update-transport",
         ],
-        "zephium-blocker-update dependency table",
+        "drift-blocker-update dependency table",
     )?;
     let async_trait = require_dependency_table(dependencies, "async-trait")?;
     require_key_set(
         async_trait,
         &["optional", "version"],
-        "zephium-blocker-update async-trait dependency",
+        "drift-blocker-update async-trait dependency",
     )?;
     require_string(async_trait, "version", "=0.1.89")?;
     require_bool(async_trait, "optional", true)?;
@@ -975,15 +975,15 @@ fn validate_blocker_update_manifest(repository: &Path) -> Result<(), String> {
     require_key_set(
         tough,
         &["optional", "workspace"],
-        "zephium-blocker-update tough dependency",
+        "drift-blocker-update tough dependency",
     )?;
     require_bool(tough, "workspace", true)?;
     require_bool(tough, "optional", true)?;
-    let transport = require_dependency_table(dependencies, "zephium-update-transport")?;
+    let transport = require_dependency_table(dependencies, "drift-update-transport")?;
     require_key_set(
         transport,
         &["optional", "workspace"],
-        "zephium-blocker-update transport dependency",
+        "drift-blocker-update transport dependency",
     )?;
     require_bool(transport, "workspace", true)?;
     require_bool(transport, "optional", true)?;
@@ -991,7 +991,7 @@ fn validate_blocker_update_manifest(repository: &Path) -> Result<(), String> {
     require_key_set(
         tokio,
         &["features", "optional", "workspace"],
-        "zephium-blocker-update tokio dependency",
+        "drift-blocker-update tokio dependency",
     )?;
     require_bool(tokio, "workspace", true)?;
     require_string_array(tokio, "features", &["fs", "io-util", "rt", "time"])?;
@@ -1000,8 +1000,8 @@ fn validate_blocker_update_manifest(repository: &Path) -> Result<(), String> {
     let dev_dependencies = require_table(&update, "dev-dependencies")?;
     require_key_set(
         dev_dependencies,
-        &["aws-lc-rs", "jiff", "tempfile", "zephium-core"],
-        "zephium-blocker-update dev-dependency table",
+        &["aws-lc-rs", "jiff", "tempfile", "drift-core"],
+        "drift-blocker-update dev-dependency table",
     )?;
     require_dependency_version(dev_dependencies, "aws-lc-rs", "=1.18.1")?;
     require_dependency_version(dev_dependencies, "jiff", "0.2")?;
@@ -1015,31 +1015,31 @@ fn validate_blocker_update_manifest(repository: &Path) -> Result<(), String> {
             "cfg(target_os = \"windows\")",
             "cfg(unix)",
         ],
-        "zephium-blocker-update target table",
+        "drift-blocker-update target table",
     )?;
     validate_target_dependency(
         targets,
         "cfg(not(target_os = \"windows\"))",
-        "zephium-blocker",
+        "drift-blocker",
         &["webkit"],
     )?;
     validate_target_dependency(
         targets,
         "cfg(target_os = \"windows\")",
-        "zephium-blocker",
+        "drift-blocker",
         &["runtime"],
     )?;
     let unix = target_dependencies(targets, "cfg(unix)")?;
     require_key_set(
         unix,
         &["rustix"],
-        "zephium-blocker-update Unix dependency table",
+        "drift-blocker-update Unix dependency table",
     )?;
     let rustix = require_dependency_table(unix, "rustix")?;
     require_key_set(
         rustix,
         &["features", "optional", "version"],
-        "zephium-blocker-update rustix dependency",
+        "drift-blocker-update rustix dependency",
     )?;
     require_string(rustix, "version", "=1.1.4")?;
     require_string_array(rustix, "features", &["fs", "process"])?;
@@ -1048,14 +1048,14 @@ fn validate_blocker_update_manifest(repository: &Path) -> Result<(), String> {
     let windows = target_dependencies(targets, "cfg(target_os = \"windows\")")?;
     require_key_set(
         windows,
-        &["windows", "zephium-blocker"],
-        "zephium-blocker-update Windows dependency table",
+        &["windows", "drift-blocker"],
+        "drift-blocker-update Windows dependency table",
     )?;
     let windows_crate = require_dependency_table(windows, "windows")?;
     require_key_set(
         windows_crate,
         &["features", "optional", "version"],
-        "zephium-blocker-update windows dependency",
+        "drift-blocker-update windows dependency",
     )?;
     require_string(windows_crate, "version", "=0.61.3")?;
     require_string_array(
@@ -1073,19 +1073,19 @@ fn validate_blocker_update_manifest(repository: &Path) -> Result<(), String> {
 
 fn validate_update_transport_manifest(repository: &Path) -> Result<(), String> {
     let transport = parse_table(
-        &read_text(&repository.join("crates/zephium-update-transport/Cargo.toml"))?,
-        "zephium-update-transport Cargo.toml",
+        &read_text(&repository.join("crates/drift-update-transport/Cargo.toml"))?,
+        "drift-update-transport Cargo.toml",
     )?;
     require_string(
         require_table(&transport, "package")?,
         "name",
-        "zephium-update-transport",
+        "drift-update-transport",
     )?;
     let features = require_table(&transport, "features")?;
     require_key_set(
         features,
         &["default", "tough"],
-        "zephium-update-transport feature table",
+        "drift-update-transport feature table",
     )?;
     require_string_array(features, "default", &[])?;
     require_string_array(features, "tough", &["dep:async-trait", "dep:tough"])?;
@@ -1101,7 +1101,7 @@ fn validate_update_transport_manifest(repository: &Path) -> Result<(), String> {
             "tough",
             "url",
         ],
-        "zephium-update-transport dependency table",
+        "drift-update-transport dependency table",
     )?;
     let time = require_dependency_table(dependencies, "time")?;
     require_key_set(
@@ -1116,7 +1116,7 @@ fn validate_update_transport_manifest(repository: &Path) -> Result<(), String> {
     require_key_set(
         async_trait,
         &["optional", "version"],
-        "zephium-update-transport async-trait dependency",
+        "drift-update-transport async-trait dependency",
     )?;
     require_string(async_trait, "version", "=0.1.89")?;
     require_bool(async_trait, "optional", true)?;
@@ -1124,7 +1124,7 @@ fn validate_update_transport_manifest(repository: &Path) -> Result<(), String> {
     require_key_set(
         futures,
         &["default-features", "features", "version"],
-        "zephium-update-transport futures-util dependency",
+        "drift-update-transport futures-util dependency",
     )?;
     require_string(futures, "version", "=0.3.32")?;
     require_bool(futures, "default-features", false)?;
@@ -1133,7 +1133,7 @@ fn validate_update_transport_manifest(repository: &Path) -> Result<(), String> {
     require_key_set(
         reqwest,
         &["default-features", "features", "version"],
-        "zephium-update-transport reqwest dependency",
+        "drift-update-transport reqwest dependency",
     )?;
     require_string(reqwest, "version", "=0.13.4")?;
     require_bool(reqwest, "default-features", false)?;
@@ -1145,7 +1145,7 @@ fn validate_update_transport_manifest(repository: &Path) -> Result<(), String> {
     require_key_set(
         tough,
         &["optional", "workspace"],
-        "zephium-update-transport tough dependency",
+        "drift-update-transport tough dependency",
     )?;
     require_bool(tough, "workspace", true)?;
     require_bool(tough, "optional", true)?;
@@ -1154,8 +1154,8 @@ fn validate_update_transport_manifest(repository: &Path) -> Result<(), String> {
 
 fn validate_private_fs_validation_manifest(repository: &Path) -> Result<(), String> {
     let manifest = parse_table(
-        &read_text(&repository.join("crates/zephium-private-fs/Cargo.toml"))?,
-        "zephium-private-fs Cargo.toml",
+        &read_text(&repository.join("crates/drift-private-fs/Cargo.toml"))?,
+        "drift-private-fs Cargo.toml",
     )?;
     let features = require_table(&manifest, "features")?;
     require_key_set(
@@ -1171,26 +1171,26 @@ fn validate_private_fs_validation_manifest(repository: &Path) -> Result<(), Stri
 
 fn validate_blocker_service_manifest(repository: &Path) -> Result<(), String> {
     let service = parse_table(
-        &read_text(&repository.join("crates/zephium-blocker-service/Cargo.toml"))?,
-        "zephium-blocker-service Cargo.toml",
+        &read_text(&repository.join("crates/drift-blocker-service/Cargo.toml"))?,
+        "drift-blocker-service Cargo.toml",
     )?;
     require_string(
         require_table(&service, "package")?,
         "name",
-        "zephium-blocker-service",
+        "drift-blocker-service",
     )?;
     let features = require_table(&service, "features")?;
     require_key_set(
         features,
         &["default", "official-https", "tuf"],
-        "zephium-blocker-service feature table",
+        "drift-blocker-service feature table",
     )?;
     require_string_array(features, "default", &[])?;
-    require_string_array(features, "tuf", &["zephium-blocker-update/tuf"])?;
+    require_string_array(features, "tuf", &["drift-blocker-update/tuf"])?;
     require_string_array(
         features,
         "official-https",
-        &["zephium-blocker-update/official-https"],
+        &["drift-blocker-update/official-https"],
     )?;
     let dependencies = require_table(&service, "dependencies")?;
     require_key_set(
@@ -1201,11 +1201,11 @@ fn validate_blocker_service_manifest(repository: &Path) -> Result<(), String> {
             "serde_json",
             "sha2",
             "thiserror",
-            "zephium-blocker",
-            "zephium-blocker-update",
-            "zephium-core",
+            "drift-blocker",
+            "drift-blocker-update",
+            "drift-core",
         ],
-        "zephium-blocker-service dependency table",
+        "drift-blocker-service dependency table",
     )?;
     require_dependency_version(dependencies, "flate2", "=1.1.9")?;
     require_dependency_version(dependencies, "sha2", "=0.10.9")?;
@@ -1213,9 +1213,9 @@ fn validate_blocker_service_manifest(repository: &Path) -> Result<(), String> {
         "serde",
         "serde_json",
         "thiserror",
-        "zephium-blocker",
-        "zephium-blocker-update",
-        "zephium-core",
+        "drift-blocker",
+        "drift-blocker-update",
+        "drift-core",
     ] {
         require_workspace_dependency(dependencies, name, &[])?;
     }
@@ -1223,21 +1223,21 @@ fn validate_blocker_service_manifest(repository: &Path) -> Result<(), String> {
     require_key_set(
         dev_dependencies,
         &["tempfile"],
-        "zephium-blocker-service dev-dependency table",
+        "drift-blocker-service dev-dependency table",
     )?;
     require_workspace_dependency(dev_dependencies, "tempfile", &[])
 }
 
 fn validate_blocker_fuzz_manifest(repository: &Path) -> Result<(), String> {
-    let root = repository.join("crates/zephium-blocker/fuzz");
+    let root = repository.join("crates/drift-blocker/fuzz");
     validate_blocker_fuzz_layout(&root)?;
     validate_blocker_fuzz_deny(&root)?;
     let fuzz = parse_table(
         &read_text(&root.join("Cargo.toml"))?,
-        "zephium-blocker fuzz Cargo.toml",
+        "drift-blocker fuzz Cargo.toml",
     )?;
     let package = require_table(&fuzz, "package")?;
-    require_string(package, "name", "zephium-blocker-fuzz")?;
+    require_string(package, "name", "drift-blocker-fuzz")?;
     require_string(package, "version", "0.0.0")?;
     require_string(package, "edition", "2021")?;
     require_string(package, "license", "MPL-2.0")?;
@@ -1248,15 +1248,15 @@ fn validate_blocker_fuzz_manifest(repository: &Path) -> Result<(), String> {
     let dependencies = require_table(&fuzz, "dependencies")?;
     require_key_set(
         dependencies,
-        &["libfuzzer-sys", "zephium-blocker"],
-        "zephium-blocker fuzz dependency table",
+        &["libfuzzer-sys", "drift-blocker"],
+        "drift-blocker fuzz dependency table",
     )?;
     require_dependency_version(dependencies, "libfuzzer-sys", "=0.4.13")?;
-    let blocker = require_dependency_table(dependencies, "zephium-blocker")?;
+    let blocker = require_dependency_table(dependencies, "drift-blocker")?;
     require_key_set(
         blocker,
         &["default-features", "features", "path", "version"],
-        "zephium-blocker fuzz blocker dependency",
+        "drift-blocker fuzz blocker dependency",
     )?;
     require_string(blocker, "path", "..")?;
     require_string(blocker, "version", "=0.1.0")?;
@@ -1312,8 +1312,8 @@ fn validate_blocker_fuzz_manifest(repository: &Path) -> Result<(), String> {
     let packages = parse_lock(&read_text(&root.join("Cargo.lock"))?)?;
     for (name, version) in [
         ("adblock", "0.13.2"),
-        ("zephium-blocker", "0.1.0"),
-        ("zephium-blocker-fuzz", "0.0.0"),
+        ("drift-blocker", "0.1.0"),
+        ("drift-blocker-fuzz", "0.0.0"),
     ] {
         let package = require_single_lock_package(&packages, name, version)?;
         if package.contains_key("source") || package.contains_key("checksum") {
@@ -1345,11 +1345,11 @@ fn validate_blocker_fuzz_deny(root: &Path) -> Result<(), String> {
 }
 
 fn validate_blocker_fuzz_deny_source(source: &str) -> Result<(), String> {
-    let policy = parse_table(source, "zephium-blocker fuzz deny.toml")?;
+    let policy = parse_table(source, "drift-blocker fuzz deny.toml")?;
     require_key_set(
         &policy,
         &["advisories", "bans", "graph", "licenses", "sources"],
-        "zephium-blocker fuzz deny policy",
+        "drift-blocker fuzz deny policy",
     )?;
 
     let graph = require_table(&policy, "graph")?;
@@ -1538,7 +1538,7 @@ fn validate_blocker_fuzz_layout(root: &Path) -> Result<(), String> {
             .map_err(|_| format!("blocker corpus {} is not UTF-8", path.display()))?;
         if !text.contains(".invalid") || sha256_file(&path)? != expected_digest {
             return Err(format!(
-                "blocker corpus {} is not the reviewed Zephium-authored seed",
+                "blocker corpus {} is not the reviewed Drift-authored seed",
                 path.display()
             ));
         }
@@ -1692,10 +1692,10 @@ fn reject_blocker_packages_except(
         if matches!(
             package,
             "adblock"
-                | "zephium-blocker"
-                | "zephium-blocker-service"
-                | "zephium-blocker-update"
-                | "zephium-update-transport"
+                | "drift-blocker"
+                | "drift-blocker-service"
+                | "drift-blocker-update"
+                | "drift-update-transport"
         ) && (!allowed.contains(&package) || name != package)
         {
             return Err(format!(
@@ -1984,7 +1984,7 @@ fn verify_lock_alignment(repository: &Path) -> Result<(), String> {
         &[
             "tree",
             "-p",
-            "zephium-blocker",
+            "drift-blocker",
             "--locked",
             "--offline",
             "--no-default-features",
@@ -2095,7 +2095,7 @@ fn verify_desktop_feature_graphs(repository: &Path) -> Result<(), String> {
             &[
                 "tree",
                 "-p",
-                "zephium-desktop",
+                "drift-desktop",
                 "--locked",
                 "--offline",
                 "--target",
@@ -2116,7 +2116,7 @@ fn verify_desktop_feature_graphs(repository: &Path) -> Result<(), String> {
             &[
                 "tree",
                 "-p",
-                "zephium-blocker-service",
+                "drift-blocker-service",
                 "--locked",
                 "--offline",
                 "--target",
@@ -2135,7 +2135,7 @@ fn verify_desktop_feature_graphs(repository: &Path) -> Result<(), String> {
             "aws-lc-rs",
             "rustls-platform-verifier",
             "tough",
-            "zephium-update-transport",
+            "drift-update-transport",
         ] {
             reject_package(&blocker, target, package)?;
         }
@@ -2150,12 +2150,12 @@ fn verify_desktop_feature_graph(
     expected_adblock_features: &[&str],
 ) -> Result<(), String> {
     let tree = parse_feature_tree(source)?;
-    require_direct_product_package(&tree, target, "zephium-blocker", "0.1.0")?;
-    require_direct_product_package(&tree, target, "zephium-blocker-service", "0.1.0")?;
+    require_direct_product_package(&tree, target, "drift-blocker", "0.1.0")?;
+    require_direct_product_package(&tree, target, "drift-blocker-service", "0.1.0")?;
     require_package_features(
         &tree,
         target,
-        "zephium-blocker",
+        "drift-blocker",
         "0.1.0",
         expected_blocker_features,
     )?;
@@ -2169,19 +2169,19 @@ fn verify_desktop_feature_graph(
     require_package_features(
         &tree,
         target,
-        "zephium-blocker-service",
+        "drift-blocker-service",
         "0.1.0",
         &["official-https"],
     )?;
     require_package_features(
         &tree,
         target,
-        "zephium-blocker-update",
+        "drift-blocker-update",
         "0.1.0",
         &["official-https"],
     )?;
     require_direct_product_package(&tree, target, "reqwest", "0.13.4")?;
-    require_package_features(&tree, target, "zephium-update-transport", "0.1.0", &[])?;
+    require_package_features(&tree, target, "drift-update-transport", "0.1.0", &[])?;
     reject_package(&tree, target, "tough")?;
     Ok(())
 }
@@ -2266,10 +2266,10 @@ fn require_package_features(
 
 fn verify_blocker_product_lock(repository: &Path) -> Result<(), String> {
     const LOCAL: [(&str, &str); 4] = [
-        ("zephium-blocker", "0.1.0"),
-        ("zephium-blocker-service", "0.1.0"),
-        ("zephium-blocker-update", "0.1.0"),
-        ("zephium-update-transport", "0.1.0"),
+        ("drift-blocker", "0.1.0"),
+        ("drift-blocker-service", "0.1.0"),
+        ("drift-blocker-update", "0.1.0"),
+        ("drift-update-transport", "0.1.0"),
     ];
     const REGISTRY: [(&str, &str); 5] = [
         ("aws-lc-rs", "1.18.1"),
@@ -2773,7 +2773,7 @@ mod tests {
 
     #[test]
     fn fuzz_dependency_policy_cannot_silently_weaken() {
-        let strict = include_str!("../../crates/zephium-blocker/fuzz/deny.toml");
+        let strict = include_str!("../../crates/drift-blocker/fuzz/deny.toml");
         validate_blocker_fuzz_deny_source(strict).unwrap();
         let weakened = strict.replace("unknown-git = \"deny\"", "unknown-git = \"allow\"");
         assert!(validate_blocker_fuzz_deny_source(&weakened).is_err());
@@ -2782,9 +2782,9 @@ mod tests {
     #[test]
     fn feature_tree_normalizes_colored_duplicate_feature_rows() {
         let tree = parse_feature_tree(
-            "0zephium-desktop v0.1.0 (/workspace/desktop)|\n\
-             1zephium-blocker v0.1.0 (/workspace/crates/zephium-blocker)|runtime\n\
-             2zephium-blocker v0.1.0 (/workspace/crates/zephium-blocker)|runtime \x1b[33m\x1b[2m(*)\x1b[39m\x1b[22m\n",
+            "0drift-desktop v0.1.0 (/workspace/desktop)|\n\
+             1drift-blocker v0.1.0 (/workspace/crates/drift-blocker)|runtime\n\
+             2drift-blocker v0.1.0 (/workspace/crates/drift-blocker)|runtime \x1b[33m\x1b[2m(*)\x1b[39m\x1b[22m\n",
         )
         .expect("Cargo colour must not become a feature name");
 

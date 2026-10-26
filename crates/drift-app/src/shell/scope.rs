@@ -1,0 +1,155 @@
+//! Profile, space, and item authorization scope helpers.
+
+use super::*;
+
+impl Shell {
+    /// Extensions may address Browse tabs throughout their profile, but never
+    /// the tab currently borrowed or owned by the Work pane. Agent contexts
+    /// have separate identities and are never members of `items`.
+    pub(super) fn extension_tab_in_scope(&self, id: ItemId, profile: ProfileId) -> bool {
+        !self.profile_deletion_quarantines(profile)
+            && self.profile_of_item(id) == Some(profile)
+            && self.items.tab(id).is_some()
+            && self.work_pane.as_ref().is_none_or(|pane| pane.tab != id)
+    }
+
+    pub(super) fn profile_of_item(&self, id: ItemId) -> Option<ProfileId> {
+        match self.items.get(id)?.placement {
+            Placement::Favorites { profile } => Some(profile),
+            Placement::Space { space, .. } => self.spaces.get(space).map(|s| s.profile),
+        }
+    }
+
+    /// A space is an authorization boundary for UI-directed item IDs. Tabs
+    /// placed in a space require an exact match; profile-wide favorites may
+    /// appear in any space owned by that same profile.
+    pub(super) fn item_in_scope(&self, id: ItemId, profile: ProfileId, space: SpaceId) -> bool {
+        if self.profile_deletion_quarantines(profile) {
+            return false;
+        }
+        if self
+            .spaces
+            .get(space)
+            .is_none_or(|candidate| candidate.profile != profile)
+        {
+            return false;
+        }
+        let Some(item) = self.items.get(id).filter(|item| item.tab().is_some()) else {
+            return false;
+        };
+        match item.placement {
+            Placement::Favorites {
+                profile: item_profile,
+            } => item_profile == profile,
+            Placement::Space {
+                space: item_space, ..
+            } => item_space == space,
+        }
+    }
+
+    pub(super) fn item_in_focused_scope(&self, id: ItemId) -> bool {
+        self.windows
+            .focused()
+            .is_some_and(|win| self.item_in_scope(id, win.profile, win.space))
+    }
+
+    pub(super) fn pane_in_scope(&self, tree: &Pane, profile: ProfileId, space: SpaceId) -> bool {
+        let tabs = tree.tabs();
+        tabs.len() <= MAX_VISIBLE_PANES
+            && tabs.into_iter().all(|id| {
+                self.item_in_scope(id, profile, space)
+                    && self
+                        .items
+                        .tab(id)
+                        .is_some_and(|tab| tab.content == drift_core::item::TabContent::Web)
+            })
+    }
+
+    pub(super) fn partition_of(&self, id: ItemId) -> Partition {
+        let profile = self
+            .profile_of_item(id)
+            .or_else(|| self.windows.focused().map(|w| w.profile))
+            .unwrap_or_else(|| {
+                self.profiles
+                    .default_profile()
+                    .unwrap_or(ProfileId::from(0))
+            });
+        match self.profiles.get(profile).map(|p| p.kind) {
+            Some(ProfileKind::Named) => Partition::Persistent(profile),
+            Some(ProfileKind::Incognito) => Partition::Ephemeral(profile),
+            Some(ProfileKind::Default) | None => Partition::Default(profile),
+        }
+    }
+
+    pub(super) fn tab_metadata(
+        &self,
+        profile: ProfileId,
+        ids: &[ItemId],
+    ) -> Vec<crate::TabMetadata> {
+        ids.iter()
+            .filter(|id| self.profile_of_item(**id) == Some(profile))
+            .filter_map(|id| {
+                let tab = self.items.tab(*id)?;
+                Some(crate::TabMetadata {
+                    id: *id,
+                    title: tab.title.clone(),
+                    url: tab.url.as_ref().map(|url| url.to_string()),
+                })
+            })
+            .collect()
+    }
+
+    /// The open tabs of the focused window, when it shows `profile`.
+    pub(super) fn window_tabs(&self, profile: ProfileId) -> Vec<crate::TabMetadata> {
+        let Some(window) = self
+            .windows
+            .focused()
+            .filter(|window| window.profile == profile)
+        else {
+            return Vec::new();
+        };
+        let ids = self.today_tabs(window.space);
+        self.tab_metadata(profile, &ids)
+    }
+
+    /// Tabs in the order the sidebar reads top to bottom: favorites, pinned
+    /// (folders opened in place), then today. Keyboard selection and cycling
+    /// walk this one list so a pinned tab is never a dead end.
+    pub(super) fn keyboard_tabs(&self, profile: ProfileId, space: SpaceId) -> Vec<ItemId> {
+        let mut ordered = Vec::new();
+        for placement in [
+            Placement::Favorites { profile },
+            Placement::Space {
+                space,
+                section: SpaceSection::Pinned,
+            },
+            Placement::Space {
+                space,
+                section: SpaceSection::Today,
+            },
+        ] {
+            let mut pending: Vec<ItemId> =
+                self.items.roots(placement).iter().rev().copied().collect();
+            while let Some(id) = pending.pop() {
+                if self.items.tab(id).is_some() {
+                    ordered.push(id);
+                } else {
+                    pending.extend(self.items.children(id).iter().rev().copied());
+                }
+            }
+        }
+        ordered
+    }
+
+    pub(super) fn today_tabs(&self, space: SpaceId) -> Vec<ItemId> {
+        self.items
+            .roots(Placement::Space {
+                space,
+                section: SpaceSection::Today,
+            })
+            .iter()
+            .copied()
+            .filter(|id| self.items.tab(*id).is_some())
+            .collect()
+    }
+}

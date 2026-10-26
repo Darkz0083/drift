@@ -6,14 +6,14 @@ use std::time::Duration;
 use serde::{Deserialize, Serialize};
 use tauri::{Manager, WebviewWindow};
 use tauri_specta::Event;
-use zephium_app::{Command, Handle};
-use zephium_core::ids::ProfileId;
-use zephium_core::notes::{NoteCall, NoteError, NoteReply, NoteResponse};
-use zephium_core::ports::store::Store;
-use zephium_core::resources::ResourceContent;
-use zephium_notes::legacy::LegacyNote;
-use zephium_notes::{Host, NoteService};
-use zephium_store::SqliteStore;
+use drift_app::{Command, Handle};
+use drift_core::ids::ProfileId;
+use drift_core::notes::{NoteCall, NoteError, NoteReply, NoteResponse};
+use drift_core::ports::store::Store;
+use drift_core::resources::ResourceContent;
+use drift_notes::legacy::LegacyNote;
+use drift_notes::{Host, NoteService};
+use drift_store::SqliteStore;
 
 use crate::{
     authorize, emit_to_privileged, resource_close, shutdown_started, CallerPolicy, MAIN_LABEL,
@@ -24,7 +24,7 @@ use crate::{
 const STORE_WAIT: Duration = Duration::from_secs(10);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-pub(crate) struct NotesChanged(zephium_core::notes::NoteChanges);
+pub(crate) struct NotesChanged(drift_core::notes::NoteChanges);
 
 struct DesktopHost {
     app: tauri::AppHandle,
@@ -32,9 +32,9 @@ struct DesktopHost {
 }
 
 impl Host for DesktopHost {
-    fn changed(&self, event: zephium_core::notes::NoteChanges) {
+    fn changed(&self, event: drift_core::notes::NoteChanges) {
         let event = NotesChanged(event);
-        emit_to_privileged(&self.app, MAIN_LABEL, "zephium:notes-changed", &event);
+        emit_to_privileged(&self.app, MAIN_LABEL, "drift:notes-changed", &event);
     }
 
     fn reveal(&self, path: &Path) {
@@ -137,8 +137,8 @@ pub(crate) fn install(
     });
     match NoteService::start(data_dir.to_path_buf(), host) {
         Ok(service) => {
-            let service: zephium_core::ports::notes::SharedNotes = Arc::new(service);
-            if !shell.dispatch(Command::AttachNotes(zephium_app::NotesAttachment(service))) {
+            let service: drift_core::ports::notes::SharedNotes = Arc::new(service);
+            if !shell.dispatch(Command::AttachNotes(drift_app::NotesAttachment(service))) {
                 crate::write_diagnostic(format_args!("notes: the shell refused its notes service"));
             }
         }
@@ -183,7 +183,7 @@ pub(crate) async fn note_call(
     if !shell.dispatch(Command::NoteCall {
         expected_profile,
         call: Arc::new(call),
-        done: zephium_app::NoteCompletion::new(move |reply| {
+        done: drift_app::NoteCompletion::new(move |reply| {
             let _permit = permit;
             let _ = send.send(reply);
         }),

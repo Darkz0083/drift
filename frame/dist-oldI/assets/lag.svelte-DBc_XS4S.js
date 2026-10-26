@@ -1,0 +1,1 @@
+import{Et as e,Ft as t,Kt as n,Wt as r}from"./chrome-shared-BPcNoa3e.js";var i=500;function a(a,o=i){let s=n(!1);return t(()=>{if(!a()){r(s,!1);return}let e=setTimeout(()=>r(s,!0),o);return()=>clearTimeout(e)}),{get current(){return e(s)}}}export{a as t};

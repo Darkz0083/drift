@@ -1,4 +1,4 @@
-# Zephium interface system
+# Drift interface system
 
 The implementation follows `product-system.md`: Browse stands alone; Work
 makes useful state visible. Geist, neutral surfaces, optical alignment, and
@@ -177,7 +177,7 @@ change and once after it:
 
 - `shared/lib/list-motion.ts` moves a keyed list: moved items slide from where
   they were, new ones rise, departed ones fade as inert ghosts stripped of every
-  `data-zephium-*` sentinel (native must never find a closed tab), and an item
+  `data-drift-*` sentinel (native must never find a closed tab), and an item
   leaving one list for another carries its mark across. Only a change of order
   or membership is measured; title and loading changes cost nothing.
 - `shared/lib/plate-glide.ts` carries a selection's plate to the next selection

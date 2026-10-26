@@ -3,7 +3,7 @@
 Status: accepted implementation program
 Last reviewed: 2026-09-06
 
-This document defines how Zephium proves and builds the browser-execution layer
+This document defines how Drift proves and builds the browser-execution layer
 used by Work. It is deliberately independent of the Work canvas, product
 persistence, hosted backend, collaboration, and final visual design. The layer
 must first demonstrate that agents can operate real pages quickly, safely,
@@ -17,7 +17,7 @@ product or security invariant to preserve a proposed technique.
 
 ## 1. Outcome and proof standard
 
-The outcome is not “JavaScript can click a button.” Zephium needs a
+The outcome is not “JavaScript can click a button.” Drift needs a
 production-grade browser actor that can:
 
 - operate difficult public and authenticated sites over many steps;
@@ -94,7 +94,7 @@ tokens, latency, unsafe ambiguity, or human intervention.
    typed operations.
 2. **No generic page-to-native bridge.** Agent instrumentation runs in an
    audited isolated content world/principal and can call only fixed internal
-   recipes. Page scripts cannot invoke Zephium authority.
+   recipes. Page scripts cannot invoke Drift authority.
 3. **No agent extensions.** Work-owned browser contexts never load user
    extensions or userscripts. Native blocking, cookie policy, and browser
    network policy still apply.
@@ -233,8 +233,8 @@ independent and policy-controlled:
 
 On macOS, a permanently hidden `WKWebView` is not assumed to have full rendering
 liveness. If a page needs a display-backed rendering opportunity, the scheduler
-must acquire an explicit bounded lease in the normal Zephium application
-lifecycle. It must never activate Zephium, take key/main-window status, or
+must acquire an explicit bounded lease in the normal Drift application
+lifecycle. It must never activate Drift, take key/main-window status, or
 compete for input merely to keep an agent running. If the application is
 inactive and supported public APIs cannot satisfy the lease, local execution
 pauses or defers honestly. No private WebKit SPI or website-specific animation
@@ -244,7 +244,7 @@ shim may turn that limitation into a false success claim.
 
 Selecting an owned context in Work presents the exact native page in a
 dedicated non-overlapping page surface or split. It does not serialize and
-recreate the page in another engine. When the person interacts, Zephium:
+recreate the page in another engine. When the person interacts, Drift:
 
 1. revokes the current input permit;
 2. pauses dependent agent execution;
@@ -266,7 +266,7 @@ adapters state precisely what they can guarantee.
 ### 4.1 macOS
 
 An owned `WKWebView` uses the exact selected profile's `WKWebsiteDataStore` but
-a configuration with no `WKWebExtensionController` and no Zephium userscript or
+a configuration with no `WKWebExtensionController` and no Drift userscript or
 extension principal. Context construction asserts the controller and extension
 inventory are absent before navigation. The agent runtime uses a separate,
 fixed `WKContentWorld`; user page-world code and extension worlds receive no
@@ -356,7 +356,7 @@ presence on the page. Each sync writes one content-free line
 
 Pages Work opens without the person's session (public reads, public page
 tasks, sites marked Never or declined for the run, and search results pages)
-use **Work's own website data**: one persistent store per durable Zephium profile, separate from the
+use **Work's own website data**: one persistent store per durable Drift profile, separate from the
 profile's own store and from every other profile's. It remembers what a
 person-free browser would remember between visits: solved bot checks such as
 DataDome or Cloudflare clearance cookies, consent choices such as Google's EU
@@ -382,7 +382,7 @@ theirs in normal browsing too, and the reverse.
 
 Every page of a run and of parallel runs shares the profile's one store, as
 ordinary tabs share a profile's; page teardown never removes it. Deleting the
-Zephium profile erases it with the profile's own data (macOS removes the named
+Drift profile erases it with the profile's own data (macOS removes the named
 store and verifies it is gone; Windows removes and verifies the folder).
 Settings → Work → Privacy clears it on request
 (`work_clear_website_data`). A private profile has no Work store; its Work
@@ -404,9 +404,9 @@ profile registry, but it may not infer a persistence class from `ProfileId` or
 substitute another storage partition.
 
 Controlled raw-profile experiments acquire an exclusive lease and require the
-normal Zephium process to be closed. Production-concurrency tests do not bypass
+normal Drift process to be closed. Production-concurrency tests do not bypass
 this rule by opening the raw profile twice; they exercise the adapter through a
-running Zephium shell so ordinary Browse and agent contexts share the profile
+running Drift shell so ordinary Browse and agent contexts share the profile
 machinery as designed.
 
 Profile locations, cookies, page content, screenshots, and extracted data are
@@ -563,7 +563,7 @@ The wire form is compact and deterministic, for example:
 
 ```text
 @a1 heading "Repository settings" level=1
-@a2 textbox "Repository name" value="zephium"
+@a2 textbox "Repository name" value="drift"
 @a3 button "Save changes" effect=write
 ```
 
@@ -842,7 +842,7 @@ when their public semantics are insufficient.
 Every frame is a separate trust and generation boundary. Same-origin frames
 can expose the full bounded runtime. Cross-origin frames require an
 engine-supported isolated injection path and are represented as explicit frame
-boundaries. If a platform cannot observe a frame safely, Zephium reports the
+boundaries. If a platform cannot observe a frame safely, Drift reports the
 limitation rather than pretending the elements do not exist.
 
 ## 7. Model-facing browser tools
@@ -866,7 +866,7 @@ model, Work, remote input, or ordinary product build.
 The complete native capability registry may be richer than the tools visible
 in one model turn. A deterministic router selects a small profile from the
 objective phase, admitted envelope, current resource state, and prior typed
-failure. The model does not receive fifty schemas merely because Zephium can
+failure. The model does not receive fifty schemas merely because Drift can
 perform fifty operations. Tool discovery is bounded and cannot grant a
 capability absent from the original envelope.
 
@@ -886,7 +886,7 @@ DOM evaluation.
 
 ### 7.1 Batched turn execution
 
-Zephium is in-process and should exploit it. A normal model turn submits one
+Drift is in-process and should exploit it. A normal model turn submits one
 bounded action batch. The runtime executes actions sequentially while their
 preconditions remain valid, waits for the declared observation condition,
 verifies the effect, computes a diff, and returns once. It does not require a
@@ -1042,7 +1042,7 @@ The runtime can choose among:
 - human takeover.
 
 Backend choice is measured per action/site and returned as diagnostic metadata,
-not exposed as a model choice. Zephium must never steal pointer or keyboard
+not exposed as a model choice. Drift must never steal pointer or keyboard
 focus from normal browsing to make an invisible owned context work.
 
 ### 8.3 Deferred native trusted-context text design
@@ -1182,7 +1182,7 @@ silent foreground focus theft.
 ## 10. Prompt injection, data flow, and effect safety
 
 Boundary markers around page text are useful model context but are not the
-security solution. Zephium enforces source-to-sink policy outside the model.
+security solution. Drift enforces source-to-sink policy outside the model.
 
 Every observed value carries:
 
@@ -1312,15 +1312,15 @@ settle on reported usage.
 
 The chosen-model drive keeps every other transport rule: admission, the
 disclosure commit, cancellation, the absolute deadline and terminal
-settlement are the fixed-endpoint path's own. A body Zephium built is
+settlement are the fixed-endpoint path's own. A body Drift built is
 translated into one provider-neutral call: the fixed instructions become the
 system prompt, developer host facts become user text whose first line marks
 them, replayed function calls and results become tool turns, reasoning items
 are dropped, a screenshot reaches only a model that accepts images, and a
-structured-output mapping becomes one forced answer tool. Any item Zephium
+structured-output mapping becomes one forced answer tool. Any item Drift
 never writes refuses the call before dispatch. The reply crosses back through
 the closed browser-tool decoder and stream ceilings: only the first tool call
-is decoded, it must be a tool the request offered, it receives Zephium's own
+is decoded, it must be a tool the request offered, it receives Drift's own
 call identity, and further calls and narration are dropped and counted
 without conferring anything. When its one call was kept whole, the model's
 own parts around it (thinking blocks, signatures, reasoning items) and the
@@ -1360,7 +1360,7 @@ explicit combined diagnostic feature. The library-owned authentication
 `HeaderValue` is constructed only at dispatch and
 marked sensitive. Pinned `http` copies that value into ordinary `Bytes` and
 does not zeroize it on drop, so the zeroization guarantee applies to
-Zephium-owned credential and construction buffers, not unavoidable HTTP-stack
+Drift-owned credential and construction buffers, not unavoidable HTTP-stack
 or wire copies. An already-sticky run or shutdown cancellation is checked
 before that header or request is materialized, then checked again after request
 construction and immediately before the send future can be polled. Admission
@@ -1831,7 +1831,7 @@ credentials in committed evidence.
 
 ### 13.3 Evaluation portfolio
 
-No single browser benchmark is the release gate. Zephium uses complementary
+No single browser benchmark is the release gate. Drift uses complementary
 evidence layers:
 
 1. deterministic hostile fixtures for protocol, policy, lifecycle, safety, and
@@ -1840,7 +1840,7 @@ evidence layers:
    uncertainty, and recovery;
 3. a small heterogeneous live-site matrix for current-web compatibility;
 4. reproducible self-hosted tasks from maintained BrowserGym/WebArena-family
-   environments where their task semantics match Zephium capabilities;
+   environments where their task semantics match Drift capabilities;
 5. a sampled live benchmark such as Online-Mind2Web for external validity and
    a sampled WebVoyager-compatible run only for market comparability; and
 6. owned authenticated accounts with reversible read/write workflows, followed
@@ -2240,7 +2240,7 @@ Research implementation details against current pinned code and primary
 sources rather than copying another browser agent's architecture:
 
 - [Vercel agent-browser](https://github.com/vercel-labs/agent-browser) is a
-  useful CDP/CLI comparison and performance reference, not Zephium's runtime.
+  useful CDP/CLI comparison and performance reference, not Drift's runtime.
 - [WebKit `WKContentWorld`](https://developer.apple.com/documentation/webkit/wkcontentworld)
   defines the native content-world primitive used on supported macOS versions.
 - [WebKit JavaScript evaluation in a frame and content world](https://developer.apple.com/documentation/webkit/wkwebview/evaluatejavascript%28_%3Ain%3Ain%3Acompletionhandler%3A%29)
@@ -2299,14 +2299,14 @@ sources rather than copying another browser agent's architecture:
 - [Chrome DevTools Protocol `Runtime.evaluate`](https://chromedevtools.github.io/devtools-protocol/tot/Runtime/#method-evaluate)
   defines the explicit `userGesture` control used for M1 fixture observation.
 - [OWASP LLM prompt-injection prevention](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html)
-  summarizes the threat class; Zephium's deterministic source-to-sink policy
+  summarizes the threat class; Drift's deterministic source-to-sink policy
   remains the actual product boundary.
 - [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses/create)
   defines the first fixed request, bearer-authentication, streaming, and usage
-  surface; Zephium sets `store: false` and accepts only its own closed tools.
+  surface; Drift sets `store: false` and accepts only its own closed tools.
 - [Anthropic Messages API](https://docs.anthropic.com/en/api/messages)
   defines the second fixed request, `x-api-key` and version headers, streaming,
   and usage surface used by the provider-neutral adapter.
 
 Primary documentation does not substitute for device tests against the exact
-runtime Zephium ships.
+runtime Drift ships.

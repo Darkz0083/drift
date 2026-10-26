@@ -15,7 +15,7 @@ async function search(body: string, query: string): Promise<Snapshot> {
   );
   frame.srcdoc = `<style>pre{white-space:pre-wrap}</style>${body}<script>${inject("semanticMediaRuntime")}
     addEventListener("load",()=>{
-      const api=globalThis.__zephiumSemanticRuntimeV1;
+      const api=globalThis.__driftSemanticRuntimeV1;
       const b={n:128,t:16384,w:65536,x:4096,geo:true};
       const first=JSON.parse(api.invoke(JSON.stringify({v:1,i:1,g:1,s:{k:"initial"},b})));
       document.documentElement.dataset.capture=api.invoke(JSON.stringify({v:1,i:2,g:2,s:{k:"text_search",a:first.n[0].k,q:${JSON.stringify(query)}},b}));

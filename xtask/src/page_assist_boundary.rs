@@ -5,9 +5,9 @@ use std::path::{Path, PathBuf};
 
 use toml::Value;
 
-const CORE_ROOT: &str = "crates/zephium-page-assist";
-const SERVICE_ROOT: &str = "crates/zephium-work-composition/src/page_assist";
-const CORE_DEPENDENCIES: [&str; 2] = ["zephium-ipc", "cssparser"];
+const CORE_ROOT: &str = "crates/drift-page-assist";
+const SERVICE_ROOT: &str = "crates/drift-work-composition/src/page_assist";
+const CORE_DEPENDENCIES: [&str; 2] = ["drift-ipc", "cssparser"];
 const CORE_DEV_DEPENDENCIES: [&str; 1] = ["proptest"];
 const CORE_ATTRIBUTES: [&str; 3] = [
     "#![forbid(unsafe_code)]",
@@ -21,10 +21,10 @@ const CORE_FORBIDDEN: [&str; 22] = [
     "hyper",
     "tauri",
     "wry",
-    "zephium_engine",
-    "zephium_app",
-    "zephium_store",
-    "zephium_agentic",
+    "drift_engine",
+    "drift_app",
+    "drift_store",
+    "drift_agentic",
     "std::fs",
     "std::net",
     "std::process",
@@ -128,7 +128,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         .get("package")
         .and_then(Value::as_table)
         .ok_or_else(|| "page-assist core package metadata is missing".to_owned())?;
-    if package.get("name").and_then(Value::as_str) != Some("zephium-page-assist")
+    if package.get("name").and_then(Value::as_str) != Some("drift-page-assist")
         || package.get("publish").and_then(Value::as_bool) != Some(false)
         || package.get("build").and_then(Value::as_bool) != Some(false)
     {
@@ -211,8 +211,8 @@ mod tests {
 
     #[test]
     fn manifest_rejects_new_dependencies_and_build_inputs() {
-        let base = "[package]\nname = \"zephium-page-assist\"\npublish = false\nbuild = false\n";
-        assert!(validate_manifest(&format!("{base}[dependencies]\nzephium-ipc = \"1\"\n")).is_ok());
+        let base = "[package]\nname = \"drift-page-assist\"\npublish = false\nbuild = false\n";
+        assert!(validate_manifest(&format!("{base}[dependencies]\ndrift-ipc = \"1\"\n")).is_ok());
         for extra in [
             "[dependencies]\ntokio = \"1\"\n",
             "[dev-dependencies]\nreqwest = \"1\"\n",

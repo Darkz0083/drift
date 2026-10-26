@@ -8,7 +8,7 @@ use super::*;
 #[serde(rename_all = "snake_case")]
 pub(crate) enum VoiceEngineV1 {
     OnDevice,
-    Zephium,
+    Drift,
     OpenAi,
     Groq,
 }
@@ -65,21 +65,21 @@ pub(crate) enum VoiceFaultV1 {
     KeyRefused,
     SignedOut,
     OutOfCredit,
-    /// The chosen Zephium AI speech model needs another plan.
+    /// The chosen Drift AI speech model needs another plan.
     PlanRequired,
-    /// The Zephium account is under billing review.
+    /// The Drift account is under billing review.
     BillingReview,
-    /// The account's daily Zephium AI limit is reached.
+    /// The account's daily Drift AI limit is reached.
     DailyLimit,
-    /// Free Zephium AI usage is paused for now.
+    /// Free Drift AI usage is paused for now.
     FreeUsagePaused,
-    /// Zephium AI is paused as a spending protection.
+    /// Drift AI is paused as a spending protection.
     HostedPaused,
     /// The server could not read the recording.
     InvalidAudio,
     /// The server does not take the recording's encoding.
     UnsupportedAudio,
-    /// The recording is longer than Zephium AI takes.
+    /// The recording is longer than Drift AI takes.
     AudioTooLong,
     RateLimited,
     Offline,
@@ -91,7 +91,7 @@ pub(crate) enum VoiceFaultV1 {
 
 /// A take moved on. `text` is set once, when it is done.
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, tauri_specta::Event)]
-#[tauri_specta(event_name = "zephium:voice-changed")]
+#[tauri_specta(event_name = "drift:voice-changed")]
 pub(crate) struct VoiceChanged {
     pub(crate) take: u32,
     pub(crate) phase: VoicePhaseV1,
@@ -105,7 +105,7 @@ pub(crate) struct VoiceChanged {
 /// Input levels in percent, one per 40 ms of audio, oldest first; they
 /// arrive about ten times a second.
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, tauri_specta::Event)]
-#[tauri_specta(event_name = "zephium:voice-levels")]
+#[tauri_specta(event_name = "drift:voice-levels")]
 pub(crate) struct VoiceLevels {
     pub(crate) take: u32,
     pub(crate) levels: Vec<u8>,
@@ -132,8 +132,8 @@ const MAX_PARTIAL_BYTES: usize = 4 * 1024;
 #[cfg(target_os = "macos")]
 const PRIVACY_PANE: &str = "x-apple.systempreferences:com.apple.preference.security?";
 
-fn fault_of(fault: zephium_voice::Fault) -> VoiceFaultV1 {
-    use zephium_voice::Fault;
+fn fault_of(fault: drift_voice::Fault) -> VoiceFaultV1 {
+    use drift_voice::Fault;
     match fault {
         Fault::MicrophoneDenied => VoiceFaultV1::MicrophoneDenied,
         Fault::RecognitionDenied => VoiceFaultV1::RecognitionDenied,
@@ -144,11 +144,11 @@ fn fault_of(fault: zephium_voice::Fault) -> VoiceFaultV1 {
     }
 }
 
-fn permission(permission: zephium_voice::Permission) -> VoicePermissionV1 {
+fn permission(permission: drift_voice::Permission) -> VoicePermissionV1 {
     match permission {
-        zephium_voice::Permission::Granted => VoicePermissionV1::Granted,
-        zephium_voice::Permission::Undetermined => VoicePermissionV1::Undetermined,
-        zephium_voice::Permission::Denied => VoicePermissionV1::Denied,
+        drift_voice::Permission::Granted => VoicePermissionV1::Granted,
+        drift_voice::Permission::Undetermined => VoicePermissionV1::Undetermined,
+        drift_voice::Permission::Denied => VoicePermissionV1::Denied,
     }
 }
 
@@ -169,7 +169,7 @@ fn percent(level: f32) -> u8 {
 }
 
 fn emit(app: &tauri::AppHandle, event: &VoiceChanged) {
-    emit_to_privileged(app, MAIN_LABEL, "zephium:voice-changed", event);
+    emit_to_privileged(app, MAIN_LABEL, "drift:voice-changed", event);
 }
 
 #[cfg(feature = "work-product")]
@@ -177,14 +177,14 @@ mod product {
     use super::*;
     use std::sync::atomic::{AtomicU32, Ordering};
     use std::sync::{Arc, Mutex, MutexGuard};
-    use zephium_app::voice::{self, VoiceEngine};
-    use zephium_core::work::model::{HostedRefusal, WorkModelError};
-    use zephium_voice::{Capture, Ending, Listener, Outcome, Recognition};
+    use drift_app::voice::{self, VoiceEngine};
+    use drift_core::work::model::{HostedRefusal, WorkModelError};
+    use drift_voice::{Capture, Ending, Listener, Outcome, Recognition};
 
     pub(super) fn engine_v1(engine: VoiceEngine) -> VoiceEngineV1 {
         match engine {
             VoiceEngine::OnDevice => VoiceEngineV1::OnDevice,
-            VoiceEngine::Zephium => VoiceEngineV1::Zephium,
+            VoiceEngine::Drift => VoiceEngineV1::Drift,
             VoiceEngine::OpenAi => VoiceEngineV1::OpenAi,
             VoiceEngine::Groq => VoiceEngineV1::Groq,
         }
@@ -193,7 +193,7 @@ mod product {
     pub(super) fn engine_of(engine: VoiceEngineV1) -> VoiceEngine {
         match engine {
             VoiceEngineV1::OnDevice => VoiceEngine::OnDevice,
-            VoiceEngineV1::Zephium => VoiceEngine::Zephium,
+            VoiceEngineV1::Drift => VoiceEngine::Drift,
             VoiceEngineV1::OpenAi => VoiceEngine::OpenAi,
             VoiceEngineV1::Groq => VoiceEngine::Groq,
         }
@@ -202,7 +202,7 @@ mod product {
     pub(super) fn cloud_fault(engine: VoiceEngine, error: WorkModelError) -> VoiceFaultV1 {
         match error {
             WorkModelError::Unauthorized | WorkModelError::MissingKey
-                if engine == VoiceEngine::Zephium =>
+                if engine == VoiceEngine::Drift =>
             {
                 VoiceFaultV1::SignedOut
             }
@@ -259,7 +259,7 @@ mod product {
             emit_to_privileged(
                 &self.app,
                 MAIN_LABEL,
-                "zephium:voice-levels",
+                "drift:voice-levels",
                 &VoiceLevels {
                     take: self.take,
                     levels: levels.iter().map(|level| percent(*level)).collect(),
@@ -298,20 +298,20 @@ mod product {
     }
 
     pub(super) async fn resolve() -> Resolved {
-        tauri::async_runtime::spawn(zephium_app::work_models::refresh_cloud_catalog());
+        tauri::async_runtime::spawn(drift_app::work_models::refresh_cloud_catalog());
         let chosen = voice::chosen();
         let language = voice::language();
         let cloud = voice::cloud_engines().await;
         let wanted = language.clone();
         let (locale, languages, microphone) = tauri::async_runtime::spawn_blocking(move || {
             (
-                zephium_voice::on_device_locale(wanted.as_deref()),
-                zephium_voice::preferred_languages(),
-                zephium_voice::microphone_permission(),
+                drift_voice::on_device_locale(wanted.as_deref()),
+                drift_voice::preferred_languages(),
+                drift_voice::microphone_permission(),
             )
         })
         .await
-        .unwrap_or((None, Vec::new(), zephium_voice::Permission::Granted));
+        .unwrap_or((None, Vec::new(), drift_voice::Permission::Granted));
         let engine = voice::effective(chosen, locale.is_some(), &cloud);
         let mut engines = Vec::new();
         if cfg!(target_os = "macos") {
@@ -375,7 +375,7 @@ mod product {
         let started =
             tauri::async_runtime::spawn_blocking(move || Capture::start(recognition, false, relay))
                 .await
-                .unwrap_or(Err(zephium_voice::Fault::Unsupported));
+                .unwrap_or(Err(drift_voice::Fault::Unsupported));
         let mut live = live();
         let current = live.as_mut().filter(|live| live.take == take);
         match (started, current) {
@@ -468,7 +468,7 @@ mod product {
         let handle = tauri::async_runtime::spawn(async move {
             let finished = tauri::async_runtime::spawn_blocking(move || capture.finish())
                 .await
-                .unwrap_or(Err(zephium_voice::Fault::Unsupported));
+                .unwrap_or(Err(drift_voice::Fault::Unsupported));
             let outcome = match &finished {
                 Ok(Outcome::Text(_)) => "text",
                 Ok(Outcome::Nothing) => "nothing",
@@ -627,7 +627,7 @@ pub(crate) async fn voice_choose_engine(
     }
     #[cfg(feature = "work-product")]
     {
-        zephium_app::voice::choose(engine.map(product::engine_of));
+        drift_app::voice::choose(engine.map(product::engine_of));
         product::resolve().await.status
     }
     #[cfg(not(feature = "work-product"))]
@@ -648,7 +648,7 @@ pub(crate) async fn voice_choose_language(
     }
     #[cfg(feature = "work-product")]
     {
-        zephium_app::voice::choose_language(language.as_deref());
+        drift_app::voice::choose_language(language.as_deref());
         product::resolve().await.status
     }
     #[cfg(not(feature = "work-product"))]
@@ -792,7 +792,7 @@ mod tests {
 
     #[test]
     fn a_switched_off_dictation_is_its_own_fault() {
-        use zephium_voice::Fault;
+        use drift_voice::Fault;
         assert_eq!(fault_of(Fault::DictationOff), VoiceFaultV1::DictationOff);
         assert_eq!(fault_of(Fault::Recognizer), VoiceFaultV1::Unavailable);
         assert_eq!(
@@ -821,11 +821,11 @@ mod tests {
     #[cfg(feature = "work-product")]
     #[test]
     fn cloud_refusals_name_what_the_person_can_fix() {
-        use zephium_app::voice::VoiceEngine;
-        use zephium_core::work::model::{HostedRefusal, WorkModelError};
+        use drift_app::voice::VoiceEngine;
+        use drift_core::work::model::{HostedRefusal, WorkModelError};
         let fault = product::cloud_fault;
         assert_eq!(
-            fault(VoiceEngine::Zephium, WorkModelError::Unauthorized),
+            fault(VoiceEngine::Drift, WorkModelError::Unauthorized),
             VoiceFaultV1::SignedOut
         );
         assert_eq!(
@@ -837,7 +837,7 @@ mod tests {
             VoiceFaultV1::OutOfCredit
         );
         assert_eq!(
-            fault(VoiceEngine::Zephium, WorkModelError::ContextTooLong),
+            fault(VoiceEngine::Drift, WorkModelError::ContextTooLong),
             VoiceFaultV1::TooLong
         );
         let hosted = |refusal| WorkModelError::Hosted {
@@ -866,11 +866,11 @@ mod tests {
             (HostedRefusal::AudioTooLong, VoiceFaultV1::AudioTooLong),
             (HostedRefusal::AlreadySent, VoiceFaultV1::Unavailable),
         ] {
-            assert_eq!(fault(VoiceEngine::Zephium, hosted(refusal)), expected);
+            assert_eq!(fault(VoiceEngine::Drift, hosted(refusal)), expected);
         }
         for engine in [
             VoiceEngineV1::OnDevice,
-            VoiceEngineV1::Zephium,
+            VoiceEngineV1::Drift,
             VoiceEngineV1::OpenAi,
             VoiceEngineV1::Groq,
         ] {

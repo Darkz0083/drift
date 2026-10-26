@@ -66,7 +66,7 @@ test("the column's document cannot scroll sideways in a column-wide view", async
   render(Shell);
   await settle();
   await userEvent.click(
-    document.querySelector<HTMLInputElement>("aside input[data-zephium-address]")!,
+    document.querySelector<HTMLInputElement>("aside input[data-drift-address]")!,
   );
   await settle();
 

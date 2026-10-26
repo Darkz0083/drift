@@ -9,7 +9,7 @@ export type { MediaAssetV1 };
 const DIGEST = /^[0-9a-f]{64}$/;
 const PROFILE = /^[0-9A-HJKMNP-TV-Z]{26}$/;
 const STEP_ID = /^[A-Za-z0-9_-]{1,64}$/;
-const base = IS_MAC ? "zephium-media://localhost/" : "http://zephium-media.localhost/";
+const base = IS_MAC ? "drift-media://localhost/" : "http://drift-media.localhost/";
 
 /** The newest frame of one agent page; the generation only busts caches. */
 export function pageFrameUrl(attempt: string, step: string, generation: number): string | null {

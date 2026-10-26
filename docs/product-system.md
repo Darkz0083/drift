@@ -1,9 +1,9 @@
-# Zephium product system
+# Drift product system
 
 Status: product and target-architecture source of truth
 Last reviewed: 2026-09-13
 
-This document defines what Zephium is, what the first public release must be,
+This document defines what Drift is, what the first public release must be,
 and the architectural decisions that let the product grow without being
 rewritten. Product direction is fixed at this level; individual interaction
 details and replaceable implementation choices can evolve when evidence says
@@ -18,7 +18,7 @@ document does not change implemented permissions or contracts.
 
 ## 0. Program context
 
-Zephium is not beginning as an AI mockup around a generic browser shell. Its
+Drift is not beginning as an AI mockup around a generic browser shell. Its
 WebView-based browser foundation has already validated the hardest architectural
 risk: native page lifecycle, low application overhead, native Rust blocking,
 and substantial Chrome-extension compatibility. Active extension work has
@@ -34,13 +34,13 @@ silently rebased over either subsystem's invariants.
 
 The project also starts with meaningful distribution: the creator's Terax
 open-source audience and launch experience have produced nearly 10,000 GitHub
-stars and substantial product interest. Zephium should be engineered for
+stars and substantial product interest. Drift should be engineered for
 thousands of real users from its first release, not as a disposable prototype
 that will be rebuilt if a launch video succeeds.
 
 ## 1. Product thesis
 
-Zephium has two native ways of using the web:
+Drift has two native ways of using the web:
 
 **Browse** is a premium, lightweight, private browser. It must be worth using
 when every AI capability is disabled.
@@ -58,7 +58,7 @@ Language is often the fastest way to express intent. The environment is a
 better way to represent complex state. The agent is an actor in that
 environment, not the interface itself.
 
-Zephium is therefore not positioned as a canvas browser, graph browser,
+Drift is therefore not positioned as a canvas browser, graph browser,
 productivity browser, research browser, AI browser, agentic browser, task
 manager, or browser with built-in tools. Those are components or properties.
 The product identity is **Browse + Work**.
@@ -82,15 +82,15 @@ The following are release requirements, not aspirations:
    button added after autonomous execution. Pause and continuation are offered
    only where the runtime supports them; cancellation is not advertised as pause.
 6. **Native components before generated webpages.** Agents populate bounded,
-   accessible Zephium components with structured data. They do not inject
+   accessible Drift components with structured data. They do not inject
    arbitrary HTML into a privileged surface.
 7. **Local-first and privacy-conscious.** Local state remains local by default.
    Only the minimum relevant context crosses a model or service boundary.
-8. **One product architecture.** Local models, BYOK, and Zephium-hosted models
+8. **One product architecture.** Local models, BYOK, and Drift-hosted models
    use the same work, agent, tool, and result contracts. Provider choice must
    not create different products.
 9. **No silent degradation.** If a model, platform, or integration cannot meet
-   a capability contract, Zephium explains the incompatibility and asks for a
+   a capability contract, Drift explains the incompatibility and asks for a
    compatible choice. It does not quietly produce an inferior workflow.
 10. **Best-in-class engineering is part of the product.** Correctness,
     responsiveness, CPU, RAM, GPU, battery, security, recoverability, and
@@ -121,7 +121,7 @@ Same-profile references can reuse a note, artifact, or browser resource across
 Works without duplicating its identity. Cross-Space discovery follows context
 access settings; cross-profile access or copying must always be explicit.
 
-Browser profiles, a Zephium service account, connected website accounts, and
+Browser profiles, a Drift service account, connected website accounts, and
 model-provider credentials are distinct concepts even when reached through one
 menu. Moving or grouping an object never grants a capability or changes which
 account an operation uses.
@@ -140,7 +140,7 @@ Browse owns the familiar web experience:
 - optional notes, tasks, history, analytics, focus tools, command/search, and
   contextual AI.
 
-Platform WebViews provide rendering. Zephium owns browser state, lifecycle,
+Platform WebViews provide rendering. Drift owns browser state, lifecycle,
 resource policy, interface, product features, and the integration model around
 them. Being WebView-based is an engineering constraint, not the product
 identity.
@@ -161,7 +161,7 @@ surface rather than a parallel application.
 
 Browse may offer page-scoped help such as summarization, translation,
 extraction, questions about the current page, and small actions. It is compact
-and contextual, not Zephium's defining AI interface. A conventional chat may
+and contextual, not Drift's defining AI interface. A conventional chat may
 exist where it is the simplest representation, but chat is never allowed to
 become the primary product shell.
 
@@ -170,7 +170,7 @@ and model-dependent actions while preserving manual Work, its objects, and its
 toolbar. Disabling Work leaves ordinary Browse available. Notes, tasks, history,
 analytics, and other non-AI utilities remain independently usable and
 independently disableable. Neither local/BYOK use nor manual Work requires a
-Zephium service account.
+Drift service account.
 
 ## 4. Work
 
@@ -210,7 +210,7 @@ Substantial work follows this conceptual loop:
    knowledge survive. A transcript is supporting evidence, not the product
    result.
 
-Understanding and execution are separable. A user can ask Zephium to build a
+Understanding and execution are separable. A user can ask Drift to build a
 complete model and recommendation, then execute all, some, or none of it.
 This loop is not a wizard that every interaction must traverse. Manual work
 requires no objective or approval ceremony, and a small contextual question
@@ -259,7 +259,7 @@ separate polish step.
 Exact spacing and the minimal return affordance remain subject to real native
 visual and accessibility testing. Do not fill all corners with permanent
 panels. Settings remain accessible without leaving Work. The Work profile
-popover is Zephium-owned UI; it does not replace Browse's native menu boundary.
+popover is Drift-owned UI; it does not replace Browse's native menu boundary.
 Show measured usage and labeled estimates, not invented provider balances.
 
 Toolbar popovers combine creation with finding and attaching existing objects.
@@ -386,7 +386,7 @@ are specified in `agentic-browsing.md`.
 
 ### 4.6 Native visual primitives
 
-Zephium owns a versioned registry of structured visual primitives. The target
+Drift owns a versioned registry of structured visual primitives. The target
 vocabulary is expected to cover:
 
 - Card and resource collection;
@@ -427,7 +427,7 @@ accessibility behavior, interaction contract, renderer, persistence codec, and
 migration path. Models can request a supported component and populate its
 data. Rust validates admission. Unknown versions fail safely or render a
 bounded fallback. The product's real-time generative UI is this validated
-semantic composition: agents provide data and relationships to Zephium-owned
+semantic composition: agents provide data and relationships to Drift-owned
 components. They never generate or execute arbitrary HTML, CSS, Svelte,
 JavaScript, selectors, or privileged UI. Images and source logos use admitted
 media loading with bounded decoding and privacy rules; a model-supplied image
@@ -441,7 +441,7 @@ alter evidence or claim a remote mutation.
 
 ### 4.7 Actors and delegation
 
-A Work may contain the user, a primary Zephium agent, bounded sub-agents,
+A Work may contain the user, a primary Drift agent, bounded sub-agents,
 specialist external agents, deterministic workflows, local tools, connected
 services, and local models. Responsibility must be visible at the part of the
 work it affects.
@@ -467,7 +467,7 @@ initial admission policy; neither is a structural schema restriction. The UI
 emphasizes responsibility and outcomes, revealing actors when ownership,
 handoffs, questions, failures, or waiting matters.
 
-External agents complement Zephium. A coding branch can be handed to Codex or
+External agents complement Drift. A coding branch can be handed to Codex or
 Claude Code while its objective, context, progress, review, and result remain
 part of the parent Work. Integration is through capability-scoped adapters,
 not screen scraping when a structured CLI, API, or MCP route exists.
@@ -590,7 +590,7 @@ Neither task checkmarks nor estimated progress prove an execution succeeded.
 ### 5.2 Notes and documents
 
 Notes are lightweight user artifacts and context, kept as Markdown files the
-person owns rather than records in a Zephium database. Rich editing uses Tiptap
+person owns rather than records in a Drift database. Rich editing uses Tiptap
 directly over a Markdown bridge that writes unchanged text back exactly as it
 was. Only the active document mounts an editor; read-only and spatial
 projections use lightweight renderers. Collaboration packages and heavy extensions are
@@ -607,7 +607,7 @@ Memory has two conceptual layers:
 - **User knowledge** is information deliberately worth revisiting: decisions,
   findings, explanations, references, notes, documents, and other artifacts.
 
-Agent output does not automatically become permanent user knowledge. Zephium
+Agent output does not automatically become permanent user knowledge. Drift
 can suggest preserving useful material. Retrieval filters locally first and
 sends only the relevant bounded context to an external model. The user can
 inspect a context manifest showing what will leave the device and why.
@@ -637,7 +637,7 @@ advertising channel.
 
 ## 6. AI and agent architecture
 
-Zephium has one agent architecture with replaceable model transports:
+Drift has one agent architecture with replaceable model transports:
 
 ```text
 Intent / Work state
@@ -646,7 +646,7 @@ Rust agent supervisor and policy engine
         |
 Typed model, browser, tool, memory, artifact, and approval ports
         |
-Local runtime | BYOK provider | Zephium hosted gateway
+Local runtime | BYOK provider | Drift hosted gateway
 ```
 
 The Rust process owns run state, planning contracts, tool scheduling,
@@ -663,7 +663,7 @@ The target model surface includes:
 - OpenAI-compatible custom endpoints;
 - local runtimes such as Ollama, LM Studio, and llama.cpp endpoints without
   bundling an inference runtime initially;
-- a Zephium-hosted model gateway.
+- a Drift-hosted model gateway.
 
 All implement the same typed streaming and tool-use contracts. Capability
 descriptors express structured output, tool calling, images, context limits,
@@ -703,7 +703,7 @@ The gateway stores no prompts, page contents, model outputs, screenshots, or
 tool payloads for product analytics. Operational and billing records are the
 minimum content-free metadata required for abuse controls, reliability, and
 accounting. Downstream model providers retain their own disclosed policies;
-Zephium must not claim that BYOK or hosted relay changes those policies.
+Drift must not claim that BYOK or hosted relay changes those policies.
 
 Hosted AI should offer an integrated experience; speed, quality, and efficiency
 advantages must be measured. It must not impose dependencies on BYOK or local
@@ -716,7 +716,7 @@ browser and reads it with no model call (see
 [Work execution](agent-work-execution.md#web-search)); the chosen provider's
 native web search is its capped fallback. Preserve search activity, citations, provenance,
 usage, cancellation, and attribution requirements through typed adapters. Do
-not require Tavily, Firecrawl, a Zephium account, or a hosted search subscription
+not require Tavily, Firecrawl, a Drift account, or a hosted search subscription
 for BYOK. A future hosted offering can add suitable search services.
 
 Ordinary public search needs no query-by-query Rust approval. Provider-native
@@ -743,12 +743,12 @@ advertised tool is not automatically authorized. Coding and filesystem work
 need explicit workspace/process scopes, not unrestricted model-controlled shell
 or filesystem access. Credential handling remains outside model-visible tools.
 
-### 6.4 Rig reuse and Zephium authority
+### 6.4 Rig reuse and Drift authority
 
 Prefer [Rig](https://github.com/0xPlaygrounds/rig) where it demonstrably reduces
 provider, streaming, tool-protocol, search, embedding, or multimodal integration
 work. Evaluate its host-driven agent loop where useful. Start with a pinned
-upstream dependency and narrow Zephium adapters; contribute general fixes
+upstream dependency and narrow Drift adapters; contribute general fixes
 upstream. Maintain a fork only for a demonstrated essential gap that cannot be
 reasonably addressed through those boundaries.
 
@@ -760,7 +760,7 @@ features on upstream main are not automatically available in a release.
 
 Rig is not the durable Work store, capability authority, effect-settlement
 system, native browser owner, or UI model. Its internal checkpoints must not
-become the product persistence format or resurrect worker authority. Zephium
+become the product persistence format or resurrect worker authority. Drift
 retains control of requests and tool dispatch, scheduling, immutable approvals,
 bounded delegation, recovery, and publication. Reuse a component only when this
 boundary remains intact; do not maintain parallel provider implementations
@@ -830,7 +830,7 @@ IPC, and native OS surfaces where they fit. `frontend.md` is the working
 frontend contract.
 
 The following additions are preferred because each remains replaceable behind
-a Zephium-owned domain boundary:
+a Drift-owned domain boundary:
 
 - **Tiptap/ProseMirror:** limited note/document editing schema;
 - **`@xyflow/svelte`:** the existing viewport/interaction adapter, subject to
@@ -873,7 +873,7 @@ existing on disk is not a reason to keep its runtime alive.
 
 ## 9. Design system and native quality
 
-Zephium should feel like a premium operating-system application: quiet,
+Drift should feel like a premium operating-system application: quiet,
 legible, responsive, and obvious despite the complexity underneath. The aim is
 Apple-level quality, not a platform-neutral imitation of macOS. Windows follows
 Windows interaction conventions with the same restraint and finish.
@@ -886,7 +886,7 @@ script.
 
 On macOS, the complete native Tao window uses the best supported native window
 material: Liquid Glass on macOS 26 and later when the pinned native stack can
-prove it, with vibrancy as the fallback. Restrained Zephium-owned blur and
+prove it, with vibrancy as the fallback. Restrained Drift-owned blur and
 translucency are allowed where they improve separation and remain within
 measured contrast, CPU/GPU, and power budgets. There is no blanket CSS blur ban
 and no requirement to rewrite an upstream component solely for an unused blur
@@ -895,7 +895,7 @@ On Windows, prefer proven Mica and native materials with a solid Windows 10
 fallback; Acrylic is retained only
 where resize, GPU, power, and contrast measurements justify it. Cross-WebView
 surfaces retain their native boundaries. Browse's native menus remain native;
-Work's toolbar and profile popovers are accessible Zephium-owned controls in
+Work's toolbar and profile popovers are accessible Drift-owned controls in
 its presentation surface, not a generic privileged overlay across web pages.
 
 A specialist design agent may later own tokens, components, interaction polish,
@@ -980,7 +980,7 @@ crippled MVP. It includes:
 
 Linux remains in the architecture and build discipline, with full product
 parity expected after the first release. Major Chrome extensions are the
-compatibility target; Zephium does not claim the entire Chrome extension API.
+compatibility target; Drift does not claim the entire Chrome extension API.
 
 The following are deliberately post-release but must attach through existing
 ports and identities rather than require a product rewrite:
@@ -998,7 +998,7 @@ The browser and capable local Work remain open source. Free/local value can
 include Browse, blocking, extensions, customization, local Work, local models,
 BYOK, notes/tasks/memory, local integrations, and external-agent adapters.
 
-Paid value corresponds to real hosted value: Zephium-hosted AI, compute,
+Paid value corresponds to real hosted value: Drift-hosted AI, compute,
 premium models, cloud browser execution, long-running and parallel hosted
 agents, synchronization, continuation, collaboration, and organizational
 capabilities. The browser is not artificially impaired to manufacture a
@@ -1090,7 +1090,7 @@ requires them.
 
 ## 15. Decision discipline
 
-Zephium does not need an ADR ceremony for ordinary implementation. This
+Drift does not need an ADR ceremony for ordinary implementation. This
 document and the subsystem specifications hold accepted decisions. A short ADR
 is justified only when a choice is expensive to reverse or changes one of:
 
@@ -1128,7 +1128,7 @@ Do not:
 
 ## 17. Success
 
-Browse succeeds when people switch because Zephium is an exceptional browser,
+Browse succeeds when people switch because Drift is an exceptional browser,
 even if they never enable AI.
 
 Work succeeds when a person can express a substantial goal, understand the

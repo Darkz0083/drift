@@ -74,25 +74,25 @@ export default defineConfig({
           provide: {
             formSubmitRuntime: readFileSync(
               new URL(
-                "../crates/zephium-engine/src/platform/form_submit_observer.js",
+                "../crates/drift-engine/src/platform/form_submit_observer.js",
                 import.meta.url,
               ),
               "utf8",
             ),
             formActionRuntime: readFileSync(
               new URL(
-                "../crates/zephium-engine/src/platform/macos/agentic_form_diagnostic_probe.js",
+                "../crates/drift-engine/src/platform/macos/agentic_form_diagnostic_probe.js",
                 import.meta.url,
               ),
               "utf8",
             ),
             formOracleRuntime: readFileSync(
-              new URL("../crates/zephium-engine/src/host/work_form_oracle.js", import.meta.url),
+              new URL("../crates/drift-engine/src/host/work_form_oracle.js", import.meta.url),
               "utf8",
             ),
             pixelPrivacyRuntime: readFileSync(
               new URL(
-                "../crates/zephium-agentic/assets/semantic-pixel-privacy-v1.js",
+                "../crates/drift-agentic/assets/semantic-pixel-privacy-v1.js",
                 import.meta.url,
               ),
               "utf8",
@@ -100,21 +100,21 @@ export default defineConfig({
             semanticMediaRuntime:
               readFileSync(
                 new URL(
-                  "../crates/zephium-agentic/assets/semantic-record-media-v1.js",
+                  "../crates/drift-agentic/assets/semantic-record-media-v1.js",
                   import.meta.url,
                 ),
                 "utf8",
               ) +
               readFileSync(
-                new URL("../crates/zephium-agentic/assets/semantic-runtime-v1.js", import.meta.url),
+                new URL("../crates/drift-agentic/assets/semantic-runtime-v1.js", import.meta.url),
                 "utf8",
               ),
             humanWallSurvey: readFileSync(
-              new URL("../crates/zephium-agentic/assets/work-human-wall-v1.js", import.meta.url),
+              new URL("../crates/drift-agentic/assets/work-human-wall-v1.js", import.meta.url),
               "utf8",
             ),
             contentStyleSource: readFileSync(
-              new URL("../crates/zephium-engine/src/host/content_style.js", import.meta.url),
+              new URL("../crates/drift-engine/src/host/content_style.js", import.meta.url),
               "utf8",
             ),
             packagedStylePolicy: {
@@ -147,9 +147,9 @@ export default defineConfig({
             instances: [
               {
                 browser:
-                  process.env.ZEPHIUM_COMPONENT_BROWSER === "chromium" ||
-                  process.env.ZEPHIUM_COMPONENT_BROWSER === "webkit"
-                    ? process.env.ZEPHIUM_COMPONENT_BROWSER
+                  process.env.DRIFT_COMPONENT_BROWSER === "chromium" ||
+                  process.env.DRIFT_COMPONENT_BROWSER === "webkit"
+                    ? process.env.DRIFT_COMPONENT_BROWSER
                     : process.platform === "darwin"
                       ? "webkit"
                       : "chromium",

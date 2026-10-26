@@ -1,13 +1,13 @@
 import { describe, expect, test } from "vitest";
 import { PERSONAS, WORKFLOWS, composed, recentWorkflows, workflowOf } from "../lib/start/workflows";
 
-const skills = import.meta.glob<string>("../../../../../crates/zephium-app/skills/*/SKILL.md", {
+const skills = import.meta.glob<string>("../../../../../crates/drift-app/skills/*/SKILL.md", {
   query: "?raw",
   import: "default",
   eager: true,
 });
 const skill = (name: string) =>
-  skills[`../../../../../crates/zephium-app/skills/${name}/SKILL.md`] ?? "";
+  skills[`../../../../../crates/drift-app/skills/${name}/SKILL.md`] ?? "";
 
 describe("workflows", () => {
   test("each is a built-in skill, and every role has at least two", () => {

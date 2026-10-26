@@ -4,9 +4,9 @@ use std::path::Path;
 
 pub(crate) fn check(root: &Path) -> Result<(), String> {
     let source =
-        std::fs::read_to_string(root.join("crates/zephium-agentic/src/work_browser_resource.rs"))
+        std::fs::read_to_string(root.join("crates/drift-agentic/src/work_browser_resource.rs"))
             .map_err(|e| e.to_string())?;
-    let port = std::fs::read_to_string(root.join("crates/zephium-agentic/src/context_port.rs"))
+    let port = std::fs::read_to_string(root.join("crates/drift-agentic/src/context_port.rs"))
         .map_err(|e| e.to_string())?;
     validate(&source, &port)?;
     for (path, required, forbidden) in ADAPTER_RULES {
@@ -19,7 +19,7 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
     }
     validate_preflight_order(
         &std::fs::read_to_string(
-            root.join("crates/zephium-work-composition/src/retained_qualification.rs"),
+            root.join("crates/drift-work-composition/src/retained_qualification.rs"),
         )
         .map_err(|e| e.to_string())?,
     )?;
@@ -69,7 +69,7 @@ fn validate_url_revocation_order(source: &str) -> Result<(), String> {
 
 const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
     (
-        "crates/zephium-engine/src/host/work_resource_action.rs",
+        "crates/drift-engine/src/host/work_resource_action.rs",
         &[
             "PASSIVE_SETTLEMENT:Duration=Duration::from_secs(3)",
             "RETIREMENT_MARGIN:Duration=Duration::from_millis(100)",
@@ -88,7 +88,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["evaluateJavaScript", "requestAnimationFrame", "std::thread", "tokio::"],
     ),
     (
-        "crates/zephium-engine/src/host/work_resource_observation.rs",
+        "crates/drift-engine/src/host/work_resource_observation.rs",
         &[
             "OBSERVATION_BUDGET:Duration=Duration::from_secs(5)",
             // A document's first look waits for a heavy app, its wakes cover
@@ -122,7 +122,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["ContextRegistry", "create_agent_context", "evaluateJavaScript", "requestAnimationFrame", "makeKey", "makeFirstResponder", "std::thread", "tokio::"],
     ),
     (
-        "crates/zephium-engine/src/platform/macos/work_observation_presentation.rs",
+        "crates/drift-engine/src/platform/macos/work_observation_presentation.rs",
         &[
             // cd6792df..53d344ba: the page is hosted beneath the human window's
             // chrome instead of a borderless surface; the window refuses its focus.
@@ -141,7 +141,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["makeKeyAndOrderFront", "makeFirstResponder", "activateIgnoringOtherApps", "setActivationPolicy", "setInactiveSchedulingPolicy", "requestAnimationFrame", "evaluateJavaScript", "runUntilDate"],
     ),
     (
-        "crates/zephium-agentic/src/work_browser_navigation.rs",
+        "crates/drift-agentic/src/work_browser_navigation.rs",
         &[
             "letOk(request)=active.native_request()",
             "request.operation()!=self.join.operation||request.redirect_policy().is_some()",
@@ -158,7 +158,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["Serialize", "Deserialize", "ContextRegistry", "std::thread", "tokio::", "evaluateJavaScript", "ForegroundRendering"],
     ),
     (
-        "crates/zephium-engine/src/work_resource_navigation_port.rs",
+        "crates/drift-engine/src/work_resource_navigation_port.rs",
         &[
             "state.observed!=Some(request.source())",
             "state.document_epoch!=request.source().navigation_epoch().get()",
@@ -175,7 +175,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["ContextRegistry", "ContextIdentity::new", "ContextJoin::", "cancel_run(", "ForegroundRendering", "evaluateJavaScript"],
     ),
     (
-        "crates/zephium-engine/src/host/work_resource_navigation.rs",
+        "crates/drift-engine/src/host/work_resource_navigation.rs",
         &[
             "Arc::ptr_eq(&resource.guard,&guard)",
             "!self.erasure_tombstones.contains(&resource.profile())",
@@ -201,7 +201,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["ContextRegistry", "ContextIdentity::new", "create_agent_context", "construct_work_resource", "evaluateJavaScript", "std::thread", "tokio::"],
     ),
     (
-        "crates/zephium-app/src/work_resources_product.rs",
+        "crates/drift-app/src/work_resources_product.rs",
         &[
             // b8bf7f37: the actor also carries the durable human wait; a continuation must have one.
             "letspec=input.retained_resource_spec()?", "StagedActor::try_new(input,browser,runtime,provider,access,audit,task,waiting,)",
@@ -224,7 +224,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["InspectablePublic", "try_new_for_probe", "AgentWorkController::", "PendingAgentRuntime", "ContextRegistry", "std::thread", "tokio::spawn", "Serialize", "Deserialize", "execute_semantic_action", "invoke_semantic", "AgentNativeShutdownProof"],
     ),
     (
-        "crates/zephium-app/src/shell/mod.rs",
+        "crates/drift-app/src/shell/mod.rs",
         &[
             // b892f874/24832e90: a stuck retained Work moves to a draining graveyard,
             // and shutdown begins on every retained owner instead of one.
@@ -241,7 +241,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ], &[],
     ),
     (
-        "crates/zephium-agentic/src/work_browser_document.rs",
+        "crates/drift-agentic/src/work_browser_document.rs",
         &[
             "#[default]Exact", "url.scheme()==\"https\"", "url.query().is_none()",
             "url.fragment().is_none()", "url.username().is_empty()", "url.password().is_none()",
@@ -251,7 +251,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["Serialize", "Deserialize", "reqwest", "WKWebView", "ContextNavigationRequest"],
     ),
     (
-        "crates/zephium-engine/src/platform/macos/agent_context.rs",
+        "crates/drift-engine/src/platform/macos/agent_context.rs",
         &[
             "ifgate.failed(){",
             "invoke_owned_unit_callback(navigation_invariant_failure.as_ref(),navigation_callback_panicked.as_ref(),);navigation_semantic.cancel();",
@@ -268,7 +268,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         // Work's own website data replaces per-run ephemeral storage for pages
         // without the person's session (2026-10-09): a stable, hash-derived
         // identifier per profile that can never equal the profile's own.
-        "crates/zephium-engine/src/work_website_data.rs",
+        "crates/drift-engine/src/work_website_data.rs",
         &[
             "Sha256::new().chain_update(DOMAIN).chain_update(profile.bytes())",
             "ifid==profile.bytes(){id[15]^=1;}",
@@ -276,7 +276,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["dataStoreForIdentifier", "ProfileId::generate()"],
     ),
     (
-        "crates/zephium-app/src/work_resources_probe.rs",
+        "crates/drift-app/src/work_resources_probe.rs",
         &[
             "owner:WorkResourceOwner", "WorkResourceOwner::new(WorkId::generate(),profile,wake,factory)",
             "self.owner.retained_browser(lease,now)", "SnapshotReleaseBrowser::from_capture(browser,self.resource.clone().ok_or(\"resource\")?,capture,)",
@@ -291,7 +291,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["AgentNativeShutdownProof", "AgentBrowserShutdownOutcome", "ContextRegistry::new", "WorkBrowserResources::new", "Serialize", "Deserialize", "attach_successor", "browser_loop", "persist_extraction_result", "try_new_for_probe", "reap_absent("],
     ),
     (
-        "crates/zephium-engine/src/platform/macos/agentic_resource_composition_probe.rs",
+        "crates/drift-engine/src/platform/macos/agentic_resource_composition_probe.rs",
         &[
             "port:ResourceWitnessPort,resource:WorkBrowserResourceJoin", "MainThreadMarker::new()?",
             "if!admission.remains_current()", "engine.agent_context_port.resource_witness_port()?",
@@ -305,7 +305,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["AgentProvider", "AgentBrowserPort", "WorkBrowserResources", "evaluateJavaScript", "setActivationPolicy", "makeKey", "makeMain", "NSRunLoop", "requestAnimationFrame", "unsafe", "Serialize", "Deserialize"],
     ),
     (
-        "crates/zephium-work-composition/src/retained_qualification.rs",
+        "crates/drift-work-composition/src/retained_qualification.rs",
         &[
             "owner:RetainedWorkProbeOwner", "admission:ForegroundRenderingAdmission",
             "load_probe_openai_credential()", "native.take_agent_browser_port(move|event|sink(event))",
@@ -339,7 +339,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["AgentNativeShutdownProof", "AgentBrowserShutdownOutcome", "ContextRegistry", "WorkBrowserResources", "browser_loop", "AgentBrowserSession", "evaluateJavaScript", "NSRunLoop", "std::thread::sleep", "OPENAI_API_KEY", "Command::new", "attach_successor", "persist_extraction_result"],
     ),
     (
-        "crates/zephium-work-composition/src/retained_qualification_task.rs",
+        "crates/drift-work-composition/src/retained_qualification_task.rs",
         &[
             "snapshot.completeness()==SemanticCompleteness::Complete", "observation.request().context().identity()==self.context",
             "!sample.current||!sample.complete||sample.boundaries!=0||sample.markers.into_iter().any(|present|!present)",
@@ -348,12 +348,12 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
             "source.frame==expected.frame", "source.role==SemanticRole::Paragraph",
             "AgentAccountScope::Anonymous", "FixtureServer::start()", "Some(fixture)",
             "RetainedProbeCapture::BoundedReadiness(retire)",
-            "zephium_agentic::WorkBrowserDocumentPolicy::Exact",
+            "drift_agentic::WorkBrowserDocumentPolicy::Exact",
         ],
         &["allows_actions_before_extraction", "navigation_target", "with_source_roles", "with_subtree_extraction", "AgentBrowserPort", "Serialize", "Deserialize"],
     ),
     (
-        "crates/zephium-work-composition/src/retained_qualification_input.rs",
+        "crates/drift-work-composition/src/retained_qualification_input.rs",
         &[
             "AgentRunBudget::try_new(8,100_000,100_000,1)",
             "AgentBrowserModel::Luna",
@@ -374,14 +374,14 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-work-composition/src/retained_qualification_public.rs",
+        "crates/drift-work-composition/src/retained_qualification_public.rs",
         &[
             "TARGET:&str=\"https://shop.pimoroni.com/products/raspberry-pi-pico-2\"",
             "ContextNavigationTarget::parse(TARGET)",
             "WorkResourceRenderingProbe::admits_public_product(&target)",
             "WorkResourceRenderingProbe::for_public_product(engine,admission,resource)",
             "RetainedProbeCapture::OneShot(retire)",
-            "zephium_agentic::WorkBrowserDocumentPolicy::InitialQueryFinalization",
+            "drift_agentic::WorkBrowserDocumentPolicy::InitialQueryFinalization",
             "RetainedProbeTrace::ConfiguredPublic",
             "RetainedProbeTrace::PublicObservation",
             "context.kind()!=ContextKind::Owned",
@@ -424,7 +424,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-app/src/work_resources_snapshot_probe.rs",
+        "crates/drift-app/src/work_resources_snapshot_probe.rs",
         &[
             "browser:RetainedBrowser",
             "resource:WorkBrowserResourceJoin",
@@ -446,7 +446,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["AgentBrowserPort", "AgentProviderTransport", "ContextRegistry", "AgentNativeShutdownProof", "Serialize", "Deserialize", "evaluateJavaScript", "browser_loop", "tokio::spawn", "std::thread", "WorkBrowserResources::new"],
     ),
     (
-        "crates/zephium-agent-controller/src/work.rs",
+        "crates/drift-agent-controller/src/work.rs",
         &[
             // 08219870: a retained browser must also support screenshots to take one.
             "ifretained.is_some()&&(extraction_schema.is_none()||(actions_before_extraction&&!retained.as_ref().is_some_and(|browser|browser.supports_actions()))||subtree_extraction||navigation_target.is_some()||navigation_route.is_some()||(navigation_discovery.is_some()&&!retained.as_ref().is_some_and(|browser|browser.supports_navigation()))||(viewport_screenshot&&!retained.as_ref().is_some_and(|browser|browser.supports_screenshots())))",
@@ -468,7 +468,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["WorkBrowserResources::new", "implAgentWorkRetainedBrowser", "attach_successor_work"],
     ),
     (
-        "crates/zephium-agent-controller/src/work_retained.rs",
+        "crates/drift-agent-controller/src/work_retained.rs",
         &[
             "pubtraitAgentWorkRetainedBrowser:Send", "fnregister_listener(&mutself,waker:Waker)",
             "fncheck_health(&self,now:AgentPolicyInstant)",
@@ -478,7 +478,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
             "session.settle_navigation_terminal(&terminal).is_ok()",
             "fnallows_readiness_retry(&self)->bool{true}",
             "fnbinding(&self)->&WorkBrowserReadBinding",
-            "implzephium_agent_runtime::AgentRuntimeScopedControllerforAgentWorkRetainedController",
+            "impldrift_agent_runtime::AgentRuntimeScopedControllerforAgentWorkRetainedController",
             "controller.execute(&mutworker,&WorkBrowser::Retained).await",
             "AgentWorkController::with_transport(",
             "browser.register_listener(cx.waker().clone())",
@@ -499,7 +499,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["AgentBrowserPort", "ContextRegistry::new", "AgentNativeShutdownProof", "AgentNativeShutdownCoordinator", "AgentWorkJournalPort", "AgentWorkJournalRequest", "Serialize", "Deserialize", "std::thread", "tokio::spawn", "try_prove_shutdown"],
     ),
     (
-        "crates/zephium-app/src/work_resources_application.rs",
+        "crates/drift-app/src/work_resources_application.rs",
         &[
             "owner:WorkResourceOwner", "journal:Arc<dynAgentWorkJournalPort>",
             "std::ptr::addr_eq(Arc::as_ptr(&journal),Arc::as_ptr(&audit))",
@@ -547,7 +547,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-app/src/work_resources_wait.rs",
+        "crates/drift-app/src/work_resources_wait.rs",
         &[
             "generation:Mutex<Option<u64>>", "changed:Condvar", "value.checked_add(1)",
             "self.changed.notify_all()", "self.generation.lock().map_err(|_|Refusal::Uncertain)?",
@@ -560,7 +560,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-app/src/work_resources_shutdown.rs",
+        "crates/drift-app/src/work_resources_shutdown.rs",
         &[
             "shared:Arc<Shared>", "coordinator:Option<AgentNativeShutdownCoordinator>",
             "proof:Option<AgentNativeShutdownProof>", "if!owner.locally_retired()",
@@ -580,7 +580,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-app/src/work_resources_controller.rs",
+        "crates/drift-app/src/work_resources_controller.rs",
         &[
             "implAgentWorkRetainedBrowserforRetainedBrowser", "browser:LeaseBrowser",
             "binding:WorkBrowserReadBinding",
@@ -603,7 +603,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["pubstruct", "pubfn", "pub(crate)", "AgentBrowserPort", "ContextRegistry", "AgentNativeShutdownProof", "AgentWorkJournal", "Serialize", "Deserialize", "std::thread", "tokio::spawn", "port.dispatch", "port.invoke_semantic", "port.seal_for_shutdown", "running.swap"],
     ),
     (
-        "crates/zephium-app/src/work_resources_navigation.rs",
+        "crates/drift-app/src/work_resources_navigation.rs",
         &[
             "slot:Arc<Mutex<NavigationOperation>>", "preparation:Option<WorkBrowserNavigationPreparation>",
             "callback:Option<WorkBrowserNavigationCompletionCallback>",
@@ -614,7 +614,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["ContextRegistry", "WorkBrowserResources::new", "port.dispatch", "Serialize", "Deserialize", "std::thread", "tokio::spawn", "AgentProviderTransport"],
     ),
     (
-        "crates/zephium-agentic/src/work_browser_observation.rs",
+        "crates/drift-agentic/src/work_browser_observation.rs",
         &[
             // 1783cf12/98f3e6c9: two derived facts; the requested document is the admission one.
             "#[derive(Debug)]pubstructWorkBrowserReadBinding{lease:WorkBrowserExecutionLease,frame:SemanticFrameJoin,document:Arc<ContextNavigationTarget>,requested_document:Arc<ContextNavigationTarget>,current_requested_document:Arc<ContextNavigationTarget>,document_policy:crate::WorkBrowserDocumentPolicy,storage:ContextProfileStorageClass,isolated_public:bool,at_admission_document:bool,}",
@@ -633,7 +633,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-app/src/work_resources.rs",
+        "crates/drift-app/src/work_resources.rs",
         &[
             "typeNativeFactory=Box<dynFnOnce(NativeSink)->Option<Arc<dynAgentBrowserPort>>>",
             "slots:Mutex<Vec<OwnedSlot>>", "slots.len()>=3", "mpsc::sync_channel(1)",
@@ -679,7 +679,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-agentic/src/work_browser_health.rs",
+        "crates/drift-agentic/src/work_browser_health.rs",
         &[
             "resource:WorkBrowserResourceJoin,state:Arc<HealthState>,installed:AtomicBool",
             "resource!=&self.resource", "self.installed.swap(true,Ordering::AcqRel)",
@@ -695,7 +695,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["ContextJoin", "ContextIdentity", "Serialize", "VecDeque", "std::thread", "AgentNativeShutdownProof"],
     ),
     (
-        "crates/zephium-agentic/src/work_browser_delivery.rs",
+        "crates/drift-agentic/src/work_browser_delivery.rs",
         &[
             "Arc::ptr_eq(&self.0,&other.0)",
             "DeliveryBinding(Arc::new(DeliveryState{state:AtomicU8::new(PENDING)",
@@ -729,7 +729,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-engine/src/agent_work_resource_probe_port.rs",
+        "crates/drift-engine/src/agent_work_resource_probe_port.rs",
         &[
             "ifself.construction_evidence_claimed.swap(true,Ordering::AcqRel){return;}",
             "letevidence=sample()", "*first=Some(evidence)", "admission.witness_resource(resource)?",
@@ -748,7 +748,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["ContextJoin::", "ContextIdentity::", "#[derive(Serialize", "reqwest::", "evaluateJavaScript"],
     ),
     (
-        "crates/zephium-engine/src/host/work_resource_witness.rs",
+        "crates/drift-engine/src/host/work_resource_witness.rs",
         &[
             "request.document.admits(target)", "admission.document!=request.document",
             "self.witness_admission.as_mut().is_none_or(Admission::read)",
@@ -767,7 +767,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["ContextJoin", "ContextIdentity", "cancel_run(", "evaluateJavaScript", "load_url(", "setActivationPolicy", "activateIgnoringOtherApps", "makeKeyAndOrderFront", "setInactiveSchedulingPolicy"],
     ),
     (
-        "crates/zephium-engine/src/platform/macos/agentic_resource_driver.rs",
+        "crates/drift-engine/src/platform/macos/agentic_resource_driver.rs",
         &[
             "letForegroundRenderingAdmission(human)=admission", "if!human.is_current()",
             "mpsc::sync_channel(4)", "Duration::from_secs(15)", "Duration::from_secs(5)",
@@ -782,7 +782,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &["ContextIdentity::", "ContextRegistry::", "invoke_semantic(", "ContextNativeRequest::", "evaluateJavaScript", "NSApplication::", "reqwest::", "OPENAI_API_KEY", "std::thread::sleep", "runUntilDate", "activateIgnoringOtherApps", "makeKeyAndOrderFront"],
     ),
     (
-        "crates/zephium-agentic/src/work_browser_observation.rs",
+        "crates/drift-agentic/src/work_browser_observation.rs",
         &[
             "self.admits_lease(lease,now)?",
             "row.observation_sequence.checked_add(1)",
@@ -799,7 +799,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &[".cancel_run(", "evaluateJavaScript", "ForegroundRendering"],
     ),
     (
-        "crates/zephium-engine/src/work_resource_port.rs",
+        "crates/drift-engine/src/work_resource_port.rs",
         &[
             "request.resource()!=&self.resource",
             "request.document()!=self.document.as_ref()",
@@ -839,7 +839,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
             "(construction||revocation.is_some()||human.is_some()||media)&&self.guard.destruction_started()",
             "Arc::ptr_eq(current,guard)",
             "ingress.rows.len()>=MAX_LIVE_CONTEXTS",
-            ">=zephium_agentic::MAX_EXECUTING_CONTEXTS",
+            ">=drift_agentic::MAX_EXECUTING_CONTEXTS",
         ],
         &[
             "ContextIdentity::new(",
@@ -850,7 +850,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-engine/src/host/work_resource.rs",
+        "crates/drift-engine/src/host/work_resource.rs",
         &[
             // 88d35dc0: one slow-page retry, clamped to the original deadline (pinned in validate).
             "letoriginal_deadline=guard.construction_deadline(Instant::now());",
@@ -913,7 +913,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-engine/src/platform/work_document_navigation.rs",
+        "crates/drift-engine/src/platform/work_document_navigation.rs",
         &[
             "canonical_equal:expected==&actual", "raw_equal:expected.as_str()==current",
             "query_equal:expected.query()==actual.query()", "fragment_equal:expected.fragment()==actual.fragment()",
@@ -949,7 +949,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         ],
     ),
     (
-        "crates/zephium-engine/src/agent_context_port.rs",
+        "crates/drift-engine/src/agent_context_port.rs",
         &[
             "if!self.work_is_absent(){return;}",
             "if!self.work_is_absent(){returnErr(ContextPortFailure::ProfileBusy);}",
@@ -960,7 +960,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &[],
     ),
     (
-        "crates/zephium-engine/src/host/agent_context.rs",
+        "crates/drift-engine/src/host/agent_context.rs",
         &[
             "checked_add(self.work_resources.len())",
             ".filter(|resource|resource.resident())",
@@ -972,7 +972,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &[],
     ),
     (
-        "crates/zephium-engine/src/host/content_rules.rs",
+        "crates/drift-engine/src/host/content_rules.rs",
         &[
             "self.work_resources",
             "resource.replace_content_policy_registration(registration)",
@@ -980,7 +980,7 @@ const ADAPTER_RULES: &[(&str, &[&str], &[&str])] = &[
         &[],
     ),
     (
-        "crates/zephium-engine/src/platform/macos/mod.rs",
+        "crates/drift-engine/src/platform/macos/mod.rs",
         &[
             "pubfncurrent_url(view:&wry::WebView)->Option<String>{bounded_current_url(view).ok()}",
             "PAGE_URL_UTF16_LIMIT:usize=8*1_024", "PAGE_URL_UTF8_LIMIT:usize=8*1_024",
@@ -1138,12 +1138,12 @@ fn validate(source: &str, port: &str) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const SOURCE: &str = include_str!("../../crates/zephium-agentic/src/work_browser_resource.rs");
-    const PORT: &str = include_str!("../../crates/zephium-agentic/src/context_port.rs");
+    const SOURCE: &str = include_str!("../../crates/drift-agentic/src/work_browser_resource.rs");
+    const PORT: &str = include_str!("../../crates/drift-agentic/src/context_port.rs");
     #[test]
     fn document_refusal_clears_one_shot_write_authority_before_sealing() {
         let source =
-            include_str!("../../crates/zephium-engine/src/platform/work_document_navigation.rs");
+            include_str!("../../crates/drift-engine/src/platform/work_document_navigation.rs");
         let (_, required, forbidden) = ADAPTER_RULES
             .iter()
             .find(|(path, _, _)| path.ends_with("platform/work_document_navigation.rs"))
@@ -1163,7 +1163,7 @@ mod tests {
     #[test]
     fn url_revocation_cannot_be_moved_after_host_failure_notification() {
         let source =
-            include_str!("../../crates/zephium-engine/src/platform/macos/agent_context.rs");
+            include_str!("../../crates/drift-engine/src/platform/macos/agent_context.rs");
         validate_url_revocation_order(source).unwrap();
         let source = compact(production(source));
         let close = "work_location_semantic.revoke_document_authority();";
@@ -1175,7 +1175,7 @@ mod tests {
     }
     #[test]
     fn passive_action_lifetime_cannot_depend_on_queued_host_terminal_or_extend_budget() {
-        let source = include_str!("../../crates/zephium-engine/src/host/work_resource_action.rs");
+        let source = include_str!("../../crates/drift-engine/src/host/work_resource_action.rs");
         let (_, required, forbidden) = ADAPTER_RULES
             .iter()
             .find(|(path, _, _)| path.ends_with("host/work_resource_action.rs"))
@@ -1201,7 +1201,7 @@ mod tests {
     #[test]
     fn fixed_document_preflight_precedes_native_or_credential_activity() {
         let source =
-            include_str!("../../crates/zephium-work-composition/src/retained_qualification.rs");
+            include_str!("../../crates/drift-work-composition/src/retained_qualification.rs");
         validate_preflight_order(source).unwrap();
         let source = compact(production(source));
         let without = source.replace("let(fixture,target)=task::document()?;", "");
@@ -1213,7 +1213,7 @@ mod tests {
     #[test]
     fn real_public_brief_cannot_widen_target_or_drop_exact_source_guards() {
         let source = include_str!(
-            "../../crates/zephium-work-composition/src/retained_qualification_public.rs"
+            "../../crates/drift-work-composition/src/retained_qualification_public.rs"
         );
         let (_, required, forbidden) = ADAPTER_RULES
             .iter()

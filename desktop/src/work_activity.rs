@@ -4,11 +4,11 @@ use std::{
     sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
-use zephium_app::work_runtime::{WorkAttemptObserver, WorkPageFrame, WorkPageFrames};
-use zephium_core::ids::ProfileId;
-use zephium_core::work::{runtime::*, WorkAttemptId, WorkExecutionId, WorkId, WorkStepId};
-use zephium_ipc::work::{WorkChangedV1, WorkPageFrameV1, WorkPageV1, WorkSignalV1};
-use zephium_store::{WorkFrameRecord, WorkFrameStore};
+use drift_app::work_runtime::{WorkAttemptObserver, WorkPageFrame, WorkPageFrames};
+use drift_core::ids::ProfileId;
+use drift_core::work::{runtime::*, WorkAttemptId, WorkExecutionId, WorkId, WorkStepId};
+use drift_ipc::work::{WorkChangedV1, WorkPageFrameV1, WorkPageV1, WorkSignalV1};
+use drift_store::{WorkFrameRecord, WorkFrameStore};
 
 const MAX_PAGE_ATTEMPTS: usize = 8;
 const MAX_STORED_WORKS: usize = 8;
@@ -459,7 +459,7 @@ mod tests {
                     step,
                     url: "https://fixture.invalid/final".into(),
                     live: false,
-                    frame: Some(Arc::new(zephium_agentic::WorkBrowserFrame {
+                    frame: Some(Arc::new(drift_agentic::WorkBrowserFrame {
                         generation,
                         width: 4,
                         height: 2,
@@ -497,7 +497,7 @@ mod tests {
                     step,
                     url: "https://fixture.invalid/".into(),
                     live: false,
-                    frame: Some(Arc::new(zephium_agentic::WorkBrowserFrame {
+                    frame: Some(Arc::new(drift_agentic::WorkBrowserFrame {
                         generation: 1,
                         width: 4,
                         height: 2,

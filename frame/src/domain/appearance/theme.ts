@@ -71,7 +71,7 @@ export const customizationKeys = Object.keys(fields) as CustomizationKey[];
  *  stored or projected value at a time. */
 export function customize(key: CustomizationKey, value: string) {
   const next: Customization = customization ?? {
-    theme: "zephium",
+    theme: "drift",
     custom: "",
     level: String(DEFAULT_CONTRAST),
     contrast: false,

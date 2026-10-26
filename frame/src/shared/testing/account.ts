@@ -1,11 +1,11 @@
 import type { AccountUsageV1, AccountV1 } from "$shared/ipc/bindings";
 
-/** A signed-out account on Zephium's server, as `account_get` answers it. */
+/** A signed-out account on Drift's server, as `account_get` answers it. */
 export function accountFixture(overrides: Partial<AccountV1> = {}): AccountV1 {
   return {
     version: 1,
     available: true,
-    server: "https://api.zephium.app",
+    server: "https://api.drift.app",
     custom_server: false,
     hosted_models: true,
     billing: true,

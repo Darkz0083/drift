@@ -80,7 +80,7 @@ impl Drop for Ivars {
 define_class!(
     #[unsafe(super(NSView, NSResponder, NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "ZephiumWindowControls"]
+    #[name = "DriftWindowControls"]
     #[ivars = Ivars]
     pub struct WindowControls;
 
@@ -296,7 +296,7 @@ impl WindowControls {
     fn tell_chrome(&self, fullscreen: bool) {
         if let Some(chrome) = self.ivars().chrome.borrow().as_ref() {
             let _ = chrome.eval(format!(
-                "window.dispatchEvent(new CustomEvent('zephium:fullscreen',{{detail:{fullscreen}}}))"
+                "window.dispatchEvent(new CustomEvent('drift:fullscreen',{{detail:{fullscreen}}}))"
             ));
         }
     }

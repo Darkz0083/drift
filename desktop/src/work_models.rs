@@ -2,8 +2,8 @@
 //! Settings → AI. Keys cross this boundary only inbound; the frame sees
 //! missing / set / valid / invalid, never a key.
 use super::*;
-use zephium_core::ids::ProfileId;
-use zephium_core::work::model::{
+use drift_core::ids::ProfileId;
+use drift_core::work::model::{
     WorkModelEntry, WorkModelProvider, WorkModelReasoning, WorkModelRole,
 };
 
@@ -123,7 +123,7 @@ pub(crate) struct WorkMoreModelsV1 {
 
 /// Something in the picker or Settings → AI changed; read it again.
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, tauri_specta::Event)]
-#[tauri_specta(event_name = "zephium:work-models-changed")]
+#[tauri_specta(event_name = "drift:work-models-changed")]
 pub(crate) struct WorkModelsChanged {
     pub(crate) version: u32,
 }
@@ -131,18 +131,18 @@ pub(crate) struct WorkModelsChanged {
 #[cfg(feature = "work-product")]
 mod product {
     use super::*;
-    use zephium_app::work_models as models;
-    use zephium_core::work::model::WorkModelError;
+    use drift_app::work_models as models;
+    use drift_core::work::model::WorkModelError;
 
     struct AppSettings;
 
     impl models::WorkModelSettings for AppSettings {
         fn get(&self, key: &str) -> Option<String> {
-            use zephium_core::ports::store::Store;
+            use drift_core::ports::store::Store;
             APP_STORE.get().and_then(|store| store.app_setting(key))
         }
         fn set(&self, key: String, value: String) -> bool {
-            use zephium_core::ports::store::Store;
+            use drift_core::ports::store::Store;
             APP_STORE
                 .get()
                 .is_some_and(|store| store.set_app_setting(key, value))
@@ -156,7 +156,7 @@ mod product {
             emit_to_privileged(
                 &app,
                 MAIN_LABEL,
-                "zephium:work-models-changed",
+                "drift:work-models-changed",
                 &WorkModelsChanged { version: 1 },
             );
         }));
@@ -404,7 +404,7 @@ pub(crate) async fn work_models_ready(
     #[cfg(feature = "work-product")]
     let (ready, search) = match profile {
         Some(profile) => {
-            use zephium_app::work_models::{self as models, WorkSearchReadiness};
+            use drift_app::work_models::{self as models, WorkSearchReadiness};
             // Runs search results pages in the agent browser wherever Work
             // runs; a model's search is only their fallback.
             let search = if cfg!(any(target_os = "macos", target_os = "windows")) {
@@ -601,7 +601,7 @@ pub(crate) async fn work_local_servers(caller: WebviewWindow) -> Vec<WorkLocalSe
     }
     #[cfg(feature = "work-product")]
     {
-        use zephium_agentic::lead::{detect_local_servers, LocalServerKind};
+        use drift_agentic::lead::{detect_local_servers, LocalServerKind};
         detect_local_servers()
             .await
             .into_iter()

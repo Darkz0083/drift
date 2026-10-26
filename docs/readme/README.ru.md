@@ -1,11 +1,11 @@
 <div align="center">
-  <img src="../../.github/assets/logo.png" width="112" height="112" alt="Zephium" />
-  <h1>Zephium</h1>
+  <img src="../../.github/assets/logo.png" width="112" height="112" alt="Drift" />
+  <h1>Drift</h1>
 
   <p><strong>Быстрый браузер с полным набором возможностей и рабочая среда,<br />переосмысленные для вас и ваших агентов.</strong></p>
 
   <p>
-    <a href="https://github.com/zephium-browser/Zephium/releases"><img src="https://img.shields.io/github/v/release/zephium-browser/Zephium?include_prereleases&label=release&color=blue" alt="Последний релиз" /></a>
+    <a href="https://github.com/drift-browser/Drift/releases"><img src="https://img.shields.io/github/v/release/drift-browser/Drift?include_prereleases&label=release&color=blue" alt="Последний релиз" /></a>
     <a href="../../LICENSE"><img src="https://img.shields.io/badge/license-MPL--2.0-blue" alt="Лицензия: MPL-2.0" /></a>
     <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey" alt="Платформы: macOS и Windows" />
     <a href="https://discord.gg/tyveTUyEp7"><img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white" alt="Discord" /></a>
@@ -14,10 +14,10 @@
   </p>
 
   <p>
-    <a href="https://zephium.app">Сайт</a> ·
-    <a href="https://zephium.app/docs">Документация</a> ·
+    <a href="https://drift.app">Сайт</a> ·
+    <a href="https://drift.app/docs">Документация</a> ·
     <a href="https://youtu.be/QbSarcWspvw">Фильм о запуске</a> ·
-    <a href="https://github.com/zephium-browser/Zephium/releases/latest">Скачать</a>
+    <a href="https://github.com/drift-browser/Drift/releases/latest">Скачать</a>
   </p>
 </div>
 
@@ -41,7 +41,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="../../.github/assets/browse-dark.webp" />
-    <img src="../../.github/assets/browse-light.webp" alt="Новая вкладка Zephium: окно открывается в небо, а внизу — название, время и дата, цифры дня" width="960" />
+    <img src="../../.github/assets/browse-light.webp" alt="Новая вкладка Drift: окно открывается в небо, а внизу — название, время и дата, цифры дня" width="960" />
   </picture>
 </p>
 
@@ -54,7 +54,7 @@
 
 ---
 
-Zephium — браузер с открытым исходным кодом, написанный на Rust и работающий на
+Drift — браузер с открытым исходным кодом, написанный на Rust и работающий на
 веб-движке самой операционной системы: WebKit на macOS (на нём построен Safari)
 и WebView2 на Windows. Это не форк Chromium или Firefox. Он блокирует рекламу и
 трекеры на уровне приложения, запускает расширения Chrome, а задачи, заметки и
@@ -72,7 +72,7 @@ Zephium — браузер с открытым исходным кодом, на
 холсте, а вы видите каждый шаг.
 
 <p align="center">
-  <img src="../../.github/assets/work.webp" alt="Весь запуск Work в Zephium: помощники читают Uptime Kuma, Gatus и OpenStatus на их собственных сайтах, локальный помощник проверяет эндпоинты, затем идут ответ, сравнительная таблица с графиками, диаграмма, конфигурация и четыре задачи" width="960" />
+  <img src="../../.github/assets/work.webp" alt="Весь запуск Work в Drift: помощники читают Uptime Kuma, Gatus и OpenStatus на их собственных сайтах, локальный помощник проверяет эндпоинты, затем идут ответ, сравнительная таблица с графиками, диаграмма, конфигурация и четыре задачи" width="960" />
 </p>
 <p align="center"><sub>Получив просьбу собрать страницу статуса, Work читает три системы мониторинга на их собственных сайтах, проверяет ваши эндпоинты с вашего компьютера, собирает выбранное решение и оставляет на холсте сравнение, конфигурацию и задачи.</sub></p>
 
@@ -100,15 +100,15 @@ Zephium — браузер с открытым исходным кодом, на
   Gemini, DeepSeek или OpenRouter либо запускайте модель локально через Ollama,
   LM Studio или любой OpenAI-совместимый сервер. Ключи хранятся в системной
   связке ключей.
-  Или войдите в Zephium AI и обойдитесь без ключей: он подбирает подходящую
+  Или войдите в Drift AI и обойдитесь без ключей: он подбирает подходящую
   модель для каждого шага, а начать можно с бесплатных кредитов
-  ([цены](https://zephium.app/pricing)).
+  ([цены](https://drift.app/pricing)).
 
 Work поставляется с 25 навыками, среди которых планирование поездок,
 исследование, сравнение и выбор, планирование дня, исправление бага и
 еженедельный статус. Вы можете написать свои.
 
-## Ask Zephium
+## Ask Drift
 
 Ассистент в боковой панели, вызывается по `⌘ E` (`Ctrl E` на Windows). Он читает
 страницу, на которой вы находитесь, и отвечает по ней, подсказывает, на что стоит
@@ -118,7 +118,7 @@ Work поставляется с 25 навыками, среди которых 
 **Continue in Work** переносит её на холст вместе со страницей.
 
 <p align="center">
-  <img src="../../.github/assets/ask.webp" alt="Ask Zephium рядом с Hacker News: выбраны три статьи, открыты в новых вкладках, а главная страница переложена в спокойные карточки" width="960" />
+  <img src="../../.github/assets/ask.webp" alt="Ask Drift рядом с Hacker News: выбраны три статьи, открыты в новых вкладках, а главная страница переложена в спокойные карточки" width="960" />
 </p>
 <p align="center"><sub>На вопрос, что стоит прочитать, он выбирает три статьи, открывает их и перекладывает главную страницу в спокойные карточки.</sub></p>
 
@@ -150,7 +150,7 @@ Work поставляется с 25 навыками, среди которых 
 ### Расширения
 
 Устанавливайте расширения прямо из Chrome Web Store. Двадцать популярных
-проверены и хорошо работают в Zephium, их можно подключить одним кликом в
+проверены и хорошо работают в Drift, их можно подключить одним кликом в
 менеджере расширений, среди них 1Password, Bitwarden, Grammarly, DeepL, Dark
 Reader, Vimium, SponsorBlock, Raindrop.io, Notion Web Clipper и Refined GitHub.
 
@@ -170,13 +170,13 @@ Firefox, Brave и Edge.
   <tr>
     <td valign="top"><strong>Tasks</strong><br /><sub>Пишите их так, как сказали бы вслух, например «позвонить Анне завтра в 15:00». Списки, приоритеты, сроки, подзадачи, а страница, на которой вы были, остаётся привязанной.</sub></td>
     <td valign="top"><strong>Time</strong><br /><sub>Смотрите, на что уходит ваше время в сети; учёт ведётся только на этом устройстве. Запустите раунд Focus, и выбранные вами сайты останутся закрытыми до перерыва.</sub></td>
-    <td valign="top"><strong>Notes</strong><br /><sub>Заметки рядом со страницей, каждая — файл Markdown, который принадлежит вам. Правки из других приложений появляются в Zephium.</sub></td>
+    <td valign="top"><strong>Notes</strong><br /><sub>Заметки рядом со страницей, каждая — файл Markdown, который принадлежит вам. Правки из других приложений появляются в Drift.</sub></td>
   </tr>
 </table>
 
 ## Приватность по умолчанию
 
-- **Никакой телеметрии.** Zephium ничего не собирает и не отправляет о том, как вы пользуетесь сетью.
+- **Никакой телеметрии.** Drift ничего не собирает и не отправляет о том, как вы пользуетесь сетью.
 - **Аккаунт не нужен.** История, задачи, заметки, память и время хранятся на
   вашем устройстве.
 - **Приватные окна ничего не сохраняют** после закрытия.
@@ -185,22 +185,22 @@ Firefox, Brave и Edge.
 
 | Платформа | Архитектура | Установщик | Требования |
 | --------- | ----------- | ---------- | ---------- |
-| macOS | Apple Silicon | [`Zephium-macOS-arm64.dmg`](https://github.com/zephium-browser/Zephium/releases/latest/download/Zephium-macOS-arm64.dmg) | macOS Sonoma 14 или новее |
-| Windows | x64 | [`Zephium-Windows-x64-setup.exe`](https://github.com/zephium-browser/Zephium/releases/latest/download/Zephium-Windows-x64-setup.exe) | Windows 10 или 11 |
+| macOS | Apple Silicon | [`Drift-macOS-arm64.dmg`](https://github.com/drift-browser/Drift/releases/latest/download/Drift-macOS-arm64.dmg) | macOS Sonoma 14 или новее |
+| Windows | x64 | [`Drift-Windows-x64-setup.exe`](https://github.com/drift-browser/Drift/releases/latest/download/Drift-Windows-x64-setup.exe) | Windows 10 или 11 |
 
 Сборки для Windows пока не подписаны цифровой подписью, поэтому SmartScreen может
 показать сообщение «Windows защитила ваш компьютер». Нажмите **Подробнее**, затем
 **Выполнить в любом случае**. Подпись уже на подходе.
 
-Zephium загружает обновления в фоне и устанавливает их, когда вы выбираете
+Drift загружает обновления в фоне и устанавливает их, когда вы выбираете
 **Relaunch to update**. Все релизы доступны на
-[странице релизов](https://github.com/zephium-browser/Zephium/releases).
+[странице релизов](https://github.com/drift-browser/Drift/releases).
 
 ## Что дальше
 
 - Linux и Mac на процессорах Intel.
 - Сборки для Windows с цифровой подписью.
-- Больше расширений, проверенных в работе, и встроенные в Zephium нативные расширения.
+- Больше расширений, проверенных в работе, и встроенные в Drift нативные расширения.
 - И многое другое.
 
 ## Сборка из исходников
@@ -217,14 +217,14 @@ Zephium загружает обновления в фоне и устанавл�
   WebView2 на Windows.
 
 ```sh
-git clone https://github.com/zephium-browser/Zephium.git
-cd Zephium
+git clone https://github.com/drift-browser/Drift.git
+cd Drift
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Сборки для разработки используют собственный профиль `app.zephium.dev`, поэтому
-не затрагивают данные установленного Zephium. Linux пока не поддерживается.
+Сборки для разработки используют собственный профиль `app.drift.dev`, поэтому
+не затрагивают данные установленного Drift. Linux пока не поддерживается.
 Прежде чем открывать pull request, прочитайте [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ## Архитектура
@@ -234,7 +234,7 @@ pnpm dev
 - Ядро на Rust управляет вкладками, хранилищем, блокировщиком, расширениями и
   агентами.
 - У каждого профиля свои изолированные данные сайтов и собственные данные
-  истории, сессий и значков сайтов, которыми владеет Zephium.
+  истории, сессий и значков сайтов, которыми владеет Drift.
 - Сетевой блокировщик нативный и построен на
   [adblock-rust](https://github.com/brave/adblock-rust) от Brave.
 - Узкие внутренние адаптеры для Tauri и Wry отвечают за политику хранения,
@@ -245,7 +245,7 @@ pnpm dev
 
 ## Участие в разработке
 
-Zephium поддерживает один человек, у которого есть чёткое видение продукта,
+Drift поддерживает один человек, у которого есть чёткое видение продукта,
 поэтому крупные изменения, пожалуйста, обсуждайте до того, как их писать.
 [CONTRIBUTING.md](../../CONTRIBUTING.md) объясняет, что принимается и как.
 Вопросы и идеи приветствуются в [Discord](https://discord.gg/tyveTUyEp7).
@@ -257,16 +257,16 @@ Zephium поддерживает один человек, у которого е
 
 ## Лицензия
 
-Zephium распространяется по лицензии [Mozilla Public License 2.0](../../LICENSE).
+Drift распространяется по лицензии [Mozilla Public License 2.0](../../LICENSE).
 
 Входящие в поставку списки фильтров EasyList и EasyPrivacy используются на
 условиях [CC BY-SA 3.0](../../assets/blocker-seed/v1/LICENSE-CC-BY-SA-3.0.txt);
 об указании авторства см. [уведомление](../../assets/blocker-seed/v1/NOTICE).
 
-Название и логотип Zephium не лицензируются по MPL.
+Название и логотип Drift не лицензируются по MPL.
 
 ## Благодарности
 
-Zephium опирается на [Tauri](https://tauri.app), [Wry](https://github.com/tauri-apps/wry),
+Drift опирается на [Tauri](https://tauri.app), [Wry](https://github.com/tauri-apps/wry),
 [adblock-rust](https://github.com/brave/adblock-rust) от Brave и
 [EasyList](https://easylist.to).

@@ -58,7 +58,7 @@ impl LinuxGlobalShortcuts {
         let registration = self.registration.clone();
         let shortcut = self.shortcut;
         let spawn = std::thread::Builder::new()
-            .name("zephium-wayland-shortcut".to_owned())
+            .name("drift-wayland-shortcut".to_owned())
             .spawn(move || {
                 let Some(shortcut) = shortcut else {
                     return;

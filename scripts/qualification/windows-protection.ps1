@@ -13,11 +13,11 @@ if (Test-Path -LiteralPath $OutputDirectory) { throw 'Use a new evidence directo
 $output = New-Item -ItemType Directory -Path $OutputDirectory
 $stdout = Join-Path $output.FullName 'stdout.log'
 $stderr = Join-Path $output.FullName 'stderr.log'
-$env:ZEPHIUM_PROTECTION_SITE = $Site
-$env:ZEPHIUM_PROTECTION_MODE = $Mode
-$env:ZEPHIUM_PROTECTION_COUNTING = $Counting
-$env:ZEPHIUM_PROTECTION_TABS = [string]$Tabs
-$env:ZEPHIUM_PROTECTION_IDLE_SECONDS = [string]$IdleSeconds
+$env:DRIFT_PROTECTION_SITE = $Site
+$env:DRIFT_PROTECTION_MODE = $Mode
+$env:DRIFT_PROTECTION_COUNTING = $Counting
+$env:DRIFT_PROTECTION_TABS = [string]$Tabs
+$env:DRIFT_PROTECTION_IDLE_SECONDS = [string]$IdleSeconds
 $metadata = [ordered]@{
     startedUtc = [DateTime]::UtcNow.ToString('o')
     binarySha256 = (Get-FileHash -LiteralPath $binaryPath).Hash

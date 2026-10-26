@@ -2,9 +2,9 @@
 //! state; TypeSafe/Jev secrets cross settings only inbound and use the existing
 //! fixed native credential item. Settings never return stored secret content.
 use super::*;
-use zephium_core::ids::ProfileId;
-use zephium_core::work::WorkError;
-use zephium_ipc::work::{
+use drift_core::ids::ProfileId;
+use drift_core::work::WorkError;
+use drift_ipc::work::{
     WorkDecisionChoiceV1, WorkDecisionPreferenceChangedV1, WorkDecisionPreferenceV1,
 };
 
@@ -58,7 +58,7 @@ fn record_presence(profile: ProfileId, present: bool) {
 ))]
 fn load_presence() -> bool {
     // Exactly what a run treats as usable: anything else already falls back.
-    zephium_agentic::load_development_typesafe_credential().is_ok()
+    drift_agentic::load_development_typesafe_credential().is_ok()
 }
 
 #[cfg(not(all(
@@ -146,7 +146,7 @@ fn finish_presence_mutation(profile: ProfileId, present: Option<bool>) {
 async fn read_choice(profile: ProfileId) -> WorkDecisionChoiceV1 {
     let key = setting_key(profile);
     tokio::task::spawn_blocking(move || {
-        use zephium_core::ports::store::Store;
+        use drift_core::ports::store::Store;
         APP_STORE
             .get()
             .and_then(|store| store.app_setting(&key))
@@ -162,7 +162,7 @@ async fn read_choice(profile: ProfileId) -> WorkDecisionChoiceV1 {
 async fn write_choice(profile: ProfileId, choice: WorkDecisionChoiceV1) -> Result<(), WorkError> {
     let key = setting_key(profile);
     let stored = tokio::task::spawn_blocking(move || {
-        use zephium_core::ports::store::Store;
+        use drift_core::ports::store::Store;
         APP_STORE
             .get()
             .is_some_and(|store| store.set_app_setting(key, choice.as_str().to_owned()))
@@ -192,8 +192,8 @@ pub(crate) async fn selected_choice(profile: ProfileId) -> WorkDecisionChoiceV1 
 ))]
 pub(crate) fn composition_preference(
     choice: WorkDecisionChoiceV1,
-) -> zephium_work_composition::durable_runtime::WorkDecisionPreference {
-    use zephium_work_composition::durable_runtime::WorkDecisionPreference;
+) -> drift_work_composition::durable_runtime::WorkDecisionPreference {
+    use drift_work_composition::durable_runtime::WorkDecisionPreference;
     match choice {
         WorkDecisionChoiceV1::Recommended => WorkDecisionPreference::Recommended,
         WorkDecisionChoiceV1::Standard => WorkDecisionPreference::Emulation,
@@ -214,7 +214,7 @@ async fn confirm_profile(app: &tauri::AppHandle, expected: &str) -> Result<Profi
         any(target_os = "macos", target_os = "windows")
     ))]
     {
-        let request = app.state::<zephium_app::Handle>().work_profile_binding();
+        let request = app.state::<drift_app::Handle>().work_profile_binding();
         let readiness = tokio::time::timeout(std::time::Duration::from_secs(4), async move {
             loop {
                 if let Some(readiness) = request.try_recv() {
@@ -226,8 +226,8 @@ async fn confirm_profile(app: &tauri::AppHandle, expected: &str) -> Result<Profi
         .await
         .map_err(|_| WorkError::Unavailable)?;
         let bound = match readiness {
-            zephium_app::AgentWorkProfileReadiness::Ready(binding)
-            | zephium_app::AgentWorkProfileReadiness::PolicyPending(binding) => binding.profile(),
+            drift_app::AgentWorkProfileReadiness::Ready(binding)
+            | drift_app::AgentWorkProfileReadiness::PolicyPending(binding) => binding.profile(),
             _ => return Err(WorkError::ProfileUnavailable),
         };
         if bound != profile {
@@ -330,7 +330,7 @@ async fn mutate_key(
             any(target_os = "macos", target_os = "windows")
         ))]
         {
-            use zephium_agentic::lead::{keys, LeadSecret};
+            use drift_agentic::lead::{keys, LeadSecret};
             // Own and validate the inbound secret before the first await. It
             // cannot appear in a response, diagnostic, or stored preference.
             let secret = secret

@@ -82,7 +82,7 @@ describe("a stored page's site", () => {
   it("shows whatever the surface holds for the page's origin", async () => {
     await favicons.init();
     deliver([{ origin: "https://github.com", revision: "a", rgba: raster(5) }]);
-    expect(favicons.forPage("https://github.com/zephium/browser?tab=1")?.image.data[0]).toBe(5);
+    expect(favicons.forPage("https://github.com/drift/browser?tab=1")?.image.data[0]).toBe(5);
     expect(favicons.forPage("HTTPS://user@GitHub.com:443/")?.image.data[0]).toBe(5);
     expect(favicons.forPage("https://github.com:8443/")).toBeNull();
     expect(favicons.forPage("https://gitlab.com/")).toBeNull();

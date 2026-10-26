@@ -1,13 +1,13 @@
 {
-  "productName": "Zephium Performance",
-  "identifier": "app.zephium.performance",
+  "productName": "Drift Performance",
+  "identifier": "app.drift.performance",
   "build": { "devUrl": null },
   "app": {
     "windows": [
       {
         "label": "main",
         "create": false,
-        "title": "Zephium Performance",
+        "title": "Drift Performance",
         "width": 1200,
         "height": 800,
         "minWidth": 680,

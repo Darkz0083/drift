@@ -9,7 +9,7 @@ use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime};
 
-const ACTIVE: &str = "zephium.log";
+const ACTIVE: &str = "drift.log";
 const ARCHIVES: usize = 3;
 const SEGMENT_BYTES: u64 = 2 * 1024 * 1024;
 const SEGMENT_AGE: Duration = Duration::from_secs(24 * 60 * 60);
@@ -34,7 +34,7 @@ pub fn redirect_stderr(dir: &Path) {
     drop(file);
     let dir = dir.to_owned();
     let _ = std::thread::Builder::new()
-        .name("zephium-log-rotation".to_owned())
+        .name("drift-log-rotation".to_owned())
         .spawn(move || loop {
             std::thread::sleep(CHECK_EVERY);
             if stderr_bytes().is_some_and(|bytes| bytes >= SEGMENT_BYTES) {
@@ -56,7 +56,7 @@ fn prepare(dir: &Path) -> io::Result<()> {
 }
 
 fn archive(dir: &Path, index: usize) -> PathBuf {
-    dir.join(format!("zephium.{index}.log"))
+    dir.join(format!("drift.{index}.log"))
 }
 
 /// Rotates the active file when it is full or a day old, drops week-old

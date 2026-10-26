@@ -65,9 +65,9 @@
 <li
   data-motion-key={`tab:${tab.id}`}
   data-plate
-  data-zephium-tab-id={tab.id}
-  data-zephium-tab-url={tab.url ?? ""}
-  data-zephium-projection-revision={tab.projection_revision}
+  data-drift-tab-id={tab.id}
+  data-drift-tab-url={tab.url ?? ""}
+  data-drift-projection-revision={tab.projection_revision}
   class={["browse-tab", grouped && "browse-tab-grouped", className]}
   data-selected={active}
   data-split-candidate={splitCandidate}
@@ -96,7 +96,7 @@
       lit={active}
       {fallback}
     />
-    <span data-zephium-tab-label class="tab-label">{tab.title}</span>
+    <span data-drift-tab-label class="tab-label">{tab.title}</span>
   </button>
   {#if tab.capture}
     <span style:margin-inline-end={closable ? "28px" : "4px"}>

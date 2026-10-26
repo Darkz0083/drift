@@ -5,12 +5,12 @@ use std::path::{Path, PathBuf};
 
 use toml::Value;
 
-const CRATE_ROOT: &str = "crates/zephium-agent-model-catalog";
-const ROOT: &str = "crates/zephium-agent-model-catalog/src/lib.rs";
-const TEST_ROOT: &str = "crates/zephium-agent-model-catalog/src/tests.rs";
+const CRATE_ROOT: &str = "crates/drift-agent-model-catalog";
+const ROOT: &str = "crates/drift-agent-model-catalog/src/lib.rs";
+const TEST_ROOT: &str = "crates/drift-agent-model-catalog/src/tests.rs";
 const WORKSPACE_MANIFEST: &str = "Cargo.toml";
 const TEST_MODULE_DECLARATION: &str = "#[cfg(test)]\nmod tests;";
-const ALLOWED_DEPENDENCIES: [&str; 1] = ["zephium-agentic"];
+const ALLOWED_DEPENDENCIES: [&str; 1] = ["drift-agentic"];
 const FORBIDDEN_SOURCE_TOKENS: [&str; 24] = [
     "gpt-5.6-sol",
     "anthropic",
@@ -26,9 +26,9 @@ const FORBIDDEN_SOURCE_TOKENS: [&str; 24] = [
     "endpoint",
     "http",
     "url",
-    "zephium_engine",
-    "zephium_store",
-    "zephium_app",
+    "drift_engine",
+    "drift_store",
+    "drift_app",
     "tauri",
     "wry",
     "webkit",
@@ -134,7 +134,7 @@ fn validate_workspace_manifest(source: &str) -> Result<(), String> {
         .and_then(Value::as_table)
         .and_then(|workspace| workspace.get("dependencies"))
         .and_then(Value::as_table)
-        .and_then(|dependencies| dependencies.get("zephium-agent-model-catalog"))
+        .and_then(|dependencies| dependencies.get("drift-agent-model-catalog"))
         .and_then(Value::as_table)
         .ok_or_else(|| "Terra catalog workspace dependency is missing".to_owned())?;
     if dependency.len() != 2
@@ -148,11 +148,11 @@ fn validate_workspace_manifest(source: &str) -> Result<(), String> {
         .and_then(Value::as_table)
         .and_then(|workspace| workspace.get("dependencies"))
         .and_then(Value::as_table)
-        .and_then(|dependencies| dependencies.get("zephium-agentic"))
+        .and_then(|dependencies| dependencies.get("drift-agentic"))
         .and_then(Value::as_table)
         .ok_or_else(|| "Terra catalog workspace agentic dependency is missing".to_owned())?;
     if agentic.len() != 2
-        || agentic.get("path").and_then(Value::as_str) != Some("crates/zephium-agentic")
+        || agentic.get("path").and_then(Value::as_str) != Some("crates/drift-agentic")
         || agentic.get("version").and_then(Value::as_str) != Some("=0.1.0")
     {
         return Err("Terra catalog workspace agentic dependency drifted".to_owned());
@@ -167,7 +167,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         .get("package")
         .and_then(Value::as_table)
         .ok_or_else(|| "Terra catalog package metadata is missing".to_owned())?;
-    if package.get("name").and_then(Value::as_str) != Some("zephium-agent-model-catalog")
+    if package.get("name").and_then(Value::as_str) != Some("drift-agent-model-catalog")
         || package.get("publish").and_then(Value::as_bool) != Some(false)
         || package.get("build").and_then(Value::as_bool) != Some(false)
         || package
@@ -213,7 +213,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         .collect::<BTreeSet<_>>();
     let expected = ALLOWED_DEPENDENCIES.into_iter().collect::<BTreeSet<_>>();
     let agentic = dependencies
-        .get("zephium-agentic")
+        .get("drift-agentic")
         .and_then(Value::as_table)
         .ok_or_else(|| "Terra catalog agentic dependency is invalid".to_owned())?;
     if actual != expected
@@ -597,9 +597,9 @@ mod tests {
     use super::*;
 
     const CATALOG_SOURCE: &str =
-        include_str!("../../crates/zephium-agent-model-catalog/src/lib.rs");
+        include_str!("../../crates/drift-agent-model-catalog/src/lib.rs");
     const CATALOG_MANIFEST: &str =
-        include_str!("../../crates/zephium-agent-model-catalog/Cargo.toml");
+        include_str!("../../crates/drift-agent-model-catalog/Cargo.toml");
     const WORKSPACE_SOURCE: &str = include_str!("../../Cargo.toml");
 
     #[test]
@@ -610,8 +610,8 @@ mod tests {
     #[test]
     fn rejects_dependency_or_target_drift() {
         let dependency_drift = CATALOG_MANIFEST.replacen(
-            "zephium-agentic.workspace = true",
-            "zephium-agentic.workspace = true\nreqwest = \"1\"",
+            "drift-agentic.workspace = true",
+            "drift-agentic.workspace = true\nreqwest = \"1\"",
             1,
         );
         let library_target_drift = CATALOG_MANIFEST.replacen(
@@ -621,8 +621,8 @@ mod tests {
         );
         let build_drift = CATALOG_MANIFEST.replacen("build = false", "build = \"build.rs\"", 1);
         let feature_escalation = CATALOG_MANIFEST.replacen(
-            "zephium-agentic.workspace = true",
-            "zephium-agentic = { workspace = true, features = [\"provider-transport\"] }",
+            "drift-agentic.workspace = true",
+            "drift-agentic = { workspace = true, features = [\"provider-transport\"] }",
             1,
         );
         assert!(validate_manifest(&dependency_drift).is_err());
@@ -706,8 +706,8 @@ mod tests {
     #[test]
     fn rejects_workspace_agentic_feature_escalation() {
         let workspace = WORKSPACE_SOURCE.replacen(
-            "zephium-agentic = { path = \"crates/zephium-agentic\", version = \"=0.1.0\" }",
-            "zephium-agentic = { path = \"crates/zephium-agentic\", version = \"=0.1.0\", features = [\"provider-transport\"] }",
+            "drift-agentic = { path = \"crates/drift-agentic\", version = \"=0.1.0\" }",
+            "drift-agentic = { path = \"crates/drift-agentic\", version = \"=0.1.0\", features = [\"provider-transport\"] }",
             1,
         );
         assert!(validate_workspace_manifest(&workspace).is_err());

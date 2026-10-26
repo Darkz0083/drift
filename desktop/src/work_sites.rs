@@ -1,8 +1,8 @@
 //! Settings list of sites the agent may work on as the person.
 use super::*;
-use zephium_core::ids::ProfileId;
-use zephium_core::work::WorkError;
-use zephium_ipc::work::{WorkSiteAccessResponseV1, WorkSiteChangeV1, WorkSiteRowV1};
+use drift_core::ids::ProfileId;
+use drift_core::work::WorkError;
+use drift_ipc::work::{WorkSiteAccessResponseV1, WorkSiteChangeV1, WorkSiteRowV1};
 
 async fn sites(
     caller: WebviewWindow,
@@ -22,8 +22,8 @@ async fn sites(
             .ok_or(WorkError::Invalid)?;
         #[cfg(feature = "work-product")]
         {
-            use zephium_app::work_sites::*;
-            let shell = app.state::<zephium_app::Handle>();
+            use drift_app::work_sites::*;
+            let shell = app.state::<drift_app::Handle>();
             let entries = match change {
                 Some(change) => set_standing(&shell, profile, change.site, change.access).await?,
                 None => standing(&shell, profile).await?,
@@ -82,8 +82,8 @@ async fn screenshot_sites(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     expected_profile: String,
-    change: Option<zephium_ipc::work::WorkScreenshotSiteChangeV1>,
-) -> zephium_ipc::work::WorkScreenshotSitesResponseV1 {
+    change: Option<drift_ipc::work::WorkScreenshotSiteChangeV1>,
+) -> drift_ipc::work::WorkScreenshotSitesResponseV1 {
     let result = async {
         if !authorize(&caller, CallerPolicy::Main, "work_screenshot_sites") {
             return Err(WorkError::Unavailable);
@@ -96,8 +96,8 @@ async fn screenshot_sites(
             .ok_or(WorkError::Invalid)?;
         #[cfg(feature = "work-product")]
         {
-            use zephium_app::work_screenshots::sites;
-            let shell = app.state::<zephium_app::Handle>();
+            use drift_app::work_screenshots::sites;
+            let shell = app.state::<drift_app::Handle>();
             let entries = match change {
                 Some(change) => {
                     sites::set_standing(&shell, profile, change.origin, change.allow).await?
@@ -106,7 +106,7 @@ async fn screenshot_sites(
             };
             Ok(entries
                 .into_iter()
-                .map(|entry| zephium_ipc::work::WorkScreenshotSiteRowV1 {
+                .map(|entry| drift_ipc::work::WorkScreenshotSiteRowV1 {
                     // Exact origin, including port, stays visible. Do not broaden a
                     // screenshot grant to the vendor's registrable domain label.
                     name: entry.origin.clone(),
@@ -126,7 +126,7 @@ async fn screenshot_sites(
         Ok(sites) => (sites, None),
         Err(error) => (Vec::new(), Some(error.into())),
     };
-    zephium_ipc::work::WorkScreenshotSitesResponseV1 {
+    drift_ipc::work::WorkScreenshotSitesResponseV1 {
         version: 1,
         profile: expected_profile,
         sites,
@@ -139,7 +139,7 @@ pub(crate) async fn work_screenshot_sites(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     expected_profile: String,
-) -> zephium_ipc::work::WorkScreenshotSitesResponseV1 {
+) -> drift_ipc::work::WorkScreenshotSitesResponseV1 {
     screenshot_sites(caller, app, expected_profile, None).await
 }
 #[tauri::command]
@@ -148,7 +148,7 @@ pub(crate) async fn work_set_screenshot_site(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     expected_profile: String,
-    change: zephium_ipc::work::WorkScreenshotSiteChangeV1,
-) -> zephium_ipc::work::WorkScreenshotSitesResponseV1 {
+    change: drift_ipc::work::WorkScreenshotSiteChangeV1,
+) -> drift_ipc::work::WorkScreenshotSitesResponseV1 {
     screenshot_sites(caller, app, expected_profile, Some(change)).await
 }

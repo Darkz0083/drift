@@ -253,13 +253,13 @@ try {
         Assert-ExactDirectoryEntries -Directory $evidenceDirectory -ExpectedNames @()
 
         Invoke-Cargo -Arguments @("xtask", "check-agentic-probe-boundary")
-        Invoke-Cargo -Arguments @("test", "--locked", "-p", "zephium-agentic", "--features", "probe-harness")
-        Invoke-Cargo -Arguments @("test", "--locked", "-p", "zephium-engine", "--features", "agentic-browser", "--lib")
-        Invoke-Cargo -Arguments @("check", "--locked", "-p", "zephium-engine", "--features", "agentic-browser")
-        Invoke-Cargo -Arguments @("clippy", "--locked", "-p", "zephium-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe")
-        Invoke-Cargo -Arguments @("build", "--locked", "-p", "zephium-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe")
-        Invoke-Cargo -Arguments @("clippy", "--locked", "-p", "zephium-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe")
-        Invoke-Cargo -Arguments @("build", "--locked", "-p", "zephium-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe")
+        Invoke-Cargo -Arguments @("test", "--locked", "-p", "drift-agentic", "--features", "probe-harness")
+        Invoke-Cargo -Arguments @("test", "--locked", "-p", "drift-engine", "--features", "agentic-browser", "--lib")
+        Invoke-Cargo -Arguments @("check", "--locked", "-p", "drift-engine", "--features", "agentic-browser")
+        Invoke-Cargo -Arguments @("clippy", "--locked", "-p", "drift-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe")
+        Invoke-Cargo -Arguments @("build", "--locked", "-p", "drift-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe")
+        Invoke-Cargo -Arguments @("clippy", "--locked", "-p", "drift-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe")
+        Invoke-Cargo -Arguments @("build", "--locked", "-p", "drift-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe")
 
         $cargoTargetDirectory = Get-CargoTargetDirectory -Repository $repository
         Assert-DirectDirectory -Path $cargoTargetDirectory -Create $false
@@ -278,19 +278,19 @@ try {
         Assert-ExactDirectoryEntries -Directory $evidenceDirectory -ExpectedNames @()
         Write-SourceStamp -Path (Join-Path $evidenceDirectory $sourceStampName) -Revision $sourceRevision
 
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe", "--", "--ci-hidden-fixed-dom", "--evidence-directory", "eval/agentic-browsing/local-results")
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe", "--", "--ci-hidden-hwnd", "--evidence-directory", "eval/agentic-browsing/local-results")
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe", "--", "--ci-hidden-cdp", "--evidence-directory", "eval/agentic-browsing/local-results")
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe", "--", "--visible-background-windows-all", "--evidence-directory", "eval/agentic-browsing/local-results")
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-agentic", "--features", "probe-harness", "--bin", "windows-agentic-input-evidence-review", "--", "--directory", "eval/agentic-browsing/local-results", "--write-summary")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe", "--", "--ci-hidden-fixed-dom", "--evidence-directory", "eval/agentic-browsing/local-results")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe", "--", "--ci-hidden-hwnd", "--evidence-directory", "eval/agentic-browsing/local-results")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe", "--", "--ci-hidden-cdp", "--evidence-directory", "eval/agentic-browsing/local-results")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-engine", "--features", "native-agentic-input-probe", "--bin", "windows-agentic-input-probe", "--", "--visible-background-windows-all", "--evidence-directory", "eval/agentic-browsing/local-results")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-agentic", "--features", "probe-harness", "--bin", "windows-agentic-input-evidence-review", "--", "--directory", "eval/agentic-browsing/local-results", "--write-summary")
 
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-fixed-documents", "--evidence-directory", "eval/agentic-browsing/local-results")
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-redirect-lifecycle", "--evidence-directory", "eval/agentic-browsing/local-results")
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-location-replacement", "--evidence-directory", "eval/agentic-browsing/local-results")
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-suspend-resume", "--evidence-directory", "eval/agentic-browsing/local-results")
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-event-flood", "--evidence-directory", "eval/agentic-browsing/local-results")
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-renderer-loss", "--evidence-directory", "eval/agentic-browsing/local-results")
-        Invoke-Cargo -Arguments @("build", "--locked", "-p", "zephium-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-fixed-documents", "--evidence-directory", "eval/agentic-browsing/local-results")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-redirect-lifecycle", "--evidence-directory", "eval/agentic-browsing/local-results")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-location-replacement", "--evidence-directory", "eval/agentic-browsing/local-results")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-suspend-resume", "--evidence-directory", "eval/agentic-browsing/local-results")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-event-flood", "--evidence-directory", "eval/agentic-browsing/local-results")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe", "--", "--ci-hidden-renderer-loss", "--evidence-directory", "eval/agentic-browsing/local-results")
+        Invoke-Cargo -Arguments @("build", "--locked", "-p", "drift-engine", "--features", "native-agentic-semantic-probe", "--bin", "windows-agentic-semantic-probe")
 
         # The debugger launch is intentionally manual and separately
         # authorized. Bind it to the exact executable produced by this source-
@@ -344,7 +344,7 @@ try {
         if (Test-Path -LiteralPath (Join-Path $evidenceDirectory $semanticSummary)) {
             throw "the semantic review summary already exists"
         }
-        Invoke-Cargo -Arguments @("run", "--locked", "-p", "zephium-agentic", "--features", "probe-harness", "--bin", "windows-agentic-semantic-evidence-review", "--", "--directory", "eval/agentic-browsing/local-results", "--write-summary")
+        Invoke-Cargo -Arguments @("run", "--locked", "-p", "drift-agentic", "--features", "probe-harness", "--bin", "windows-agentic-semantic-evidence-review", "--", "--directory", "eval/agentic-browsing/local-results", "--write-summary")
         Assert-DirectFile -Path (Join-Path $evidenceDirectory $semanticSummary)
         $expectedAfterReview = $expectedBeforeReview + @($semanticSummary)
         Assert-ExactDirectoryEntries -Directory $evidenceDirectory -ExpectedNames $expectedAfterReview

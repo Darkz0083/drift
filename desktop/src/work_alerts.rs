@@ -1,11 +1,11 @@
 //! A Work page waiting on the person says so outside the window: a count on
-//! the Dock while it waits and, while Zephium is not in front, one system
+//! the Dock while it waits and, while Drift is not in front, one system
 //! notification per wait. Nothing leaves the Mac.
 use super::WorkProductState;
 use std::{collections::BTreeSet, sync::Mutex};
 use tauri::Manager;
-use zephium_ipc::work::WorkHumanReasonV1;
-use zephium_work_composition::WaitingHumanPage;
+use drift_ipc::work::WorkHumanReasonV1;
+use drift_work_composition::WaitingHumanPage;
 
 #[derive(Default)]
 pub(crate) struct WorkAlerts {
@@ -15,7 +15,7 @@ pub(crate) struct WorkAlerts {
 
 impl WorkAlerts {
     /// Called on every held-page change: the Dock count follows, and a new
-    /// wait is announced if nobody is looking at Zephium.
+    /// wait is announced if nobody is looking at Drift.
     pub(crate) fn refresh(&self, app: &tauri::AppHandle) {
         let Some(owner) = app.try_state::<WorkProductState>() else {
             return;
@@ -41,7 +41,7 @@ impl WorkAlerts {
                 continue;
             }
             let (title, body) = words(page);
-            crate::focus_alerts::notify(&format!("app.zephium.work.{}", page.key), &title, &body);
+            crate::focus_alerts::notify(&format!("app.drift.work.{}", page.key), &title, &body);
             #[cfg(target_os = "windows")]
             if let Some(window) = app.get_webview_window(crate::MAIN_LABEL) {
                 let _ =

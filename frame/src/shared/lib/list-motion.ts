@@ -13,7 +13,7 @@ import { duration, easing, reducedMotion } from "./motion";
  * - an item that left one list and arrived in another in the same update is
  *   the same thing moving, so its icon flies from the old place to the new.
  *
- * A ghost is stripped of every `data-zephium-*` attribute before it is shown:
+ * A ghost is stripped of every `data-drift-*` attribute before it is shown:
  * native resolves tabs through those sentinels, and a departed tab must never
  * be found in the document again.
  */
@@ -70,7 +70,7 @@ function settleRunning(element: Element) {
 function ghost(element: HTMLElement, rect: DOMRect, container: HTMLElement): HTMLElement {
   for (const node of [element, ...element.querySelectorAll<HTMLElement>("*")]) {
     for (const name of node.getAttributeNames()) {
-      if (name.startsWith("data-zephium-") || name === "id") node.removeAttribute(name);
+      if (name.startsWith("data-drift-") || name === "id") node.removeAttribute(name);
     }
   }
   element.removeAttribute(KEY);

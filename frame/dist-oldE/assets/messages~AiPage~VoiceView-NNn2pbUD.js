@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`On this device`)),n=((t={},n={})=>(n.locale??e(),`Drift AI`)),r=((t={},n={})=>(n.locale??e(),`Groq`)),i=((t={},n={})=>(n.locale??e(),`On this Mac`)),a=((t={},n={})=>(n.locale??e(),`OpenAI`));export{t as a,n as i,i as n,r,a as t};

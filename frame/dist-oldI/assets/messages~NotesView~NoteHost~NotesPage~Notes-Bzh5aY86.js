@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Restore`)),n=((t={},n={})=>(n.locale??e(),`Show in Finder`)),r=((t={},n={})=>(n.locale??e(),`Show in File Explorer`)),i=((t={},n={})=>(n.locale??e(),`Show in Folder`));export{t as i,r as n,n as r,i as t};

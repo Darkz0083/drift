@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`Apply to preview`)),n=((t={},n={})=>(n.locale??e(),`These controls are interactive. Changes stay in this session and do not change browser behavior.`)),r=((t={},n={})=>(n.locale??e(),`Browsing history`)),i=((t={},n={})=>(n.locale??e(),`Interface preview`));export{t as i,r as n,n as r,i as t};

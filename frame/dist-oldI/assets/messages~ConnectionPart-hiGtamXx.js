@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t,n={})=>(n.locale??e(),`${t?.count} earlier calls`)),n=((t={},n={})=>(n.locale??e(),`1 earlier call`)),r=((t={},n={})=>(n.locale??e(),`Starting…`));export{n,t as r,r as t};

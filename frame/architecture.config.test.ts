@@ -63,7 +63,7 @@ describe("feature module roles", () => {
         "src/features/launcher/lib/probe.ts",
         'export { default } from "../components/Launcher.svelte";',
       ),
-    ).toContain("zephium-modules/structure");
+    ).toContain("drift-modules/structure");
   });
   it("rejects dynamic UI loading through a feature behavior module", async () => {
     expect(
@@ -71,11 +71,11 @@ describe("feature module roles", () => {
         "src/features/launcher/lib/probe.ts",
         'export const load = () => import("../components/Launcher.svelte");',
       ),
-    ).toContain("zephium-modules/structure");
+    ).toContain("drift-modules/structure");
   });
   it("keeps feature roots for the public API", async () => {
     expect(await violations("src/features/launcher/misc.ts", "export const value = 1;")).toContain(
-      "zephium-modules/structure",
+      "drift-modules/structure",
     );
   });
   it("allows tests to inspect their own behavior modules", async () => {
@@ -84,6 +84,6 @@ describe("feature module roles", () => {
         "src/features/launcher/tests/probe.test.ts",
         'export { sameSearch } from "../lib/search-model";',
       ),
-    ).not.toContain("zephium-modules/structure");
+    ).not.toContain("drift-modules/structure");
   });
 });

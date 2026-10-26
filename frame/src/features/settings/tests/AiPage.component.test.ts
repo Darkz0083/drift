@@ -121,7 +121,7 @@ test("billing trouble preserves acceptance and the old Cloud group stays gone", 
       screen.getByText("Check your provider’s billing or available credits, then try again."),
     )
     .toBeVisible();
-  await expect.element(screen.getByText("Zephium Cloud", { exact: true })).not.toBeInTheDocument();
+  await expect.element(screen.getByText("Drift Cloud", { exact: true })).not.toBeInTheDocument();
 });
 
 test("Settings AI exposes Jev setup beside the regular model controls with honest fallback", async () => {
@@ -134,13 +134,13 @@ test("Settings AI exposes Jev setup beside the regular model controls with hones
   await expect.element(screen.getByRole("heading", { name: "Work", exact: true })).toBeVisible();
 });
 
-test("Zephium AI is offered where the server hosts models, and shows the account once signed in", async () => {
+test("Drift AI is offered where the server hosts models, and shows the account once signed in", async () => {
   await page.viewport(1100, 1200);
   native.read.mockResolvedValue(models({}));
   const account = {
     version: 1,
     available: true,
-    server: "https://api.zephium.app",
+    server: "https://api.drift.app",
     custom_server: false,
     hosted_models: true,
     billing: true,

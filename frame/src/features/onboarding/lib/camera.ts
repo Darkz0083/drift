@@ -14,7 +14,7 @@ export const PAGE = { x: 248, y: 8, width: 624, height: 544 } as const;
 export const NEWTAB = {
   notch: { width: 380, height: 38 },
   horizon: 326,
-  name: { x: 199.5, y: 223, w: 225, h: 32.31 },
+  name: { x: 199.5, y: 194.3, w: 225, h: 61.04 },
   when: 265,
 } as const;
 

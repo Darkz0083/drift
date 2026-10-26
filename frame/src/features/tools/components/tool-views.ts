@@ -25,9 +25,9 @@ export const tools = {
     load: () => import("./previews/TasksView.svelte"),
   },
   ai: {
-    title: m.tool_zephium,
-    description: m.tool_zephium_help,
-    empty: m.tool_zephium,
+    title: m.tool_drift,
+    description: m.tool_drift_help,
+    empty: m.tool_drift,
     icon: BubbleChatIcon,
     load: () => import("./previews/ChatView.svelte"),
   },

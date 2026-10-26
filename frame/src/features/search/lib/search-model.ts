@@ -33,7 +33,7 @@ export type ResultSection =
   /** Arithmetic typed into the field, answered locally. */
   | "calculator";
 
-/** Mirrors `zephium_core::search::result_section`. Native already emits results
+/** Mirrors `drift_core::search::result_section`. Native already emits results
  *  in section order, so this only names the run a row belongs to. */
 export function resultSection(result: SearchResult): ResultSection {
   if (result.kind === "tab") return "tabs";

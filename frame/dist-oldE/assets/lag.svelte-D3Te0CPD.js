@@ -1,0 +1,1 @@
+import{Dt as e,Gt as t,It as n,qt as r}from"./chrome-shared-DmjEkyC-.js";var i=500;function a(a,o=i){let s=r(!1);return n(()=>{if(!a()){t(s,!1);return}let e=setTimeout(()=>t(s,!0),o);return()=>clearTimeout(e)}),{get current(){return e(s)}}}export{a as t};

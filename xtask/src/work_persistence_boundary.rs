@@ -4,22 +4,22 @@ use std::{fs, path::Path};
 
 pub(crate) fn check(root: &Path) -> Result<(), String> {
     for path in [
-        "crates/zephium-agentic/src/agent_work_journal.rs",
-        "crates/zephium-store/src/actor/agent_work.rs",
-        "crates/zephium-store/src/hub/agent_work.rs",
+        "crates/drift-agentic/src/agent_work_journal.rs",
+        "crates/drift-store/src/actor/agent_work.rs",
+        "crates/drift-store/src/hub/agent_work.rs",
     ] {
         let source = fs::read_to_string(root.join(path)).map_err(|_| format!("missing {path}"))?;
         validate_content_free(&source)?;
     }
-    let manifest = fs::read_to_string(root.join("crates/zephium-store/Cargo.toml"))
+    let manifest = fs::read_to_string(root.join("crates/drift-store/Cargo.toml"))
         .map_err(|_| "missing Store manifest")?;
-    if !manifest.contains("work-execution = [\"dep:zephium-private-fs\"]")
-        || !manifest.contains("zephium-private-fs = { workspace = true, optional = true }")
+    if !manifest.contains("work-execution = [\"dep:drift-private-fs\"]")
+        || !manifest.contains("drift-private-fs = { workspace = true, optional = true }")
         || !manifest.contains("default = []")
     {
         return Err("Work persistence must remain an optional, idle-free Store adapter".into());
     }
-    let hub = fs::read_to_string(root.join("crates/zephium-store/src/hub/agent_work.rs"))
+    let hub = fs::read_to_string(root.join("crates/drift-store/src/hub/agent_work.rs"))
         .map_err(|_| "missing Work hub")?;
     for required in [
         "LockedPrivateNamespace::open_or_create",
@@ -36,30 +36,30 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
             return Err(format!("Work persistence lost {required}"));
         }
     }
-    let application = fs::read_to_string(root.join("crates/zephium-app/src/work.rs"))
+    let application = fs::read_to_string(root.join("crates/drift-app/src/work.rs"))
         .map_err(|_| "missing Work application")?;
     validate_application(&application)?;
     validate_terminal_records(
-        &fs::read_to_string(root.join("crates/zephium-agentic/src/agent_work_journal.rs"))
+        &fs::read_to_string(root.join("crates/drift-agentic/src/agent_work_journal.rs"))
             .map_err(|_| "missing Work journal")?,
     )?;
     let artifact =
-        fs::read_to_string(root.join("crates/zephium-agentic/src/agent_work_artifact.rs"))
+        fs::read_to_string(root.join("crates/drift-agentic/src/agent_work_artifact.rs"))
             .map_err(|_| "missing bounded Work artifact codec")?;
     validate_artifact(&artifact)?;
     validate_artifact_store(&hub)?;
     validate_retention(
         &hub,
-        &fs::read_to_string(root.join("crates/zephium-store/src/migrations.rs"))
+        &fs::read_to_string(root.join("crates/drift-store/src/migrations.rs"))
             .map_err(|_| "missing Store migrations")?,
     )?;
-    let manifest = fs::read_to_string(root.join("crates/zephium-app/Cargo.toml"))
+    let manifest = fs::read_to_string(root.join("crates/drift-app/Cargo.toml"))
         .map_err(|_| "missing application manifest")?;
     for required in [
-        "work-execution = [\"agentic-browser\", \"dep:zephium-agent-controller\", \"dep:zephium-agent-runtime\", \"dep:zephium-agent-provider-transport\"]",
-        "zephium-agent-controller = { workspace = true, optional = true, features = [\"provider-transport\"] }",
-        "zephium-agent-runtime = { workspace = true, optional = true }",
-        "zephium-agent-provider-transport = { workspace = true, optional = true }",
+        "work-execution = [\"agentic-browser\", \"dep:drift-agent-controller\", \"dep:drift-agent-runtime\", \"dep:drift-agent-provider-transport\"]",
+        "drift-agent-controller = { workspace = true, optional = true, features = [\"provider-transport\"] }",
+        "drift-agent-runtime = { workspace = true, optional = true }",
+        "drift-agent-provider-transport = { workspace = true, optional = true }",
     ] {
         if !manifest.contains(required) {
             return Err(format!("Work application lost optional boundary: {required}"));
@@ -318,8 +318,8 @@ mod tests {
 
     #[test]
     fn artifacts_remain_bounded_data_and_atomic_profile_owned_publications() {
-        let codec = include_str!("../../crates/zephium-agentic/src/agent_work_artifact.rs");
-        let store = include_str!("../../crates/zephium-store/src/hub/agent_work.rs");
+        let codec = include_str!("../../crates/drift-agentic/src/agent_work_artifact.rs");
+        let store = include_str!("../../crates/drift-store/src/hub/agent_work.rs");
         validate_artifact(codec).unwrap();
         validate_artifact_store(store).unwrap();
         for removed in [
@@ -350,8 +350,8 @@ mod tests {
 
     #[test]
     fn retention_prunes_only_clean_history_and_never_cited_results() {
-        let hub = include_str!("../../crates/zephium-store/src/hub/agent_work.rs");
-        let migrations = include_str!("../../crates/zephium-store/src/migrations.rs");
+        let hub = include_str!("../../crates/drift-store/src/hub/agent_work.rs");
+        let migrations = include_str!("../../crates/drift-store/src/migrations.rs");
         validate_retention(hub, migrations).unwrap();
         for removed in [
             "AND {CLEAN_TERMINAL}",
@@ -369,9 +369,9 @@ mod tests {
     #[test]
     fn closed_work_records_and_store_lane_remain_content_free() {
         for source in [
-            include_str!("../../crates/zephium-agentic/src/agent_work_journal.rs"),
-            include_str!("../../crates/zephium-store/src/actor/agent_work.rs"),
-            include_str!("../../crates/zephium-store/src/hub/agent_work.rs"),
+            include_str!("../../crates/drift-agentic/src/agent_work_journal.rs"),
+            include_str!("../../crates/drift-store/src/actor/agent_work.rs"),
+            include_str!("../../crates/drift-store/src/hub/agent_work.rs"),
         ] {
             validate_content_free(source).unwrap();
             for mutation in [
@@ -389,7 +389,7 @@ mod tests {
 
     #[test]
     fn work_application_preserves_original_authorities_and_stateless_execution() {
-        let source = include_str!("../../crates/zephium-app/src/work.rs");
+        let source = include_str!("../../crates/drift-app/src/work.rs");
         validate_application(source).unwrap();
         for mutation in [
             "eprintln!(page)",
@@ -433,7 +433,7 @@ mod tests {
 
     #[test]
     fn unsuccessful_terminal_facts_require_native_and_exact_policy_outcome() {
-        let source = include_str!("../../crates/zephium-agentic/src/agent_work_journal.rs");
+        let source = include_str!("../../crates/drift-agentic/src/agent_work_journal.rs");
         validate_terminal_records(source).unwrap();
         for boundary in [
             "_native: &AgentNativeShutdownProof",

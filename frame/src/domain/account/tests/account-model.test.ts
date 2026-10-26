@@ -21,7 +21,7 @@ import {
 describe("account model", () => {
   it("names the account picture only by the revision Rust holds, never a server address", () => {
     expect(avatarUrl(3)).toMatch(
-      /^(zephium-media:\/\/localhost|http:\/\/zephium-media\.localhost)\/account-avatar\/3$/u,
+      /^(drift-media:\/\/localhost|http:\/\/drift-media\.localhost)\/account-avatar\/3$/u,
     );
     for (const none of [null, undefined, 0, -1, 1.5]) expect(avatarUrl(none)).toBeNull();
     expect(stagedAvatarUrl("01JABCDEFGHJKMNPQRSTVWXYZ0")).toMatch(

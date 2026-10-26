@@ -45,8 +45,8 @@ export function verifyBraces(entry) {
 
 function installedEntry(path) {
   const [workspace, ...dependencies] = path.split(">");
-  assert.ok(["frame", "desktop", "zephium"].includes(workspace), "Unknown audit workspace");
-  let entry = resolve(root, workspace === "zephium" ? "package.json" : `${workspace}/package.json`);
+  assert.ok(["frame", "desktop", "drift"].includes(workspace), "Unknown audit workspace");
+  let entry = resolve(root, workspace === "drift" ? "package.json" : `${workspace}/package.json`);
   assert.ok(dependencies.length > 0 && dependencies.length <= 64);
   for (const name of dependencies) {
     assert.match(name, /^(?:@[\w.-]+\/)?[\w.-]+$/u);

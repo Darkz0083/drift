@@ -1,7 +1,7 @@
 import type { AccountOfferV1, AccountPriceV1 } from "$shared/ipc/bindings";
 import { IS_MAC } from "$shared/platform";
 
-const media = IS_MAC ? "zephium-media://localhost/" : "http://zephium-media.localhost/";
+const media = IS_MAC ? "drift-media://localhost/" : "http://drift-media.localhost/";
 const TOKEN = /^[0-9A-HJKMNP-TV-Z]{26}$/u;
 
 /** The account picture as Rust serves it, by the revision it holds; null shows initials. */

@@ -29,15 +29,15 @@ uBlock/Safari parity. The pinned adblock-rust fork is documented in
 
 ## Ownership and startup
 
-- `zephium-blocker-update` validates immutable catalogs and owns the official
+- `drift-blocker-update` validates immutable catalogs and owns the official
   HTTPS source store, conditional fetches, candidate staging and recovery.
-- `zephium-blocker-service` coordinates source preparation, native preflight,
+- `drift-blocker-service` coordinates source preparation, native preflight,
   durable activation, the compiler worker and monotonic catalog status.
-- `zephium-blocker` parses bounded sources, prepares immutable platform policies,
+- `drift-blocker` parses bounded sources, prepares immutable platform policies,
   resolves cosmetic exceptions, and persists compiled artifacts.
-- `zephium-app` owns profile preference revisions, site-control revisions,
+- `drift-app` owns profile preference revisions, site-control revisions,
   compile/install generations, private-session state and operation settlement.
-- `zephium-engine` owns exact native registrations, view/frame lifetime,
+- `drift-engine` owns exact native registrations, view/frame lifetime,
   pause gates, fixed stylesheet delivery and host-initiated picker evaluation.
 - Svelte projects the Rust state and sends typed intent. Admission does not
   imply durable or native success.
@@ -243,7 +243,7 @@ No test result claims Windows runtime, installer, battery or broad-web coverage.
 Use `cargo xtask check-blocker-seed` for exact bundled artifacts; blocker
 property/fuzz/fork-contract tests for compiler boundaries; and
 `synthetic_blocker_lab` for bounded matcher measurements. The native child-frame probe was removed with that delivery path. The `adblock-qa` desktop feature builds a separate,
-debug-only `app.zephium.protection-qa` application and data directory. This
+debug-only `app.drift.protection-qa` application and data directory. This
 feature rejects opt-level 0; use `CARGO_PROFILE_DEV_OPT_LEVEL=2` for QA builds.
 
 Before each release: run the Windows protection QA (`scripts/qualification/windows-protection.ps1`),

@@ -9,9 +9,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File desktop\run-webext-qa.ps1 -B
 powershell -NoProfile -ExecutionPolicy Bypass -File desktop\run-webext-qa.ps1
 ```
 
-The launcher verifies **Zephium Extensions QA** and refuses a second instance.
+The launcher verifies **Drift Extensions QA** and refuses a second instance.
 The binary, `revision.txt` and `build-profile.txt` live in `target\webext-qa`.
-Data stays in `%APPDATA%\app.zephium.webext-qa`; normal profiles are not imported.
+Data stays in `%APPDATA%\app.drift.webext-qa`; normal profiles are not imported.
 Execution policy changes only for the invoked PowerShell process.
 
 For repeatable checks without changing the usual QA session, append
@@ -30,7 +30,7 @@ Record each result individually, including build revision, extension version,
 WebView2 version and the exact failing step. Do not share credentials or complete
 authentication callback URLs. Use disposable accounts for credential tests.
 
-1. Install Bitwarden or Dark Reader using the sidebar **Add to Zephium** control.
+1. Install Bitwarden or Dark Reader using the sidebar **Add to Drift** control.
    The store's Add to Chrome control should be hidden. Review permissions and
    check installation settles without an error.
 2. On an ordinary webpage, open Utilities and the action. Check title/icon/badge,
@@ -59,7 +59,7 @@ authentication callback URLs. Use disposable accounts for credential tests.
    affecting only that install. Existing tabs/extensions must remain usable.
    A package rejected during preparation can instead stop at review.
 
-The keyed fixture at `crates/zephium-webext-windows/fixtures/storage` can be
+The keyed fixture at `crates/drift-webext-windows/fixtures/storage` can be
 installed via **Install from file > Unpacked folder**. Save its value, switch
 All -> Specific -> All, restart and recheck without account data. Remove test
 fixtures when finished.

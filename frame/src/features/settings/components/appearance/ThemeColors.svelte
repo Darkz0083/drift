@@ -123,7 +123,7 @@
     <Field
       label={m.look_import_label()}
       labelHidden
-      placeholder="zephium-theme:v1:…"
+      placeholder="drift-theme:v1:…"
       spellcheck="false"
       autocomplete="off"
       bind:value={pasted}

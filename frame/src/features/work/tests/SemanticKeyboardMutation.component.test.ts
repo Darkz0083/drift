@@ -25,7 +25,7 @@ async function editorFixture(cdp: boolean) {
       target.focus();
       const range=document.createRange();range.selectNodeContents(target);range.collapse(false);
       const selection=getSelection();selection.removeAllRanges();selection.addRange(range);
-      const api=globalThis.__zephiumSemanticRuntimeV1;
+      const api=globalThis.__driftSemanticRuntimeV1;
       const snapshot=JSON.parse(api.invoke(JSON.stringify({v:1,i:1,g:1,s:{k:"initial"},b:{n:128,t:16384,w:65536,x:4096,geo:true}})));
       const node=snapshot.n.find(n=>n.r==="textbox");
       if(!node)throw new Error("missing editor");
@@ -66,11 +66,11 @@ test("CDP native Backspace mutates the same synthetic editor and emits input", a
     expect(down.p).toMatchObject({ type: "keyDown", key: "Backspace" });
     const api = (
       frame.contentWindow as unknown as {
-        __zephiumSemanticRuntimeV1: {
+        __driftSemanticRuntimeV1: {
           nextCdpAction(attempt: number, index: number, abort: boolean): string | Promise<string>;
         };
       }
-    ).__zephiumSemanticRuntimeV1;
+    ).__driftSemanticRuntimeV1;
     await userEvent.keyboard("{Backspace>}");
     expect(fixtureDocument.querySelector("div")!.textContent).toBe("Draf");
     expect(fixtureDocument.documentElement.dataset.saves).toBe("1");
@@ -93,7 +93,7 @@ test("checkbox-backed switches retain native checkbox activation semantics", asy
     frame.addEventListener("load", () => done(), { once: true }),
   );
   frame.srcdoc = `<input type="checkbox" role="switch" aria-label="Delete saved items"><button role="switch">Delete selected item</button><script>${inject("semanticMediaRuntime")}
-    addEventListener("load",()=>document.documentElement.dataset.capture=globalThis.__zephiumSemanticRuntimeV1.invoke(JSON.stringify({v:1,i:1,g:1,s:{k:"initial"},b:{n:128,t:16384,w:65536,x:4096,geo:true}})));</script>`;
+    addEventListener("load",()=>document.documentElement.dataset.capture=globalThis.__driftSemanticRuntimeV1.invoke(JSON.stringify({v:1,i:1,g:1,s:{k:"initial"},b:{n:128,t:16384,w:65536,x:4096,geo:true}})));</script>`;
   document.body.append(frame);
   try {
     await loaded;

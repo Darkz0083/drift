@@ -7,9 +7,9 @@
 use super::*;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::RwLock;
-use zephium_core::accelerator::{Accelerator, AcceleratorError, Platform};
-use zephium_core::commands::{self, Group, KeymapError, ResolvedCommand};
-use zephium_core::ports::engine::Shortcut;
+use drift_core::accelerator::{Accelerator, AcceleratorError, Platform};
+use drift_core::commands::{self, Group, KeymapError, ResolvedCommand};
+use drift_core::ports::engine::Shortcut;
 
 const SETTING: &str = "keymap";
 const FEATURES: [&str; 5] = ["ai", "work", "notes", "tasks", "time"];
@@ -279,11 +279,11 @@ pub(crate) fn shortcut(id: &str, accelerator: &str) -> Option<Shortcut> {
     })
 }
 
-pub(crate) const EVENT_KEYMAP_CHANGED: &str = "zephium:keymap-changed";
+pub(crate) const EVENT_KEYMAP_CHANGED: &str = "drift:keymap-changed";
 
 /// The keymap changed; read it again.
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, tauri_specta::Event)]
-#[tauri_specta(event_name = "zephium:keymap-changed")]
+#[tauri_specta(event_name = "drift:keymap-changed")]
 pub(crate) struct KeymapChanged {
     pub(crate) version: u32,
 }

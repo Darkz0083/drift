@@ -1,4 +1,4 @@
-# Zephium Architecture
+# Drift Architecture
 
 FOSS browser on the OS-native webview (Tauri + Wry), Rust-heavy, with a Svelte 5
 UI and no application-owned telemetry. This document is the single source of
@@ -48,7 +48,7 @@ A composite of independent patterns, each applied where it pays:
    free.
 3. **Command/event core with domain slices.** Core state is composed of domain
    slices (see §6), each with its own commands, reducer and events. One actor
-   loop in `zephium-app` owns the composed state: commands in (queued messages),
+   loop in `drift-app` owns the composed state: commands in (queued messages),
    pure reduction, effects out through ports, events out to projections. Adding a
    feature = adding a domain slice; existing domains are not touched.
    Cross-domain operations (close tab -> Items + Splits + Session) compose
@@ -68,7 +68,7 @@ The expensive decisions are 1-3 (purity, ownership, command/event shape).
 
 The native webview delegates renderer parsing/JIT and process sandboxing to the
 maintained OS engine: untrusted web content normally runs in engine-owned
-content processes we did not build. Zephium still has to prove each supported
+content processes we did not build. Drift still has to prove each supported
 runtime's confinement and keep page data out of its Rust/native capabilities;
 using a multi-process WebView is not itself a site-isolation guarantee. Rust
 requests page-world scripts for tightly bounded observations, but never treats
@@ -212,10 +212,10 @@ order: native menu > overlay panel > DOM.
   hardening; it is not required for capability correctness.
 - Packaged Linux identity is one exact value: Tauri's Linux-only product name,
   installed desktop basename, GTK application id, and host Registry id are
-  `app.zephium`; a custom desktop template keeps the visible `Name=Zephium`.
+  `app.drift`; a custom desktop template keeps the visible `Name=Drift`.
   No Linux package is built, so the release workflow does not verify it. A raw
   development binary has no installed desktop-entry proof, so its attempted
-  Registry identity may be rejected and cannot be treated as proven. Zephium
+  Registry identity may be rejected and cannot be treated as proven. Drift
   never falls through to automatic cgroup identity after such a rejection; the
   focused fallback is the dependable development path.
 - A future true NSPanel must be allocated with a Tao-compatible subclass and
@@ -243,44 +243,44 @@ Single Cargo workspace monorepo, frontend included. Per-platform native code is
 ├── rust-toolchain.toml          pinned toolchain
 │
 ├── crates/
-│   ├── zephium-core             domains (slices + reducers + commands/events),
+│   ├── drift-core             domains (slices + reducers + commands/events),
 │   │                            layout/split math, navigation policy, ports.
 │   │                            pure, #![forbid(unsafe_code)], zero I/O.
-│   ├── zephium-agentic          pure browser-execution identity, lifecycle,
+│   ├── drift-agentic          pure browser-execution identity, lifecycle,
 │   │                            semantic, action, policy, and probe contracts;
 │   │                            native fixtures remain release-excluded.
-│   ├── zephium-agent-model-catalog
+│   ├── drift-agent-model-catalog
 │   │                            product-owned immutable Terra provider model,
 │   │                            tokenizer, and standard-rate pricing entry.
-│   ├── zephium-work-composition optional trusted macOS engine/Store adapter to
+│   ├── drift-work-composition optional trusted macOS engine/Store adapter to
 │   │                            durable Work admission; no UI or task authority.
-│   ├── zephium-ipc              DTOs + specta/tauri-specta TS codegen.
-│   ├── zephium-engine           Wry adapter + native stage per platform
+│   ├── drift-ipc              DTOs + specta/tauri-specta TS codegen.
+│   ├── drift-engine           Wry adapter + native stage per platform
 │   │                            (stage_macos / stage_windows / stage_linux,
 │   │                            same inherent surface, cfg-selected).
 │   │                            unsafe allowlisted here.
-│   ├── zephium-blocker          bounded adblock-rust compiler worker and
+│   ├── drift-blocker          bounded adblock-rust compiler worker and
 │   │                            immutable platform artifacts.
-│   ├── zephium-update-transport shared redirect-free fixed-origin HTTPS
+│   ├── drift-update-transport shared redirect-free fixed-origin HTTPS
 │   │                            boundary; no package or catalog authority.
-│   ├── zephium-blocker-update   TUF authentication, private
+│   ├── drift-blocker-update   TUF authentication, private
 │   │                            package storage, rollback/clock authority.
-│   ├── zephium-blocker-service  candidate preparation, durable commit, and
+│   ├── drift-blocker-service  candidate preparation, durable commit, and
 │   │                            exact compiler activation coordinator.
-│   ├── zephium-extension-package bounded manifests, catalogs, tree indexes,
+│   ├── drift-extension-package bounded manifests, catalogs, tree indexes,
 │   │                            portable paths, and CRX3 authentication.
-│   ├── zephium-extension-acquisition catalog-bound hostile ZIP preflight and
+│   ├── drift-extension-acquisition catalog-bound hostile ZIP preflight and
 │   │                            bounded streaming decompression.
-│   ├── zephium-extension-authority product-sealed catalog/manifest policy.
-│   ├── zephium-extension-distribution fixed-origin authenticated catalog and
+│   ├── drift-extension-authority product-sealed catalog/manifest policy.
+│   ├── drift-extension-distribution fixed-origin authenticated catalog and
 │   │                            one-at-a-time CRX/legal object acquisition.
-│   ├── zephium-extension-repository immutable package materialization, atomic
+│   ├── drift-extension-repository immutable package materialization, atomic
 │   │                            catalog sets, leases, rollback, recovery, GC.
-│   ├── zephium-extension-runtime-api move-only native host authority.
-│   ├── zephium-extension-service serialized Store/repository/native lifecycle
+│   ├── drift-extension-runtime-api move-only native host authority.
+│   ├── drift-extension-service serialized Store/repository/native lifecycle
 │   │                            and management transactions.
-│   ├── zephium-store            SQLite actor, migrations, FTS5, fakes.
-│   └── zephium-app              the actor shell: owns composed core state,
+│   ├── drift-store            SQLite actor, migrations, FTS5, fakes.
+│   └── drift-app              the actor shell: owns composed core state,
 │                                drives ports, builds projections.
 │
 ├── desktop/                     Tauri composition root. windows, menus/hotkeys,
@@ -359,7 +359,7 @@ pushed; small config (settings, theme) = load once + change events.
 
 ## 6. Domain model (the part to get right)
 
-Aggregates in `zephium-core`, invariants enforced inside the aggregate.
+Aggregates in `drift-core`, invariants enforced inside the aggregate.
 
 **ID strategy (irreversible).** Persistent/syncable entities (Profile, Space,
 Item, Document, Setting, Theme, SearchEngine, permission grants) get ULIDs so
@@ -507,9 +507,9 @@ independent fixed terminal channel; an `Allow` is downgraded to denial after
 any identity or epoch change.
 
 The Shell-side coordinator is on by default in desktop builds (the
-`zephium-desktop/macos-page-permission-prompts` feature is a default feature and
+`drift-desktop/macos-page-permission-prompts` feature is a default feature and
 forwards to the app feature). On Windows, ordinary human tabs defer camera and
-microphone to WebView2's own prompt and Zephium stores nothing; geolocation,
+microphone to WebView2's own prompt and Drift stores nothing; geolocation,
 notifications and screen capture are denied everywhere, and extension pages and
 offscreen documents deny media capture.
 The macOS coordinator loads the exact profile catalog only after a supported request from the
@@ -538,13 +538,13 @@ enters the UI-client policy decision](https://github.com/WebKit/WebKit/blob/main
 and its [mock-capture setting is test tooling rather than a shipping
 WKWebView API](https://github.com/WebKit/WebKit/blob/main/Tools/MiniBrowser/mac/WK2BrowserWindowController.m).
 An unattended run can
-therefore prompt, wait on, or mutate camera/microphone consent before Zephium
-receives the request, even though Zephium later resolves Deny. The focused
+therefore prompt, wait on, or mutate camera/microphone consent before Drift
+receives the request, even though Drift later resolves Deny. The focused
 command is a developer diagnostic only when the responsible host process is
 already TCC-authorized; it is not packaged-release evidence:
 
 ```sh
-cargo run --locked -p zephium-engine --features native-page-permission-probes --bin macos-page-permission-probe
+cargo run --locked -p drift-engine --features native-page-permission-probes --bin macos-page-permission-probe
 ```
 
 The macOS bundle carries human-readable `NSCameraUsageDescription` and
@@ -645,7 +645,7 @@ gates are documented in
 ## 10. Extensions (bounded MV3 subset; currently disabled)
 
 The WebExtensions API is a browser-layer compatibility product, not a feature
-the native engines provide uniformly. Zephium does not claim extension
+the native engines provide uniformly. Drift does not claim extension
 installation, API mediation, userscripts, or Chrome/Firefox compatibility in
 the current tree. The product target is a curated, package-neutral MV3
 compatibility surface. Pinned **Bitwarden Core** and stock third-party
@@ -654,7 +654,7 @@ they are not product dependencies and no target-specific branch belongs in
 ordinary browser code. The agreed public target now combines a small
 recommended cohort with policy-eligible Compatibility/Beta installation from
 the Chrome Web Store or an approved publisher. Original package bytes come
-directly to the user's device; Zephium serves shared signed compatibility and
+directly to the user's device; Drift serves shared signed compatibility and
 revocation metadata, not third-party packages. Recommendations retain exact
 test history while eligible upstream versions update independently. This does
 not relax the existing exact Verified manifest authority or promise general
@@ -670,7 +670,7 @@ original CRX digest and can bind its exact original manifest to a numeric
 upstream checkpoint. The checkpoint has a fixed durable codec and rejects
 downgrades, publisher changes, and equal-version byte changes.
 
-The opt-in `zephium-extension-distribution/public-policy` client now verifies
+The opt-in `drift-extension-distribution/public-policy` client now verifies
 the fixed shared target with Tough 0.24.0. It pins the channel and bootstrap
 root, bounds every metadata response before parsing, rejects delegations and
 unexpected targets, requires 2-of-3 root keys and separate signing roles, and
@@ -716,7 +716,7 @@ migration. Each encoded record is bounded to 1 KiB (the current maximum shape
 is 812 bytes), and history is capped at 128 publishers per profile. The path
 uses the existing Store actor and starts no worker, timer, or native view.
 These are structural persistence guarantees, not Beta authentication.
-The opt-in `zephium-extension-distribution/beta-admission` path now consumes an
+The opt-in `drift-extension-distribution/beta-admission` path now consumes an
 authenticated complete CRX tree and a live accepted policy to mint the separate
 `ProductAdmittedBetaSource` witness. Both macOS and Windows native targets are
 assessed independently of the build host. The shared manifest parser retains
@@ -763,7 +763,7 @@ Delivery is layered and measured:
   active principal in each eligible live content controller/view, plus an
   isolated JS context in each eligible frame/document; both cardinalities are
   explicitly capped; and
-- the Linux MV3 compatibility subset requires a bounded Zephium-owned
+- the Linux MV3 compatibility subset requires a bounded Drift-owned
   event-runtime view/context plus any chosen extension-UI or capability-specific
   offscreen resources; WKWebExtension and WebView2-native extension workers are
   engine-managed and require separate count admission and measured
@@ -773,7 +773,7 @@ On macOS 15.4 and newer, Apple's public `WKWebExtensionController` stack is the
 preferred native MV3 candidate. A feature-gated live probe proves controller
 attachment before view construction, explicit host/private-data grants,
 per-extension isolated worlds, frame matching, exact context unload/reload,
-preservation of Zephium's protected scripts, MV3 background execution, and
+preservation of Drift's protected scripts, MV3 background execution, and
 same-principal extension-storage isolation across two persistent controller
 namespaces and fresh controller instances. A second behavioral gate constructs
 two regular profiles through the exact product registry and one
@@ -834,7 +834,7 @@ delegate must therefore collect and authorize the complete request without
 depending on callback order or tab presence. The gate runs explicitly with:
 
 ```sh
-cargo run --locked -p zephium-engine --features native-web-extension-probes --bin macos-web-extension-probe -- --interactive-permission-gate --require-supported-runtime
+cargo run --locked -p drift-engine --features native-web-extension-probes --bin macos-web-extension-probe -- --interactive-permission-gate --require-supported-runtime
 ```
 
 Normal unattended CI compiles this path but reports it as
@@ -974,13 +974,13 @@ typed dismissal; a different extension or tab still receives the one-popup
 capacity refusal. The authenticated native and brokered product probes require
 open, toggle-dismiss, reopen, discard-close, and final reopen in one lifecycle.
 Diagnostic builds retain normal transient behavior by default; setting
-`ZEPHIUM_EXTENSION_LAB_RETAIN_POPUP=1` is the explicit opt-in that keeps a
+`DRIFT_EXTENSION_LAB_RETAIN_POPUP=1` is the explicit opt-in that keeps a
 popup alive while Safari attaches to its WKWebView. Surface replacement closes
 a popup when its tab becomes
 discarded, inactive, or absent; runtime retirement, profile erasure, and host
 shutdown cancel loading and close the native popup before owner release. The
 lease covers only the pending/presented interval and is released even though
-WebKit may cache its popup wrapper. Zephium-created options WKWebViews also
+WebKit may cache its popup wrapper. Drift-created options WKWebViews also
 handle `webViewWebContentProcessDidTerminate:`. The weak native delegate defers
 teardown to the next main-queue turn, revalidates the exact context and WKWebView
 generation, detaches and closes the window, and releases the shared
@@ -1061,7 +1061,7 @@ shell; a separate live gate has both the raw page and a second extension
 address the exact known context identifier through message and port APIs when
 `externally_connectable` is absent. A delayed isolated content script asks the
 target worker for its delivery counter; only exact zero passes, so a timeout is
-never treated as refusal. Zephium preserves that manifest declaration as
+never treated as refusal. Drift preserves that manifest declaration as
 unmodeled authority, so no product profile can classify it runnable. The
 authenticated content script must still complete through its isolated world
 without touching either forgery. Production
@@ -1071,7 +1071,7 @@ provisioning ingress: one move-owned, path-free request may be retained at a
 time; its actual vector capacities are charged against the shared ceiling; and
 the worker reauthenticates the sealed catalog, CRX, manifest, legal artifact,
 and complete extracted tree before publication. Complete catalog activation is
-separate and source-free. `zephium-extension-distribution` now owns the narrow
+separate and source-free. `drift-extension-distribution` now owns the narrow
 product-neutral source for that ingress. Construction first requires a valid
 compiled product authority; it then fetches one fixed `catalog-v1.json`,
 authenticates the exact bytes before requesting any package object, binds one
@@ -1100,7 +1100,7 @@ service refusal or boundary panic. Network work and package parsing never run
 on Shell, and the mutable lifecycle owner never crosses an await. Mailbox
 refusal does not claim callback ownership; an already-admitted command drained
 during terminal shutdown settles unavailable rather than disappearing. The
-separate `zephium-extension-updater` now owns the dormant product scheduler:
+separate `drift-extension-updater` now owns the dormant product scheduler:
 one explicitly constructed current-thread async runtime, one bounded request
 slot, cancellation-aware shutdown, and a fixed-size monotonic status stream.
 Its launch plan binds the authenticated client to one complete immutable
@@ -1134,7 +1134,7 @@ cannot select a profile, package, runtime target, URL, or artifact. Its bounded
 admission result is distinct from the generation-ordered completion status.
 
 The redirect-free fixed-origin HTTPS boundary shared with the blocker lives in
-`zephium-update-transport`. It accepts only plain-ASCII paths below exact HTTPS
+`drift-update-transport`. It accepts only plain-ASCII paths below exact HTTPS
 directories, refuses redirects, compression, credentials, queries, fragments,
 and encoded path components, and redacts request failures. Its stricter bounded
 object operation additionally refuses missing/ambiguous lengths and transfer
@@ -1192,7 +1192,7 @@ ceiling. Definite pre-commit refusal restores the old cohort, while uncertain
 commit quarantines management until restart.
 Core URL decisions intersect the same policy before durable host or transient
 `activeTab` authority reaches the engine, so a native denied dictionary is not
-the sole enforcement layer for Zephium-owned scripting brokers.
+the sole enforcement layer for Drift-owned scripting brokers.
 
 Privileged chrome echoes only the policy revision and a boolean. Shell derives
 the current site's scope from its own focused committed URL; URL, host, path,
@@ -1244,7 +1244,7 @@ reopen. Reinstall therefore cannot recover the prior extension-origin data.
 Remaining release gaps include product-sealed distribution endpoints, the
 complete permission and API matrix, quotas, complete
 cross-process release-build resource evidence, and endurance. Older admitted
-macOS versions and Linux require a Zephium
+macOS versions and Linux require a Drift
 compatibility runtime only after per-principal world/handler isolation, exact
 match enforcement, protected-script installed state, and native hostile tests
 pass. Windows has two separate candidates: curated MV3 packages through a
@@ -1429,7 +1429,7 @@ environment option in place; the current adapter returns a retryable native
 pre-entry `RestartRequired` refusal rather than enabling globally or silently
 mixing modes. That closed reason survives service activation, install/update/
 enable/grant settlements, Shell's bounded operation ledger, generated IPC, and
-the Extensions Center, which tells the user to restart Zephium. It is not a
+the Extensions Center, which tells the user to restart Drift. It is not a
 restart command and grants no permission to tear down a live profile behind
 Shell's tab/session authority. Exact in-process reconstruction remains future
 work; restart re-enters ordinary authenticated startup before any content view.
@@ -1598,7 +1598,7 @@ so migration preserves the catalog revision and monotonic install-ID floor but
 invalidates those inexact install/grant rows. They must be reinstalled through
 the exact package authority and their old identities can never be reused.
 
-`zephium-extension-acquisition` owns the first acquired-package boundary and is
+`drift-extension-acquisition` owns the first acquired-package boundary and is
 linked into the service only by the opt-in `acquired-packages` feature, never by
 the ordinary inert product graph. It accepts
 only CRX3 bytes whose signed developer key derives the product-expected
@@ -1730,7 +1730,7 @@ reviewed macOS classification is therefore:
 | Toolbar action and declared popup page | Native-brokered | Exact action/icon projection, privileged gesture admission, native transient popup presentation, bounded failure UX, resource admission, and teardown are implemented; release-build end-to-end UX/RSS/endurance evidence remains required |
 | Non-blocking request observation | Compatible on the exercised runtime | Exact upstream-shaped `onCompleted` registration observes a real regular-tab HTTP navigation; the supported macOS floor still requires the same release-runner evidence |
 | HTTP Basic-auth autofill | Degraded | Startup survives, but the required blocking callback semantics are unavailable |
-| Network blocking/modification through `webRequest` | Unsupported | Zephium never emulates synchronous request control through a generic bridge |
+| Network blocking/modification through `webRequest` | Unsupported | Drift never emulates synchronous request control through a generic bridge |
 
 The same product-shaped background gate records a closed runtime-namespace
 inventory, not just the permissions WebKit retained while parsing. On the
@@ -1761,7 +1761,7 @@ not the still-unimplemented pinned-source transform. The release runner at the s
 OS floor must reproduce the closed inventory and these exact behavioral
 classifications before they become floor-wide claims.
 
-The native gate also carries a separate Zephium-owned ordinary-extension
+The native gate also carries a separate Drift-owned ordinary-extension
 contract. It declares `bookmarks`, `favicon`, `history`, `search`, `sessions`,
 `storage`, and `webNavigation`, mirroring only the browser-owned API delta present in the
 official [Vimium manifest](https://github.com/philc/vimium/blob/master/manifest.json);
@@ -1825,11 +1825,11 @@ claim that the lifecycle degradation is closed.
 
 WebKit does expose a narrower compatibility seam through
 `WKWebExtensionControllerDelegate`, and the live gate now classifies it without
-enabling it in ordinary product policy. A separate Zephium-owned extension
+enabling it in ordinary product policy. A separate Drift-owned extension
 declares `history` and `nativeMessaging`, receives the one native grant only
 inside the feature-gated probe, and loads the exact package-neutral read-only
 history adapter. `chrome.history.search` sends the fixed internal identifier
-`app.zephium.extension-broker.v1` and the closed recent-history operation. The
+`app.drift.extension-broker.v1` and the closed recent-history operation. The
 delegate compares both controller and `WKWebExtensionContext` identities before
 reading the bounded string payload. The returned two-row response is strictly
 validated and mapped into `HistoryItem` values before the page accepts the
@@ -1902,22 +1902,22 @@ mandatory before Vimium is presented as compatible.
 
 | Bitwarden surface | macOS native classification | Evidence / boundary |
 |---|---|---|
-| MV3 backup-localStorage through `offscreen` | Requires a reviewed Bitwarden Core adapter before release | The pinned entrypoint always selects [`OffscreenStorageService`](https://github.com/bitwarden/clients/blob/browser-v2026.7.0/apps/browser/src/platform/storage/offscreen-storage.service.ts) for MV3. Primary writes survive because the upstream [`PrimarySecondaryStorageService`](https://github.com/bitwarden/clients/blob/browser-v2026.7.0/libs/common/src/platform/storage/primary-secondary-storage.service.ts) settles both writes, but a primary miss reaches the absent API. Zephium must select a deterministic primary-only/recovery-compatible adapter in its sealed build and test migration, missing-key, and recovery behavior; it must not inject a page-world shim. |
+| MV3 backup-localStorage through `offscreen` | Requires a reviewed Bitwarden Core adapter before release | The pinned entrypoint always selects [`OffscreenStorageService`](https://github.com/bitwarden/clients/blob/browser-v2026.7.0/apps/browser/src/platform/storage/offscreen-storage.service.ts) for MV3. Primary writes survive because the upstream [`PrimarySecondaryStorageService`](https://github.com/bitwarden/clients/blob/browser-v2026.7.0/libs/common/src/platform/storage/primary-secondary-storage.service.ts) settles both writes, but a primary miss reaches the absent API. Drift must select a deterministic primary-only/recovery-compatible adapter in its sealed build and test migration, missing-key, and recovery behavior; it must not inject a page-world shim. |
 | Idle and system-lock integration | Degraded | The pinned [`IdleBackground`](https://github.com/bitwarden/clients/blob/browser-v2026.7.0/apps/browser/src/background/idle.background.ts) returns immediately when the namespace is absent. System-lock vault timeout and idle-driven notification reconnect/disconnect are unavailable; ordinary timer-based vault locking remains a separate behavioral gate. |
 | System notifications | Degraded | The pinned composition selects `UnsupportedSystemNotificationsService` when `chrome.notifications` is absent. In-extension auth-request flows may remain available, but OS notification presentation/click handling is unavailable. |
-| Unlimited local storage | Unsupported in the initial target | WebKit can report per-extension stored bytes but exposes no quota setter. Zephium therefore refuses `unlimitedStorage` in both product grant schemas; the feature-only platform probe may exercise the native token, but no product runtime can remove WebKit's finite default quota without a separately reviewed bounded storage design. |
-| Chrome side panel | Degraded | The pinned [`BrowserApi`](https://github.com/bitwarden/clients/blob/browser-v2026.7.0/apps/browser/src/platform/browser/browser-api.ts) capability-checks the namespace and makes side-panel operations no-ops. Zephium's native toolbar popup remains the primary extension UI. |
+| Unlimited local storage | Unsupported in the initial target | WebKit can report per-extension stored bytes but exposes no quota setter. Drift therefore refuses `unlimitedStorage` in both product grant schemas; the feature-only platform probe may exercise the native token, but no product runtime can remove WebKit's finite default quota without a separately reviewed bounded storage design. |
+| Chrome side panel | Degraded | The pinned [`BrowserApi`](https://github.com/bitwarden/clients/blob/browser-v2026.7.0/apps/browser/src/platform/browser/browser-api.ts) capability-checks the namespace and makes side-panel operations no-ops. Drift's native toolbar popup remains the primary extension UI. |
 | Enterprise managed storage | Degraded to an empty read-only compatibility surface | WebKit exposes no enterprise policy. A package-neutral facade supplies `get()` with an empty frozen result and an inert `onChanged` event so optional enterprise features can initialize, while preserving any future native members. It never approximates managed policy with writable extension storage. |
 | Native messaging | Native-brokered for exact sealed publishers; otherwise unsupported | `macos.wkwebextension.v1` prohibits the permission by default. A package-specific sealed publisher requirement may select the narrower publisher schema, after which the broker reauthenticates the live context, exact host name, upstream extension allowlist, fixed Chromium registration root, and Apple Team/signing identity before launching one bounded cold stdio worker. The corrected live gate proves bidirectional persistent ports. Arbitrary native hosts remain unavailable, and each password-manager integration still requires a real signed-app interoperability gate. |
 | Programmatic main-world scripting | Native literal supported; pinned source requires a sealed adapter | `scripting.executeScript` injects the exact extension file into the product tab when passed literal `"MAIN"`, but WebKit exposes no `chrome.scripting.ExecutionWorld` enum. The sealed build must substitute the absent enum access without adding page-world privilege or a generic bridge. |
-| Runtime ports | Registered routing compatible; pre-listener connection not queued | A Zephium-owned extension page opens a named port only after the MV3 worker registers `runtime.onConnect`; the worker receives the port and completes an exact message round trip. A separate connection created immediately before listener registration returns a port, then disconnects without `runtime.lastError` and is not delivered after registration. Extensions that depend on Chrome queuing that startup race require a reviewed compatibility decision; ordinary registered port routing does not. |
+| Runtime ports | Registered routing compatible; pre-listener connection not queued | A Drift-owned extension page opens a named port only after the MV3 worker registers `runtime.onConnect`; the worker receives the port and completes an exact message round trip. A separate connection created immediately before listener registration returns a port, then disconnects without `runtime.lastError` and is not delivered after registration. Extensions that depend on Chrome queuing that startup race require a reviewed compatibility decision; ordinary registered port routing does not. |
 | Non-blocking top-level navigation observation | Compatible on the exercised runtime | A background `webNavigation.onCommitted` listener observes the real regular product-tab HTTP navigation. Frame/detail behavior remains outside this gate. |
 | Dynamic web-accessible resources | Compatible on the exercised runtime | A content script resolves an opaque runtime URL for a `use_dynamic_url` resource; the page loads and executes the declared resource. The same isolated script places the exact URL of a present but undeclared extension file into page DOM; WebKit emits the error path and the private script never executes. Revocation across a complete browser session and multi-frame behavior remain separate gates. |
 | Manifest sandbox pages | Sealed adapter primitive compatible; pinned transform still required | WebKit does not enforce the declared sandbox and also ignores the intended isolation when the extension URL is placed in an explicit sandboxed iframe. The live gate proves the reviewed replacement topology: an inert public payload is fetched by the authenticated content-script host and instantiated through a Blob-backed `allow-scripts` frame; the child has a `null` message origin, no extension APIs, and no parent DOM authority, while the privileged leaf URL is not public. The exact Bitwarden button/list bundle transformation and authenticated message flow still require deterministic source/build adaptation and hostile end-to-end tests. |
 | Private extension-resource WebAssembly startup | Release-blocked on the exercised runtime | The pinned 7,378,704-byte SDK module is returned as `application/octet-stream`. Native streaming compilation rejects that MIME, the vendor `arrayBuffer()` fallback promise does not settle, and the popup event loop stops advancing before compilation starts. A separately labelled probe that wraps the same private response body with `Content-Type: application/wasm` in both popup and background also stalls during the streaming retry. This closes a header-only runtime workaround; it does not authorize embedding bytes, adding a generic resource bridge, or distributing a modified package. |
-| Alarms | Live delivery compatible; context-restart persistence degraded | The ordinary gate creates an exact future alarm, reads it, clears it, and proves post-clear absence. The opt-in `cargo xtask classify-macos-extension-alarms` gate additionally arms the Chrome minimum 0.5-minute delay, observes `alarms.onAlarm` from the worker, then arms a second alarm and unloads/reloads the exact native context before its deadline. On macOS 26.6.1 the live alarm fires, while immediate post-reload `alarms.get` reports the second alarm absent with no delivery record. Zephium therefore does not claim Chrome-compatible alarm persistence. OS sleep/wake behavior and long-duration drift remain release gates. |
+| Alarms | Live delivery compatible; context-restart persistence degraded | The ordinary gate creates an exact future alarm, reads it, clears it, and proves post-clear absence. The opt-in `cargo xtask classify-macos-extension-alarms` gate additionally arms the Chrome minimum 0.5-minute delay, observes `alarms.onAlarm` from the worker, then arms a second alarm and unloads/reloads the exact native context before its deadline. On macOS 26.6.1 the live alarm fires, while immediate post-reload `alarms.get` reports the second alarm absent with no delivery record. Drift therefore does not claim Chrome-compatible alarm persistence. OS sleep/wake behavior and long-duration drift remain release gates. |
 | Commands | Native event routing compatible for unambiguous commands | `commands.getAll` returns the exact six pinned command names. A real `NSEvent` is matched through `commandForEvent:`, the context is exact, and `autofill_login` reaches `commands.onCommand`. Browser-menu precedence, focused/resident-tab binding, current-runtime authentication, collision refusal, and monitor retirement are implemented. `_execute_action` crosses one actor-ordered, one-second request and reuses the exact visible browser-action button as its trusted popup anchor; the ordinary Shell/native action path revalidates the complete runtime/tab/revision cohort. Browser-owned remapping/conflict UI and packaged physical-key evidence remain release gates. |
-| Context menus | Native merge and click routing compatible on the exercised tab context | The background creates and updates one tab-context item; Zephium preserves an opaque default-menu prefix, appends the bounded native item, performs it through `NSMenu`, observes the exact `contextMenus.onClicked` tab, then removes it and verifies native absence. Packaged physical right-click, frame/editable/link variants, dynamic enablement, and navigation-time teardown remain release gates. |
+| Context menus | Native merge and click routing compatible on the exercised tab context | The background creates and updates one tab-context item; Drift preserves an opaque default-menu prefix, appends the bounded native item, performs it through `NSMenu`, observes the exact `contextMenus.onClicked` tab, then removes it and verifies native absence. Packaged physical right-click, frame/editable/link variants, dynamic enablement, and navigation-time teardown remain release gates. |
 | Clipboard read/write | Behavior unassessed | A production gate must be driven by a trusted popup gesture and preserve the user's prior clipboard contents on every success, refusal, timeout, and crash path. Automated tests must not destructively overwrite ambient clipboard state. |
 
 This is one reviewed slice of the required declaration-by-declaration matrix,
@@ -1936,7 +1936,7 @@ individual source reads are bounded; a partial inspection checkout, local
 edit, untracked input, symlink escape, or source drift fails before adaptation.
 The native vertical slice builds the OSS production **Chrome MV3** target. The
 pinned Safari manifest transform deletes the service-worker `background`
-declaration and is therefore not the input to Zephium's WKWebExtension
+declaration and is therefore not the input to Drift's WKWebExtension
 controller runtime. This target choice is compiled into generated overlay
 metadata rather than left to a release-shell environment default.
 
@@ -1990,7 +1990,7 @@ increase the timeout, preload a hidden view, install a global fetch shim, or
 claim Bitwarden compatibility.
 
 The separate feature-gated `macos-web-extension-resource-probe` closes the
-public `baseURL` plus `WKURLSchemeHandler` hypothesis with a Zephium-owned MV3
+public `baseURL` plus `WKURLSchemeHandler` hypothesis with a Drift-owned MV3
 fixture. An ordinary nonpersistent `WKWebView` routes its HTML, JavaScript, and
 empty WASM module through the exact native handler, preserves
 `application/wasm`, and passes `WebAssembly.instantiateStreaming`. A loaded
@@ -2044,7 +2044,7 @@ tree re-verification, atomic repository publication, and a live lease remain
 separate requirements.
 
 Adapted packages no longer require release tooling to hold a private signing
-key in Zephium code. Before signing,
+key in Drift code. Before signing,
 `cargo xtask prepare-extension-crx3-release-archive` accepts only an exact
 closed MV3 tree and its canonical index. It binds the external P-256 public
 SPKI into the manifest's canonical `key`, removes the extension's upstream
@@ -2067,7 +2067,7 @@ reopens the closed output tree, and then runs the same deterministic CRX3
 release preparation. The exact compatibility receipt is copied byte-for-byte
 beside the release archive and inserted into the staged extension at the sole
 digest-derived path
-`__zephium__/compatibility-receipts/<sha256>.json` before the release tree is
+`__drift__/compatibility-receipts/<sha256>.json` before the release tree is
 re-indexed and zipped. Its length, SHA-256, target, and adapted pre-signing
 manifest/tree/index identities are bound into release evidence. Receipt capture
 does not settle signing, licensing, catalog membership, redistribution, or
@@ -2176,7 +2176,7 @@ the same wrapper to `background.scripts`, and selects
 typed into manifest admission and compatibility identity and is bound in the
 receipt as a degradation. Classic workers, existing page/script declarations,
 and ambiguous environment declarations fail closed. A document background is
-still event-managed by WebKit; Zephium does not create or retain a hidden
+still event-managed by WebKit; Drift does not create or retain a hidden
 `WKWebView` for it.
 
 The independently indexed current 1Password compatibility artifact has 1,005
@@ -2197,7 +2197,7 @@ viable compatibility lever on the reviewed WebKit runtime.
 Two deny-only facades preserve safe failure semantics without granting the
 missing authority. A document-scoped `clients.matchAll()` returns one frozen
 empty cohort because a background document has no ServiceWorker WindowClient
-inventory and Zephium independently enforces the single-popup lease. Native
+inventory and Drift independently enforces the single-popup lease. Native
 messaging permission is removed; `connectNative()` returns a bounded Port that
 disconnects on the next microtask, while `sendNativeMessage()` rejects (or
 settles its callback with no response). No identifier is resolved, no bytes are
@@ -2210,7 +2210,7 @@ This is a substantial positive gate, not yet a compatibility claim. The real
 browser now executes the package's no-popup action, receives its exact internal
 `tabs.create()` target, and presents the full same-principal welcome document
 through the bounded extension-UI host. Continue reaches Start setup. Sign in
-then performs the package's programmatic HTTPS transition; Zephium creates a
+then performs the package's programmatic HTTPS transition; Drift creates a
 normal profile tab at `my.1password.com/signin?auth-only=1`, retires the
 privileged extension document, reopens it on the next action, and exits cleanly
 when that document is still open. This closes onboarding action routing and the
@@ -2302,7 +2302,7 @@ The receipt explicitly requires a sealed publisher-host policy and a
 publisher-signed executable. It mints no such authority itself. The private
 lab profile now compiles the inspected 1Password host, Team, signing, and
 upstream-extension identities and activates them only from a correctly signed
-Zephium bundle; the generic transform remains non-authorizing and cannot make
+Drift bundle; the generic transform remains non-authorizing and cannot make
 an arbitrary package or native host eligible.
 
 A separate non-authorizing experiment bound the module's exported
@@ -2317,12 +2317,12 @@ top-level completion cannot be treated as the settlement contract for
 
 The August 27 signed product gate advances that evidence with the exact stock
 8.12.34.34 package and publisher-native document artifact. The installed
-1Password BrowserSupport helper verified Zephium's Developer ID team, connected
+1Password BrowserSupport helper verified Drift's Developer ID team, connected
 to the desktop app over its own XPC boundary, and exchanged framed native
 messages through the sealed upstream Chromium principal. The authenticated
 vault popup rendered real account content, and a public HTTPS login form
 exposed 1Password's inline field affordance. No 1Password package byte or
-package-specific execution branch is compiled into Zephium.
+package-specific execution branch is compiled into Drift.
 
 The August 28 follow-up identified one package-neutral startup failure rather
 than treating the intermittent result as a timeout problem. The stock
@@ -2331,7 +2331,7 @@ background rejected initialization while evaluating
 1Password reads `passwordSavingEnabled` and conditionally disables browser
 password, address, and card autofill. A declared-`privacy` compatibility asset
 now preserves every valid native member and supplies only those four settings
-when absent. Zephium has no competing browser password/address/card service, so
+when absent. Drift has no competing browser password/address/card service, so
 each value is truthfully fixed to `false`; disabling and clearing are accepted,
 enabling fails with `NotSupportedError`, and change events are inert. The
 5,813-byte asset has no credential/passkey access, network API, native message,
@@ -2346,7 +2346,7 @@ publisher onboarding completed against the installed desktop application, the
 real vault popup rendered, the content script exposed its field affordance on
 public HTTPS login forms, and an explicit popup `Autofill` action filled a
 synthetic username/password pair and dismissed the popup. This is the first
-complete real-vault fill through Zephium, but it is not yet a Verified-package
+complete real-vault fill through Drift, but it is not yet a Verified-package
 claim. In that first candidate, clicking the in-field icon changed 1Password's
 logical open/close state without presenting its inline menu, and invoking the
 already-visible toolbar action did not toggle-dismiss the popup. Save/update, lock/restart,
@@ -2359,7 +2359,7 @@ that run. Native toolbar actions now reauthenticate and toggle-dismiss only an
 exact same-context, same-tab popup before acquiring another resource lease;
 competing targets still receive the one-popup capacity refusal. Ordinary lab
 runs also use production transient outside-click/Escape behavior, while
-`ZEPHIUM_EXTENSION_LAB_RETAIN_POPUP=1` is the explicit inspector-only opt-in.
+`DRIFT_EXTENSION_LAB_RETAIN_POPUP=1` is the explicit inspector-only opt-in.
 Native and brokered product probes require open, toggle-dismiss, reopen,
 discard-close, and final reopen in one lifecycle.
 
@@ -2369,7 +2369,7 @@ patterns are bounded portable ASCII with `*` as the only wildcard; expansion
 runs against the already-authenticated closed tree, deduplicates exact paths,
 and fails a missing literal HTML declaration. Declared sandbox pages remain
 byte-identical, undeclared extension pages remain explicitly unsupported, and
-the receipt binds the exact adapted-page count. A Zephium-owned fixture embeds
+the receipt binds the exact adapted-page count. A Drift-owned fixture embeds
 one such page in a closed-shadow extension-origin iframe, authenticates its
 response by child-window identity and a random nonce, requires both native
 runtime aliases plus the compatibility marker, keeps the page world without
@@ -2390,7 +2390,7 @@ resources, an omitted `use_dynamic_url`, a stable custom context base URL, and
 a named persistent controller. Splitting web-accessible HTML into another
 manifest group did not repair the product and was removed. The product tab was
 instead sending every `WKNavigationAction`, including child frames, through
-Wry's host callback. Zephium's callback intentionally admits only canonical
+Wry's host callback. Drift's callback intentionally admits only canonical
 browser-level targets, so it cancelled the `webkit-extension:` child
 navigation before WebKit could apply its controller- and
 `web_accessible_resources`-bound authorization.
@@ -2442,7 +2442,7 @@ request-authentication behavior remained separate.
 
 An August 30 follow-up separates two different update claims. Editing the
 original synthetic login in the publisher's desktop application advanced its
-durable modification time; the already-running Zephium extension synchronized
+durable modification time; the already-running Drift extension synchronized
 that change, its isolated inline UI filled the exact replacement password on
 the public HTTPS test form, and 1Password auto-submitted the form. This closes
 publisher-app update through browser-extension sync/refill. It does not close
@@ -2453,9 +2453,9 @@ existing one. The package's full settings application contains the publisher
 toggle for inline save behavior and opens it through ordinary
 `tabs.create({ url: runtime.getURL(...) })`.
 
-That workflow exposed one package-neutral configuration error in Zephium's
+That workflow exposed one package-neutral configuration error in Drift's
 already-authenticated extension-page boundary. WebKit presents Chrome's
-default active tab with `shouldAddToSelection=false`; Zephium incorrectly
+default active tab with `shouldAddToSelection=false`; Drift incorrectly
 required that independent multi-selection flag to be true even though its
 dedicated extension window contains exactly one tab. Apple documents that an
 active tab is already selected. The boundary now accepts either inert
@@ -2475,7 +2475,7 @@ bridge, expose a native dialog, or retain credentials outside the publisher.
 
 That run also made the intermittent infinite-loading popup deterministic.
 After WebKit reloaded the nonpersistent document background, 1Password aborted
-initialization while evaluating `browser.storage.managed.onChanged`. Zephium's
+initialization while evaluating `browser.storage.managed.onChanged`. Drift's
 empty read-only facade had run before the package's browser polyfill, but the
 polyfill replaced the nested `storage` object after the facade's original
 microtask/task reconciliation had already completed. The compatibility asset
@@ -2541,7 +2541,7 @@ budgets or authority for a hidden keepalive.
 That gate also found and fixed two package-neutral lifecycle defects. WebKit
 delivers an extension's first `Port.postMessage` only after the delegate
 completion, while stock MV3 code may post immediately after `connectNative`.
-Zephium now arms the retained port and completes that logical connection
+Drift now arms the retained port and completes that logical connection
 before native process startup, holds at most the existing two-frame outbound
 capacity before the signed host is ready, and drains in order only after exact
 runtime, registration, origin, and publisher admission. Separately, WebKit can
@@ -2556,7 +2556,7 @@ One fresh, incomplete-onboarding data-store run reached the first native port
 at 60.786 seconds; after that callback, the signed worker was ready in 52 ms
 and the first host response arrived 45 ms later. The background's own WASM
 marks completed in about 31 ms on that run, so the minute was not attributed
-to Zephium's native transport or to WASM compilation. This remains a cold UX
+to Drift's native transport or to WASM compilation. This remains a cold UX
 and readiness input, not permission to add a hidden view, permanent worker,
 global fetch shim, or blind timeout. Password-manager verification still
 requires repeatable completed-onboarding restarts, save/fill/passkey workflows,
@@ -2570,13 +2570,13 @@ MessageChannel ring whose two ports close immediately when the queue drains.
 It creates no idle timer, worker, hidden view, or persistent wake source;
 overflow rejects with `QuotaExceededError`. The receipt explicitly discloses
 that a compatibility continuation cannot reproduce native priority and abort
-inheritance. A live Zephium-owned WebKit fixture proved resolution, isolated
+inheritance. A live Drift-owned WebKit fixture proved resolution, isolated
 world confinement, bounded mode reporting, credential round trips, and full
 native teardown. A stock 1Password A/B still reached its first native port at
 about 60.8 seconds, so this primitive is an API/responsiveness improvement and
 is not claimed as the password-manager startup fix.
 
-A separate Zephium-owned lifecycle gate now removes the browser action seam as
+A separate Drift-owned lifecycle gate now removes the browser action seam as
 an explanation for that stall. The exact compatibility fixture has a real
 action popup that sends a runtime message at module evaluation; its background
 returns the response asynchronously after 750 ms. The native probe executes
@@ -2593,7 +2593,7 @@ background content](https://developer.apple.com/documentation/webkit/wkwebextens
 on macOS in general, but WebKit rejects `persistent: true`
 for this Manifest V3 artifact with `WKWebExtensionErrorDomain` code 8: MV3 must
 remain nonpersistent. The experimental target was removed. These two results
-bound the current engineering posture: Zephium must preserve event-managed MV3
+bound the current engineering posture: Drift must preserve event-managed MV3
 semantics, and the stock 1Password initialization needs a publisher-owned
 event/readiness contract or an upstream lifecycle change; it is not authority
 for a timer, hidden view, permanent worker, or package-identifier branch.
@@ -2620,7 +2620,7 @@ tree ceiling; this does not authorize a runtime to retain 32 MiB buffers.
 This extension result does not remove the platform credential baseline. Apple
 documents that [`WKWebView` handles website credential challenges and works
 with keychain and third-party credential managers](https://developer.apple.com/documentation/authenticationservices/password-use-in-web-browsers).
-Zephium now preserves that division explicitly. Password AutoFill remains
+Drift now preserves that division explicitly. Password AutoFill remains
 entirely WebKit-owned. An on-demand AuthenticationServices boundary reads only
 the browser's passkey authorization state; it never enumerates credentials or
 relying parties, and a future native enum value fails closed as unknown. Before
@@ -2657,10 +2657,10 @@ save, inline-menu, settings, or desktop-integration workflows.
 A separate authenticated-tree diagnostic now identifies two narrow WebKit API
 compatibility requirements without changing production authority. It copies
 only the indexed Proton tree into a private no-replace stage, re-hashes every
-source while copying, and adds a Zephium-owned prelude and background wrapper.
+source while copying, and adds a Drift-owned prelude and background wrapper.
 The prelude preserves native `chrome` and `browser` identities, creates only a
 missing alias, locks both global properties around the same native objects, and
-provides an inert `runtime.onUpdateAvailable` event because Zephium's
+provides an inert `runtime.onUpdateAvailable` event because Drift's
 authenticated catalog owns updates. That diagnostic imports the real
 background, executes the isolated content-script prelude, renders the popup,
 and releases every native object.
@@ -2671,12 +2671,12 @@ unstable namespace-global seam, rather than requiring a Proton-specific product
 runtime.
 
 All stock third-party contracts stay feature-gated and confer
-`product_authority=false`. Zephium must not hardcode any manager into the
+`product_authority=false`. Drift must not hardcode any manager into the
 production runtime or redistribute modified third-party bytes by accident.
 
 The representative-extension gate applies the same rule to ordinary major
 extensions without adding a package-name branch. `cargo run --locked -p
-zephium-engine --features native-web-extension-probes --bin
+drift-engine --features native-web-extension-probes --bin
 macos-representative-extension-probe` accepts either one exact canonical stock
 tree/index or one non-authorizing compatibility artifact. It grants only the
 closed native permission cohort required by its page-theme/action scenario,
@@ -2701,7 +2701,7 @@ On the exercised WebKit runtime, the stock package and the package-neutral v3
 transform both darken the top document, dynamic styles, and a same-origin
 frame; render an executable popup with native runtime identity; report zero
 context errors; and release every native owner. Stock therefore needs no
-Zephium adapter for that core workflow. An `about:srcdoc` descendant remains
+Drift adapter for that core workflow. An `about:srcdoc` descendant remains
 light even though the source requests `match_about_blank`; the result is
 `usable-with-about-srcdoc-frame-degradation`, not full parity. No Dark Reader
 byte was admitted by that external probe, and its evidence alone grants no
@@ -2714,7 +2714,7 @@ degradation: unloading the context on disable and constructing a replacement on
 re-enable, or reconstructing it for a package-revision update, makes WebKit emit
 `runtime.onInstalled` with reason `install` again, so stock Dark Reader opens
 another help tab even with its deterministic origin. Restart-only hydration
-does not. Zephium does not suppress arbitrary `tabs.create` calls or branch on
+does not. Drift does not suppress arbitrary `tabs.create` calls or branch on
 Dark Reader's package identity; the background declaration remains degraded
 as an intentional WebKit semantic difference. WebKit's own
 [`InstalledEvent` test](https://github.com/WebKit/WebKit/blob/main/Tools/TestWebKitAPI/Tests/WebKit/WKWebView/WKWebExtensionAPIRuntime.mm)
@@ -2752,7 +2752,7 @@ materialize-macos-extension-compatibility --extension PATH --tree-index PATH
 --output PATH` reopens an exact closed MV3 tree, rejects source drift and
 reserved-namespace collisions, and emits a separately indexed artifact. Its
 `webkit-macos-native-v3` adapter preserves and locks native namespace identities,
-supplies only the inert catalog-update event owned by Zephium, wraps classic or
+supplies only the inert catalog-update event owned by Drift, wraps classic or
 module background workers, prepends isolated content scripts, leaves `MAIN`
 scripts unchanged, and inserts the local prelude into an explicit leading
 action-popup `<head>` plus manifest-declared web-accessible HTML pages selected
@@ -2780,7 +2780,7 @@ extension API. It derives changes from the frame's real location, bounds and
 validates extension-local messages plus native tab/frame sender identities,
 and accepts only HTTP(S) or exact blank/srcdoc URLs. Hash and popstate changes
 are native DOM inputs. History API changes require a fixed browser-owned DOM
-signal from Zephium's already-observed committed URL. The macOS host now emits
+signal from Drift's already-observed committed URL. The macOS host now emits
 that payload-free signal only for a changed same-origin URL in the exact
 current main-frame epoch, from WebKit's default client world and independently
 of extension presence. The authenticated native and brokered product probes
@@ -2829,7 +2829,7 @@ that authority.
 When a brokered source declares `bookmarks` on a WebKit floor where that
 namespace is absent, the artifact exposes an explicit empty read-only tree so
 aggregate completion handlers terminate; bookmark mutations and events remain
-unsupported and no Zephium item is invented. When it declares `favicon`, only
+unsupported and no Drift item is invented. When it declares `favicon`, only
 Chrome's unsupported `_favicon/` pseudo-URL is mapped to a sealed transparent
 SVG; all other `runtime.getURL` calls remain native. Both adaptations are typed
 in the receipt and install disclosure. The artifact metadata records all of
@@ -2863,7 +2863,7 @@ initialization, login, vault, save, autofill, and user workflows therefore
 remain unassessed; this result proves reusable background, isolated-content,
 and popup adaptation seams, not Proton compatibility.
 
-A separately indexed, Zephium-owned MV3 fixture now gates the package-neutral
+A separately indexed, Drift-owned MV3 fixture now gates the package-neutral
 path without third-party bytes. `cargo xtask ci` materializes its exact source
 tree through the same offline transform and executes the result in public
 WKWebExtension APIs. On the reviewed macOS 26.6.1 runtime, native namespace
@@ -3094,7 +3094,7 @@ Mutating commands return an `OperationAdmission` and later emit a correlated
 `OperationDisposition`; IPC must not discard either admission failure or a
 backend/store rejection. `Deferred` means the actor queued native/store work,
 not that navigation, reload, or rendering completed. Native-runtime update
-state uses the stable typed `zephium:runtime-status` event. Its security facts
+state uses the stable typed `drift:runtime-status` event. Its security facts
 are a bounded canonical set rather than one lossy highest-priority message, so
 UI presentation can evolve without changing the native admission boundary.
 
@@ -3103,7 +3103,7 @@ UI presentation can evolve without changing the native admission boundary.
 ## 13. Platform layer
 
 Linux is not a supported platform at launch: `run()` in `desktop/src/lib.rs`
-prints that Zephium isn't available on Linux yet and exits 1. The Linux code
+prints that Drift isn't available on Linux yet and exits 1. The Linux code
 stays in the tree and CI keeps it compiling, but no Linux build ships. Native
 code is written against the OS it runs on; no blind ports. CI keeps all
 targets compiling (§14). The current source-level/native checks do not replace the
@@ -3134,7 +3134,7 @@ target-gated. Linux caveat: content views on Linux are created via
 composition root (wry positions children only inside a Fixed;
 raw-window-handle child-building is not the GTK path).
 
-Current foundation status: seams live in `zephium-engine/src/platform/` and
+Current foundation status: seams live in `drift-engine/src/platform/` and
 `desktop/src/platform/` (cfg-selected modules, one per OS, same inherent
 surface). All three implement chrome positioning, content layout, native
 navigation probes, and per-profile engine partitions. On macOS the overlay
@@ -3220,7 +3220,7 @@ splits, CI depth, exact reducer composition.
 
 ## 17. Persistence
 
-`zephium-store`, SQLite via rusqlite (the plain `bundled` feature ships
+`drift-store`, SQLite via rusqlite (the plain `bundled` feature ships
 FTS5; a test guards it).
 
 - **Storage is an actor**: rusqlite is blocking; a storage actor owns the

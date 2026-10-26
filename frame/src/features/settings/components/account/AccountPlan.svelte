@@ -33,7 +33,7 @@
   /** Under billing review nothing new is bought; export, the portal and downgrades remain. */
   const review = $derived(account?.billing_review === true);
   const change = $derived(account?.plan_change ?? null);
-  // Off, the plan stays and Zephium AI's usage and credits leave with Work.
+  // Off, the plan stays and Drift AI's usage and credits leave with Work.
   const ai = $derived(preferences.aiEnabled());
   /** Credits exist only where the server states how many units make one. */
   const per = $derived(usage?.credit_units ?? null);

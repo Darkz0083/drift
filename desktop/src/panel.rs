@@ -35,7 +35,7 @@ thread_local! {
     static FADE: Cell<u64> = const { Cell::new(0) };
 }
 
-/// Zephium's own Reduce Motion preference, alongside the system's.
+/// Drift's own Reduce Motion preference, alongside the system's.
 static REDUCE_MOTION: AtomicBool = AtomicBool::new(false);
 
 pub fn set_reduce_motion(reduce: bool) {
@@ -109,7 +109,7 @@ pub fn shapes_active() -> bool {
     MainThreadMarker::new().is_some() && shapes::active()
 }
 
-pub fn layout(layout: &zephium_ipc::PanelLayout, animate: bool) {
+pub fn layout(layout: &drift_ipc::PanelLayout, animate: bool) {
     if MainThreadMarker::new().is_some() {
         shapes::apply(layout, animate);
     }

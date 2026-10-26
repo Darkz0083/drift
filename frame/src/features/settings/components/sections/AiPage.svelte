@@ -17,7 +17,7 @@
   import SettingsRow from "$shared/ui/SettingsRow";
   import AiProviderRow from "../AiProviderRow.svelte";
   import AiVoiceRow from "../AiVoiceRow.svelte";
-  import AiZephiumRow from "../AiZephiumRow.svelte";
+  import AiDriftRow from "../AiDriftRow.svelte";
   import WorkDecisions from "../WorkDecisions.svelte";
 
   let profile = $derived(tabs.profile());
@@ -97,7 +97,7 @@
 {:else}
   {#if !anyUsable}<p class="ai-note">{m.ai_byok_start()}</p>{/if}
 
-  <AiZephiumRow />
+  <AiDriftRow />
 
   <SettingsGroup title={m.ai_keys_group()} description={m.ai_keys_note()}>
     {#if session}{#each keyedProviders as provider (provider)}<AiProviderRow

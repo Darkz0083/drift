@@ -23,7 +23,7 @@ vi.mock("$shared/ipc/bindings", async () => {
 vi.mock("$domain/tabs", () => ({
   tabs: {
     profile: () => ({ id: native.profile }),
-    activeTab: () => ({ url: "https://github.com/zephium/browser", title: "Zephium on GitHub" }),
+    activeTab: () => ({ url: "https://github.com/drift/browser", title: "Drift on GitHub" }),
   },
 }));
 vi.mock("$domain/surface", () => ({ surface: { open: vi.fn() } }));
@@ -43,7 +43,7 @@ async function setup(scope: "today" | "all" = "today") {
   await session.create({
     title: "Review the browser task experience",
     dueDate: dayKey(new Date()),
-    context: { url: "https://github.com/zephium/browser", title: "Browser design review" },
+    context: { url: "https://github.com/drift/browser", title: "Browser design review" },
   });
   await session.create({ title: "Write the launch notes", dueDate: dayKey(new Date()) });
   const screen = await render(PageHost);
@@ -107,7 +107,7 @@ test("page capture opens an editable composer and keeps the source separate", as
     )
     .toContainEqual({
       title: "Review the pull request",
-      context: "https://github.com/zephium/browser",
+      context: "https://github.com/drift/browser",
     });
 });
 
@@ -137,7 +137,7 @@ test("lists, priorities and subtasks form a persistent task workflow", async () 
   const { screen, session, server } = await setup("all");
   await screen.getByRole("button", { name: "New list", exact: true }).first().click();
   const name = screen.getByRole("textbox", { name: "List name", exact: true });
-  await name.fill("Zephium");
+  await name.fill("Drift");
   await name.click();
   await userEvent.keyboard("{Enter}");
   await expect.poll(() => session.lists.length).toBe(1);
@@ -149,7 +149,7 @@ test("lists, priorities and subtasks form a persistent task workflow", async () 
     list: list.id,
     dueDate: dayKey(new Date()),
     priority: "high",
-    context: { url: "https://github.com/zephium/browser", title: "Zephium · task experience" },
+    context: { url: "https://github.com/drift/browser", title: "Drift · task experience" },
   }))!;
   await session.create({
     title: "Refine the new tab experience",

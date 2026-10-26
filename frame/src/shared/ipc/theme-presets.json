@@ -9,13 +9,13 @@
       "dark": "#1f1f22",
       "light": "#e6e6e9"
     },
-    "id": "zephium",
+    "id": "drift",
     "light": {
       "accent": "#222226",
       "bg": "#f1f1f3",
       "fg": "#1c1c1f"
     },
-    "name": "Zephium"
+    "name": "Drift"
   },
   {
     "dark": {

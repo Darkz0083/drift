@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import test from 'node:test';
 
-const source = readFileSync(new URL('../crates/zephium-engine/src/platform/automatic_pip.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../crates/drift-engine/src/platform/automatic_pip.js', import.meta.url), 'utf8');
 function fixture() {
   const listeners = new Map();
   const doc = {

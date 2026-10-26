@@ -6,128 +6,128 @@ use std::process::Command;
 
 use serde::Deserialize;
 
-const AGENTIC_MANIFEST: &str = "crates/zephium-agentic/Cargo.toml";
-const AGENTIC_ROOT: &str = "crates/zephium-agentic/src/lib.rs";
-const AGENTIC_FIXTURE_SERVER: &str = "crates/zephium-agentic/src/fixture_server.rs";
-const AGENTIC_PROBE_EVIDENCE_PATH: &str = "crates/zephium-agentic/src/probe_evidence_path.rs";
-const AGENTIC_PROVIDER_ROOT: &str = "crates/zephium-agentic/src/agent_provider.rs";
+const AGENTIC_MANIFEST: &str = "crates/drift-agentic/Cargo.toml";
+const AGENTIC_ROOT: &str = "crates/drift-agentic/src/lib.rs";
+const AGENTIC_FIXTURE_SERVER: &str = "crates/drift-agentic/src/fixture_server.rs";
+const AGENTIC_PROBE_EVIDENCE_PATH: &str = "crates/drift-agentic/src/probe_evidence_path.rs";
+const AGENTIC_PROVIDER_ROOT: &str = "crates/drift-agentic/src/agent_provider.rs";
 const AGENTIC_WINDOWS_REVIEW_BINARY: &str =
-    "crates/zephium-agentic/src/bin/windows_agentic_input_evidence_review.rs";
+    "crates/drift-agentic/src/bin/windows_agentic_input_evidence_review.rs";
 const AGENTIC_WINDOWS_SEMANTIC_REVIEW_BINARY: &str =
-    "crates/zephium-agentic/src/bin/windows_agentic_semantic_evidence_review.rs";
+    "crates/drift-agentic/src/bin/windows_agentic_semantic_evidence_review.rs";
 const AGENTIC_WINDOWS_SEMANTIC_EVIDENCE: &str =
-    "crates/zephium-agentic/src/semantic_probe_evidence.rs";
-const AGENTIC_PROBE_QUALIFICATION: &str = "crates/zephium-agentic/src/probe_qualification.rs";
-const AGENTIC_PROVIDER_REQUEST: &str = "crates/zephium-agentic/src/agent_provider/request.rs";
+    "crates/drift-agentic/src/semantic_probe_evidence.rs";
+const AGENTIC_PROBE_QUALIFICATION: &str = "crates/drift-agentic/src/probe_qualification.rs";
+const AGENTIC_PROVIDER_REQUEST: &str = "crates/drift-agentic/src/agent_provider/request.rs";
 const AGENTIC_PROVIDER_CONTINUATION: &str =
-    "crates/zephium-agentic/src/agent_provider/continuation.rs";
-const AGENTIC_PROVIDER_TOOL: &str = "crates/zephium-agentic/src/agent_provider/tool.rs";
-const AGENTIC_PROVIDER_OPENAI: &str = "crates/zephium-agentic/src/agent_provider/openai.rs";
-const AGENTIC_PROVIDER_ANTHROPIC: &str = "crates/zephium-agentic/src/agent_provider/anthropic.rs";
-const AGENTIC_PROVIDER_PRICING: &str = "crates/zephium-agentic/src/agent_provider/pricing.rs";
-const AGENTIC_PROVIDER_SETTLEMENT: &str = "crates/zephium-agentic/src/agent_provider/settlement.rs";
-const AGENTIC_POLICY: &str = "crates/zephium-agentic/src/agent_policy.rs";
-const AGENTIC_EFFECT_POLICY: &str = "crates/zephium-agentic/src/agent_policy/effect.rs";
-const AGENTIC_AUDIT: &str = "crates/zephium-agentic/src/agent_audit.rs";
-const AGENTIC_ACTION_METRICS: &str = "crates/zephium-agentic/src/agent_action_metrics.rs";
-const AGENTIC_INPUT_METRICS: &str = "crates/zephium-agentic/src/agent_input_metrics.rs";
-const AGENTIC_LIFECYCLE: &str = "crates/zephium-agentic/src/agent_lifecycle.rs";
-const AGENTIC_METRIC_CLOSURE: &str = "crates/zephium-agentic/src/agent_metric_closure.rs";
-const AGENTIC_METRICS: &str = "crates/zephium-agentic/src/agent_metrics.rs";
-const AGENTIC_NATIVE_SHUTDOWN: &str = "crates/zephium-agentic/src/agent_native_shutdown.rs";
+    "crates/drift-agentic/src/agent_provider/continuation.rs";
+const AGENTIC_PROVIDER_TOOL: &str = "crates/drift-agentic/src/agent_provider/tool.rs";
+const AGENTIC_PROVIDER_OPENAI: &str = "crates/drift-agentic/src/agent_provider/openai.rs";
+const AGENTIC_PROVIDER_ANTHROPIC: &str = "crates/drift-agentic/src/agent_provider/anthropic.rs";
+const AGENTIC_PROVIDER_PRICING: &str = "crates/drift-agentic/src/agent_provider/pricing.rs";
+const AGENTIC_PROVIDER_SETTLEMENT: &str = "crates/drift-agentic/src/agent_provider/settlement.rs";
+const AGENTIC_POLICY: &str = "crates/drift-agentic/src/agent_policy.rs";
+const AGENTIC_EFFECT_POLICY: &str = "crates/drift-agentic/src/agent_policy/effect.rs";
+const AGENTIC_AUDIT: &str = "crates/drift-agentic/src/agent_audit.rs";
+const AGENTIC_ACTION_METRICS: &str = "crates/drift-agentic/src/agent_action_metrics.rs";
+const AGENTIC_INPUT_METRICS: &str = "crates/drift-agentic/src/agent_input_metrics.rs";
+const AGENTIC_LIFECYCLE: &str = "crates/drift-agentic/src/agent_lifecycle.rs";
+const AGENTIC_METRIC_CLOSURE: &str = "crates/drift-agentic/src/agent_metric_closure.rs";
+const AGENTIC_METRICS: &str = "crates/drift-agentic/src/agent_metrics.rs";
+const AGENTIC_NATIVE_SHUTDOWN: &str = "crates/drift-agentic/src/agent_native_shutdown.rs";
 const AGENTIC_NATIVE_SHUTDOWN_DRIVER: &str =
-    "crates/zephium-agentic/src/agent_native_shutdown_driver.rs";
-const AGENTIC_PROGRESS_METRICS: &str = "crates/zephium-agentic/src/agent_progress_metrics.rs";
-const AGENTIC_SEMANTIC: &str = "crates/zephium-agentic/src/semantic.rs";
-const AGENTIC_SEMANTIC_WIRE: &str = "crates/zephium-agentic/src/semantic_wire.rs";
-const AGENTIC_SEMANTIC_DIFF: &str = "crates/zephium-agentic/src/semantic_diff.rs";
-const AGENTIC_SEMANTIC_DIFF_MODEL: &str = "crates/zephium-agentic/src/semantic_diff_model.rs";
-const AGENTIC_SEMANTIC_LOCATE: &str = "crates/zephium-agentic/src/semantic_locate.rs";
-const AGENTIC_SEMANTIC_LOCATE_MODEL: &str = "crates/zephium-agentic/src/semantic_locate_model.rs";
-const AGENTIC_SEMANTIC_READ: &str = "crates/zephium-agentic/src/semantic_read.rs";
-const AGENTIC_SEMANTIC_READ_MODEL: &str = "crates/zephium-agentic/src/semantic_read_model.rs";
-const AGENTIC_SEMANTIC_EXTRACT: &str = "crates/zephium-agentic/src/semantic_extract.rs";
-const AGENTIC_SEMANTIC_EXTRACT_MODEL: &str = "crates/zephium-agentic/src/semantic_extract_model.rs";
-const AGENTIC_PROVIDER_EXTRACTION: &str = "crates/zephium-agentic/src/agent_provider/extraction.rs";
-const AGENTIC_SEMANTIC_ACTION: &str = "crates/zephium-agentic/src/semantic_action.rs";
+    "crates/drift-agentic/src/agent_native_shutdown_driver.rs";
+const AGENTIC_PROGRESS_METRICS: &str = "crates/drift-agentic/src/agent_progress_metrics.rs";
+const AGENTIC_SEMANTIC: &str = "crates/drift-agentic/src/semantic.rs";
+const AGENTIC_SEMANTIC_WIRE: &str = "crates/drift-agentic/src/semantic_wire.rs";
+const AGENTIC_SEMANTIC_DIFF: &str = "crates/drift-agentic/src/semantic_diff.rs";
+const AGENTIC_SEMANTIC_DIFF_MODEL: &str = "crates/drift-agentic/src/semantic_diff_model.rs";
+const AGENTIC_SEMANTIC_LOCATE: &str = "crates/drift-agentic/src/semantic_locate.rs";
+const AGENTIC_SEMANTIC_LOCATE_MODEL: &str = "crates/drift-agentic/src/semantic_locate_model.rs";
+const AGENTIC_SEMANTIC_READ: &str = "crates/drift-agentic/src/semantic_read.rs";
+const AGENTIC_SEMANTIC_READ_MODEL: &str = "crates/drift-agentic/src/semantic_read_model.rs";
+const AGENTIC_SEMANTIC_EXTRACT: &str = "crates/drift-agentic/src/semantic_extract.rs";
+const AGENTIC_SEMANTIC_EXTRACT_MODEL: &str = "crates/drift-agentic/src/semantic_extract_model.rs";
+const AGENTIC_PROVIDER_EXTRACTION: &str = "crates/drift-agentic/src/agent_provider/extraction.rs";
+const AGENTIC_SEMANTIC_ACTION: &str = "crates/drift-agentic/src/semantic_action.rs";
 const AGENTIC_SEMANTIC_ACTION_BATCH_RESULT: &str =
-    "crates/zephium-agentic/src/semantic_action_batch_result.rs";
-const AGENTIC_SEMANTIC_ACTION_RESULT: &str = "crates/zephium-agentic/src/semantic_action_result.rs";
-const AGENTIC_SEMANTIC_EXECUTE: &str = "crates/zephium-agentic/src/semantic_execute.rs";
+    "crates/drift-agentic/src/semantic_action_batch_result.rs";
+const AGENTIC_SEMANTIC_ACTION_RESULT: &str = "crates/drift-agentic/src/semantic_action_result.rs";
+const AGENTIC_SEMANTIC_EXECUTE: &str = "crates/drift-agentic/src/semantic_execute.rs";
 const AGENTIC_SEMANTIC_EXECUTE_COORDINATOR: &str =
-    "crates/zephium-agentic/src/semantic_execute_coordinator.rs";
+    "crates/drift-agentic/src/semantic_execute_coordinator.rs";
 const AGENTIC_SEMANTIC_SETTLE_COORDINATOR: &str =
-    "crates/zephium-agentic/src/semantic_settle_coordinator.rs";
-const AGENTIC_SEMANTIC_SETTLE: &str = "crates/zephium-agentic/src/semantic_settle.rs";
-const AGENTIC_SEMANTIC_SCREENSHOT: &str = "crates/zephium-agentic/src/semantic_screenshot.rs";
-const AGENTIC_SEMANTIC_VERIFY: &str = "crates/zephium-agentic/src/semantic_verify.rs";
-const AGENTIC_CONTEXT_PORT: &str = "crates/zephium-agentic/src/context_port.rs";
-const AGENTIC_CONTEXT_REGISTRY: &str = "crates/zephium-agentic/src/context_registry.rs";
-const AGENTIC_COOKIE_TRANSFER: &str = "crates/zephium-agentic/src/cookie_transfer.rs";
-const AGENTIC_PROFILE_LEASE: &str = "crates/zephium-agentic/src/profile_lease.rs";
-const AGENTIC_SUPERVISOR: &str = "crates/zephium-agentic/src/agent_supervisor.rs";
-const AGENTIC_SUPERVISOR_RUNTIME: &str = "crates/zephium-agentic/src/agent_supervisor/runtime.rs";
+    "crates/drift-agentic/src/semantic_settle_coordinator.rs";
+const AGENTIC_SEMANTIC_SETTLE: &str = "crates/drift-agentic/src/semantic_settle.rs";
+const AGENTIC_SEMANTIC_SCREENSHOT: &str = "crates/drift-agentic/src/semantic_screenshot.rs";
+const AGENTIC_SEMANTIC_VERIFY: &str = "crates/drift-agentic/src/semantic_verify.rs";
+const AGENTIC_CONTEXT_PORT: &str = "crates/drift-agentic/src/context_port.rs";
+const AGENTIC_CONTEXT_REGISTRY: &str = "crates/drift-agentic/src/context_registry.rs";
+const AGENTIC_COOKIE_TRANSFER: &str = "crates/drift-agentic/src/cookie_transfer.rs";
+const AGENTIC_PROFILE_LEASE: &str = "crates/drift-agentic/src/profile_lease.rs";
+const AGENTIC_SUPERVISOR: &str = "crates/drift-agentic/src/agent_supervisor.rs";
+const AGENTIC_SUPERVISOR_RUNTIME: &str = "crates/drift-agentic/src/agent_supervisor/runtime.rs";
 const AGENTIC_SUPERVISOR_PROGRESS: &str =
-    "crates/zephium-agentic/src/agent_supervisor/runtime/progress.rs";
+    "crates/drift-agentic/src/agent_supervisor/runtime/progress.rs";
 const AGENTIC_SUPERVISOR_CONTEXT_SCHEDULE: &str =
-    "crates/zephium-agentic/src/agent_supervisor/runtime/context_schedule.rs";
-const APP_MANIFEST: &str = "crates/zephium-app/Cargo.toml";
-const APP_ROOT: &str = "crates/zephium-app/src/lib.rs";
-const APP_API: &str = "crates/zephium-app/src/api.rs";
-const APP_ACTOR: &str = "crates/zephium-app/src/actor/mod.rs";
-const APP_SHELL: &str = "crates/zephium-app/src/shell/mod.rs";
+    "crates/drift-agentic/src/agent_supervisor/runtime/context_schedule.rs";
+const APP_MANIFEST: &str = "crates/drift-app/Cargo.toml";
+const APP_ROOT: &str = "crates/drift-app/src/lib.rs";
+const APP_API: &str = "crates/drift-app/src/api.rs";
+const APP_ACTOR: &str = "crates/drift-app/src/actor/mod.rs";
+const APP_SHELL: &str = "crates/drift-app/src/shell/mod.rs";
 const DESKTOP_MANIFEST: &str = "desktop/Cargo.toml";
-const STORE_ACTOR: &str = "crates/zephium-store/src/actor.rs";
-const STORE_AGENT_AUDIT_ACTOR: &str = "crates/zephium-store/src/actor/agent_audit.rs";
-const STORE_AGENT_AUDIT_HUB: &str = "crates/zephium-store/src/hub/agent_audit.rs";
-const PROVIDER_TRANSPORT_MANIFEST: &str = "crates/zephium-agentic/Cargo.toml";
-const PROVIDER_TRANSPORT_ROOT: &str = "crates/zephium-agentic/src/provider_transport.rs";
+const STORE_ACTOR: &str = "crates/drift-store/src/actor.rs";
+const STORE_AGENT_AUDIT_ACTOR: &str = "crates/drift-store/src/actor/agent_audit.rs";
+const STORE_AGENT_AUDIT_HUB: &str = "crates/drift-store/src/hub/agent_audit.rs";
+const PROVIDER_TRANSPORT_MANIFEST: &str = "crates/drift-agentic/Cargo.toml";
+const PROVIDER_TRANSPORT_ROOT: &str = "crates/drift-agentic/src/provider_transport.rs";
 const PROVIDER_TRANSPORT_FACADE_MANIFEST: &str =
-    "crates/zephium-agent-provider-transport/Cargo.toml";
-const PROVIDER_TRANSPORT_FACADE_ROOT: &str = "crates/zephium-agent-provider-transport/src/lib.rs";
-const ENGINE_MANIFEST: &str = "crates/zephium-engine/Cargo.toml";
-const ENGINE_ROOT: &str = "crates/zephium-engine/src/lib.rs";
-const ENGINE_PLATFORM_MODULE: &str = "crates/zephium-engine/src/platform/mod.rs";
-const ENGINE_HOST_ROOT: &str = "crates/zephium-engine/src/host/mod.rs";
-const ENGINE_AGENT_CONTEXT_PORT: &str = "crates/zephium-engine/src/agent_context_port.rs";
-const ENGINE_AGENT_CONTEXT_HOST: &str = "crates/zephium-engine/src/host/agent_context.rs";
-const ENGINE_AGENT_COOKIE_SOURCE: &str = "crates/zephium-engine/src/host/agent_cookie_source.rs";
-const ENGINE_MACOS_MODULE: &str = "crates/zephium-engine/src/platform/macos/mod.rs";
+    "crates/drift-agent-provider-transport/Cargo.toml";
+const PROVIDER_TRANSPORT_FACADE_ROOT: &str = "crates/drift-agent-provider-transport/src/lib.rs";
+const ENGINE_MANIFEST: &str = "crates/drift-engine/Cargo.toml";
+const ENGINE_ROOT: &str = "crates/drift-engine/src/lib.rs";
+const ENGINE_PLATFORM_MODULE: &str = "crates/drift-engine/src/platform/mod.rs";
+const ENGINE_HOST_ROOT: &str = "crates/drift-engine/src/host/mod.rs";
+const ENGINE_AGENT_CONTEXT_PORT: &str = "crates/drift-engine/src/agent_context_port.rs";
+const ENGINE_AGENT_CONTEXT_HOST: &str = "crates/drift-engine/src/host/agent_context.rs";
+const ENGINE_AGENT_COOKIE_SOURCE: &str = "crates/drift-engine/src/host/agent_cookie_source.rs";
+const ENGINE_MACOS_MODULE: &str = "crates/drift-engine/src/platform/macos/mod.rs";
 const ENGINE_MACOS_AGENT_CONTEXT: &str =
-    "crates/zephium-engine/src/platform/macos/agent_context.rs";
+    "crates/drift-engine/src/platform/macos/agent_context.rs";
 const ENGINE_MACOS_SEMANTIC_RUNTIME: &str =
-    "crates/zephium-engine/src/platform/macos/semantic_runtime.rs";
+    "crates/drift-engine/src/platform/macos/semantic_runtime.rs";
 const ENGINE_MACOS_SEMANTIC_ACTION: &str =
-    "crates/zephium-engine/src/platform/macos/semantic_action.rs";
+    "crates/drift-engine/src/platform/macos/semantic_action.rs";
 const ENGINE_MACOS_SEMANTIC_SCREENSHOT: &str =
-    "crates/zephium-engine/src/platform/macos/semantic_screenshot.rs";
+    "crates/drift-engine/src/platform/macos/semantic_screenshot.rs";
 const ENGINE_MACOS_SEMANTIC_PROBE: &str =
-    "crates/zephium-engine/src/platform/macos/agentic_semantic_probe.rs";
+    "crates/drift-engine/src/platform/macos/agentic_semantic_probe.rs";
 const ENGINE_MACOS_RENDERING_PROBE: &str =
-    "crates/zephium-engine/src/platform/macos/agentic_rendering_probe.rs";
+    "crates/drift-engine/src/platform/macos/agentic_rendering_probe.rs";
 const ENGINE_MACOS_RENDERING_OPPORTUNITY_PROBE: &str =
-    "crates/zephium-engine/src/platform/macos/agentic_rendering_opportunity_probe.rs";
+    "crates/drift-engine/src/platform/macos/agentic_rendering_opportunity_probe.rs";
 const ENGINE_MACOS_RENDERING_PRESENTED_PROBE: &str =
-    "crates/zephium-engine/src/platform/macos/agentic_rendering_presented_probe.rs";
-const ENGINE_WINDOWS_MODULE: &str = "crates/zephium-engine/src/platform/windows/mod.rs";
+    "crates/drift-engine/src/platform/macos/agentic_rendering_presented_probe.rs";
+const ENGINE_WINDOWS_MODULE: &str = "crates/drift-engine/src/platform/windows/mod.rs";
 const ENGINE_WINDOWS_AGENT_CONTEXT: &str =
-    "crates/zephium-engine/src/platform/windows/agent_context.rs";
-const ENGINE_WINDOWS_AGENT_TIMEOUT: &str = "crates/zephium-engine/src/platform/windows/timeout.rs";
-const ENGINE_AGENT_NAVIGATION: &str = "crates/zephium-engine/src/platform/agent_navigation.rs";
-const ENGINE_AGENT_SUSPENSION: &str = "crates/zephium-engine/src/platform/agent_suspension.rs";
+    "crates/drift-engine/src/platform/windows/agent_context.rs";
+const ENGINE_WINDOWS_AGENT_TIMEOUT: &str = "crates/drift-engine/src/platform/windows/timeout.rs";
+const ENGINE_AGENT_NAVIGATION: &str = "crates/drift-engine/src/platform/agent_navigation.rs";
+const ENGINE_AGENT_SUSPENSION: &str = "crates/drift-engine/src/platform/agent_suspension.rs";
 const ENGINE_AGENT_SCREENSHOT_BUFFER: &str =
-    "crates/zephium-engine/src/platform/agent_screenshot_buffer.rs";
+    "crates/drift-engine/src/platform/agent_screenshot_buffer.rs";
 const ENGINE_AGENT_COOKIE_PREFLIGHT: &str =
-    "crates/zephium-engine/src/platform/agent_cookie_preflight.rs";
+    "crates/drift-engine/src/platform/agent_cookie_preflight.rs";
 const ENGINE_WINDOWS_COOKIE_TRANSFER: &str =
-    "crates/zephium-engine/src/platform/windows/cookie_transfer.rs";
+    "crates/drift-engine/src/platform/windows/cookie_transfer.rs";
 const ENGINE_WINDOWS_SEMANTIC_PROTOCOL: &str =
-    "crates/zephium-engine/src/platform/agent_semantic_cdp_protocol.rs";
+    "crates/drift-engine/src/platform/agent_semantic_cdp_protocol.rs";
 const ENGINE_WINDOWS_SEMANTIC_RUNTIME: &str =
-    "crates/zephium-engine/src/platform/windows/semantic_runtime.rs";
+    "crates/drift-engine/src/platform/windows/semantic_runtime.rs";
 const ENGINE_WINDOWS_SEMANTIC_SCREENSHOT: &str =
-    "crates/zephium-engine/src/platform/windows/semantic_screenshot.rs";
-const ENGINE_HOST_CONTENT_RULES: &str = "crates/zephium-engine/src/host/content_rules.rs";
+    "crates/drift-engine/src/platform/windows/semantic_screenshot.rs";
+const ENGINE_HOST_CONTENT_RULES: &str = "crates/drift-engine/src/host/content_rules.rs";
 const ENGINE_AGENTIC_NATIVE_UNSAFE_MODULES: [&str; 9] = [
     ENGINE_MACOS_AGENT_CONTEXT,
     ENGINE_MACOS_SEMANTIC_RUNTIME,
@@ -167,24 +167,24 @@ const AGENTIC_NO_DIRECT_LOGGING_ATTRIBUTE: &str =
 const AGENTIC_NO_INVARIANT_PANIC_ATTRIBUTE: &str =
     "#![cfg_attr(not(test),deny(clippy::panic,clippy::unreachable,clippy::unwrap_used))]";
 const ENGINE_MACOS_PROBE_MODULE: &str =
-    "crates/zephium-engine/src/platform/macos/agentic_input_probe.rs";
+    "crates/drift-engine/src/platform/macos/agentic_input_probe.rs";
 const ENGINE_WINDOWS_PROBE_MODULE: &str =
-    "crates/zephium-engine/src/platform/windows/agentic_input_probe.rs";
+    "crates/drift-engine/src/platform/windows/agentic_input_probe.rs";
 const ENGINE_WINDOWS_PROBE_RESOURCES: &str =
-    "crates/zephium-engine/src/platform/windows/agentic_probe_resources.rs";
+    "crates/drift-engine/src/platform/windows/agentic_probe_resources.rs";
 const ENGINE_WINDOWS_SEMANTIC_PROBE_MODULE: &str =
-    "crates/zephium-engine/src/platform/windows/agentic_semantic_probe.rs";
+    "crates/drift-engine/src/platform/windows/agentic_semantic_probe.rs";
 const ENGINE_MACOS_PROBE_BINARY: &str =
-    "crates/zephium-engine/src/bin/macos_agentic_input_probe.rs";
+    "crates/drift-engine/src/bin/macos_agentic_input_probe.rs";
 const ENGINE_MACOS_SEMANTIC_PROBE_BINARY: &str =
-    "crates/zephium-engine/src/bin/macos_agentic_semantic_probe.rs";
+    "crates/drift-engine/src/bin/macos_agentic_semantic_probe.rs";
 const ENGINE_WINDOWS_PROBE_BINARY: &str =
-    "crates/zephium-engine/src/bin/windows_agentic_input_probe.rs";
+    "crates/drift-engine/src/bin/windows_agentic_input_probe.rs";
 const ENGINE_WINDOWS_SEMANTIC_PROBE_BINARY: &str =
-    "crates/zephium-engine/src/bin/windows_agentic_semantic_probe.rs";
+    "crates/drift-engine/src/bin/windows_agentic_semantic_probe.rs";
 const NIGHTLY_WORKFLOW: &str = ".github/workflows/nightly.yml";
 const WINDOWS_AGENTIC_QUALIFICATION_SCRIPT: &str = "scripts/qualification/windows-agentic.ps1";
-const AGENTIC_SOURCE_DIRECTORY: &str = "crates/zephium-agentic/src";
+const AGENTIC_SOURCE_DIRECTORY: &str = "crates/drift-agentic/src";
 const AGENTIC_DIAGNOSTIC_MODULES: [&str; 11] = [
     "contract.rs",
     "control.rs",
@@ -198,7 +198,7 @@ const AGENTIC_DIAGNOSTIC_MODULES: [&str; 11] = [
     "windows_agentic_input_evidence_review.rs",
     "windows_agentic_semantic_evidence_review.rs",
 ];
-const SHIPPING_ROOTS: [&str; 2] = ["desktop", "crates/zephium-app"];
+const SHIPPING_ROOTS: [&str; 2] = ["desktop", "crates/drift-app"];
 const RELEASE_REFUSAL: &str = concat!(
     "#[cfg(all(feature=\"probe-harness\",not(debug_assertions)))]",
     "compile_error!(\"theagenticprobeharnessisforbiddeninoptimizedbuilds\");"
@@ -227,7 +227,7 @@ pub(crate) fn check(repository: &Path) -> Result<(), String> {
     )?;
     let agentic_root = read(repository.join(AGENTIC_ROOT))?;
     let fixed_runtime = compact(&read(
-        repository.join("crates/zephium-agentic/src/semantic_runtime.rs"),
+        repository.join("crates/drift-agentic/src/semantic_runtime.rs"),
     )?);
     for required in [
         "MAX_SEMANTIC_RUNTIME_SOURCE_BYTES:usize=216*1024;",
@@ -438,7 +438,7 @@ pub(crate) fn check(repository: &Path) -> Result<(), String> {
     validate_provider_transport_http2_ingress_boundary(&provider_transport_root)?;
     validate_provider_transport_shutdown_contract(
         &provider_transport_root,
-        &read(repository.join("crates/zephium-agentic/src/provider_transport/lead/keys.rs"))?,
+        &read(repository.join("crates/drift-agentic/src/provider_transport/lead/keys.rs"))?,
     )?;
     validate_agentic_no_direct_logging_attribute(
         PROVIDER_TRANSPORT_ROOT,
@@ -452,7 +452,7 @@ pub(crate) fn check(repository: &Path) -> Result<(), String> {
     validate_provider_secret_diagnostic_contract(&provider_transport_root)?;
     validate_provider_revocation_before_secret_materialization(&provider_transport_root)?;
     validate_chosen_model_drive_contract(&read(
-        repository.join("crates/zephium-agentic/src/provider_transport/model_client.rs"),
+        repository.join("crates/drift-agentic/src/provider_transport/model_client.rs"),
     )?)?;
     validate_engine_manifest(&read(repository.join(ENGINE_MANIFEST))?)?;
     validate_engine_root(&read(repository.join(ENGINE_ROOT))?)?;
@@ -697,8 +697,8 @@ fn validate_engine_manifest(source: &str) -> Result<(), String> {
         "dep:serde",
         "dep:tempfile",
         "dep:windows-probe-sys",
-        "dep:zephium-agentic",
-        "zephium-agentic/probe-harness",
+        "dep:drift-agentic",
+        "drift-agentic/probe-harness",
     ]
     .into_iter()
     .collect::<BTreeSet<_>>();
@@ -767,7 +767,7 @@ fn validate_engine_manifest(source: &str) -> Result<(), String> {
         .ok_or_else(|| "engine agentic-browser feature is missing".to_owned())?;
     if production_feature.as_slice()
         != [
-            toml::Value::String("dep:zephium-agentic".to_owned()),
+            toml::Value::String("dep:drift-agentic".to_owned()),
             toml::Value::String("dep:zeroize".to_owned()),
             toml::Value::String("dep:image".to_owned()),
         ]
@@ -814,7 +814,7 @@ fn validate_engine_manifest(source: &str) -> Result<(), String> {
         "agentic-browser",
         "dep:tempfile",
         "dep:windows-probe-sys",
-        "zephium-agentic/probe-harness",
+        "drift-agentic/probe-harness",
     ]
     .into_iter()
     .collect::<BTreeSet<_>>();
@@ -824,15 +824,15 @@ fn validate_engine_manifest(source: &str) -> Result<(), String> {
     }
     let agentic_dependency = manifest
         .get("dependencies")
-        .and_then(|dependencies| dependencies.get("zephium-agentic"))
+        .and_then(|dependencies| dependencies.get("drift-agentic"))
         .and_then(toml::Value::as_table)
-        .ok_or_else(|| "engine zephium-agentic dependency is missing".to_owned())?;
+        .ok_or_else(|| "engine drift-agentic dependency is missing".to_owned())?;
     if agentic_dependency
         .get("optional")
         .and_then(toml::Value::as_bool)
         != Some(true)
     {
-        return Err("engine zephium-agentic dependency must remain optional".to_owned());
+        return Err("engine drift-agentic dependency must remain optional".to_owned());
     }
     let zeroize_dependency = manifest
         .get("dependencies")
@@ -942,8 +942,8 @@ fn validate_engine_root(source: &str) -> Result<(), String> {
         "platform::macos::run_agentic_semantic_model_two_action_probe(",
         "#[cfg(all(target_os=\"windows\",feature=\"native-agentic-semantic-probe\"))]",
         "pubfnrun_windows_agentic_semantic_probe(",
-        "mode:zephium_agentic::WindowsSemanticProbeMode",
-        "Result<zephium_agentic::WindowsSemanticProbeEvidence,zephium_agentic::WindowsSemanticProbeFailure,>",
+        "mode:drift_agentic::WindowsSemanticProbeMode",
+        "Result<drift_agentic::WindowsSemanticProbeEvidence,drift_agentic::WindowsSemanticProbeFailure,>",
         "platform::windows::run_agentic_semantic_probe(request_id,mode)",
     ] {
         if !source.contains(required) {
@@ -1023,8 +1023,8 @@ fn validate_engine_agent_context_boundary(
     for required in [
         "#[cfg(feature=\"agentic-browser\")]modagent_context;",
         "#[cfg(all(feature=\"agentic-browser\",target_os=\"windows\"))]modagent_cookie_source;",
-        "agent_contexts:HashMap<zephium_agentic::ContextId,agent_context::AgentOwnedContext>",
-        "agent_cookie_transfers:HashMap<zephium_agentic::ContextCookieTransferId,agent_context::AgentPendingCookieTransfer",
+        "agent_contexts:HashMap<drift_agentic::ContextId,agent_context::AgentOwnedContext>",
+        "agent_cookie_transfers:HashMap<drift_agentic::ContextCookieTransferId,agent_context::AgentPendingCookieTransfer",
         "agent_cookie_quarantined_profiles:HashSet<ProfileId>",
     ] {
         if !host_root.contains(required) {
@@ -2134,7 +2134,7 @@ fn validate_engine_windows_agent_cookie_source(module: &str, source: &str) -> Re
         "GetCookies",
         "AddOrUpdateCookie",
         "DeleteAllCookies",
-        "usezephium_core::ids::ItemId",
+        "usedrift_core::ids::ItemId",
         "self.stages",
         "extension_document_authority",
         "extension_browser_surfaces",
@@ -2679,7 +2679,7 @@ fn validate_engine_semantic_runtime_boundary(source: &str) -> Result<(), String>
     if source.contains("program_probe") {
         for required in [
             "#[cfg(feature=\"native-agentic-semantic-probe\")]#[path=\"agentic_semantic_program_probe.rs\"]modprogram_probe;",
-            "#[cfg(any(not(feature=\"native-agentic-semantic-probe\"),test))]usezephium_agentic::SEMANTIC_RUNTIME_PROGRAM;",
+            "#[cfg(any(not(feature=\"native-agentic-semantic-probe\"),test))]usedrift_agentic::SEMANTIC_RUNTIME_PROGRAM;",
             "#[cfg(not(feature=\"native-agentic-semantic-probe\"))]letsource=NSString::from_str(SEMANTIC_RUNTIME_PROGRAM.installation_source());",
             "#[cfg(feature=\"native-agentic-semantic-probe\")]letsource=NSString::from_str(&program_probe::source());",
             "#[cfg(not(feature=\"native-agentic-semantic-probe\"))]letsource_mismatch=source.to_string()!=SEMANTIC_RUNTIME_PROGRAM.installation_source();",
@@ -2748,7 +2748,7 @@ fn validate_engine_semantic_runtime_boundary(source: &str) -> Result<(), String>
         "fnrevoked_settling_action",
         "self.phase==DocumentPhase::AuthorityRevoked&&self.settling_action(attempt)",
         "self.settling_action==Some(attempt)",
-        "super::semantic_action::map_runtime_fault(*fault)==zephium_agentic::SemanticActionNativeFailure::AppliedUnverified",
+        "super::semantic_action::map_runtime_fault(*fault)==drift_agentic::SemanticActionNativeFailure::AppliedUnverified",
         "DocumentPhase::AuthorityRevoked",
         "lethanded_off=self.awaiting_result&&matches!(self.pending,Some(PendingInvocation::Action{..}|PendingInvocation::Privacy{..}|PendingInvocation::Media{..}));",
         "fnretire",
@@ -2771,7 +2771,7 @@ fn validate_engine_semantic_runtime_boundary(source: &str) -> Result<(), String>
         "PAGE_WORLD_COMPATIBILITY_FILL_PROGRAM",
         "WKContentWorld::pageWorld",
         "page_relay",
-        "ZEPHIUM_PAGE_WORLD_FILL_RELAY_PROBE",
+        "DRIFT_PAGE_WORLD_FILL_RELAY_PROBE",
         "native-agentic-input-probe",
         "unreachable!",
     ] {
@@ -3459,10 +3459,10 @@ fn validate_windows_probe_ci(source: &str) -> Result<(), String> {
         "[ref]$tokens,[ref]$parseErrors",
         "if($parseErrors.Count-ne0)",
         "throw\"physicalWindowsagenticorchestratordidnotparse\"",
-        "cargoclippy--locked-pzephium-engine--featuresnative-agentic-input-probe--binwindows-agentic-input-probe",
-        "cargobuild--locked-pzephium-engine--featuresnative-agentic-input-probe--binwindows-agentic-input-probe",
-        "cargoclippy--locked-pzephium-engine--featuresnative-agentic-semantic-probe--binwindows-agentic-semantic-probe",
-        "cargobuild--locked-pzephium-engine--featuresnative-agentic-semantic-probe--binwindows-agentic-semantic-probe",
+        "cargoclippy--locked-pdrift-engine--featuresnative-agentic-input-probe--binwindows-agentic-input-probe",
+        "cargobuild--locked-pdrift-engine--featuresnative-agentic-input-probe--binwindows-agentic-input-probe",
+        "cargoclippy--locked-pdrift-engine--featuresnative-agentic-semantic-probe--binwindows-agentic-semantic-probe",
+        "cargobuild--locked-pdrift-engine--featuresnative-agentic-semantic-probe--binwindows-agentic-semantic-probe",
     ] {
         if !source.contains(required) {
             return Err(format!(
@@ -3503,13 +3503,13 @@ fn validate_windows_physical_workflow(source: &str) -> Result<(), String> {
         "Assert-ExactDirectoryEntries-Directory$evidenceDirectory-ExpectedNames$expectedBeforeReview",
         "Assert-ExactDirectoryEntries-Directory$evidenceDirectory-ExpectedNames$expectedAfterReview",
         "Invoke-Cargo-Arguments@(\"xtask\",\"check-agentic-probe-boundary\")",
-        "Invoke-Cargo-Arguments@(\"test\",\"--locked\",\"-p\",\"zephium-agentic\",\"--features\",\"probe-harness\")",
-        "Invoke-Cargo-Arguments@(\"test\",\"--locked\",\"-p\",\"zephium-engine\",\"--features\",\"agentic-browser\",\"--lib\")",
-        "Invoke-Cargo-Arguments@(\"check\",\"--locked\",\"-p\",\"zephium-engine\",\"--features\",\"agentic-browser\")",
-        "Invoke-Cargo-Arguments@(\"clippy\",\"--locked\",\"-p\",\"zephium-engine\",\"--features\",\"native-agentic-input-probe\",\"--bin\",\"windows-agentic-input-probe\")",
-        "Invoke-Cargo-Arguments@(\"build\",\"--locked\",\"-p\",\"zephium-engine\",\"--features\",\"native-agentic-input-probe\",\"--bin\",\"windows-agentic-input-probe\")",
-        "Invoke-Cargo-Arguments@(\"clippy\",\"--locked\",\"-p\",\"zephium-engine\",\"--features\",\"native-agentic-semantic-probe\",\"--bin\",\"windows-agentic-semantic-probe\")",
-        "Invoke-Cargo-Arguments@(\"build\",\"--locked\",\"-p\",\"zephium-engine\",\"--features\",\"native-agentic-semantic-probe\",\"--bin\",\"windows-agentic-semantic-probe\")",
+        "Invoke-Cargo-Arguments@(\"test\",\"--locked\",\"-p\",\"drift-agentic\",\"--features\",\"probe-harness\")",
+        "Invoke-Cargo-Arguments@(\"test\",\"--locked\",\"-p\",\"drift-engine\",\"--features\",\"agentic-browser\",\"--lib\")",
+        "Invoke-Cargo-Arguments@(\"check\",\"--locked\",\"-p\",\"drift-engine\",\"--features\",\"agentic-browser\")",
+        "Invoke-Cargo-Arguments@(\"clippy\",\"--locked\",\"-p\",\"drift-engine\",\"--features\",\"native-agentic-input-probe\",\"--bin\",\"windows-agentic-input-probe\")",
+        "Invoke-Cargo-Arguments@(\"build\",\"--locked\",\"-p\",\"drift-engine\",\"--features\",\"native-agentic-input-probe\",\"--bin\",\"windows-agentic-input-probe\")",
+        "Invoke-Cargo-Arguments@(\"clippy\",\"--locked\",\"-p\",\"drift-engine\",\"--features\",\"native-agentic-semantic-probe\",\"--bin\",\"windows-agentic-semantic-probe\")",
+        "Invoke-Cargo-Arguments@(\"build\",\"--locked\",\"-p\",\"drift-engine\",\"--features\",\"native-agentic-semantic-probe\",\"--bin\",\"windows-agentic-semantic-probe\")",
         "$preflightRevision=Get-SourceRevision-Repository$repository",
         "if($preflightRevision-cne$sourceRevision)",
         "$semanticProbeBinary=Join-Path$cargoTargetDirectory\"debug\\windows-agentic-semantic-probe.exe\"",
@@ -3632,7 +3632,7 @@ fn validate_windows_physical_workflow(source: &str) -> Result<(), String> {
         .find("Write-SourceStamp-Path(Join-Path$evidenceDirectory$sourceStampName)")
         .ok_or_else(|| "physical Windows qualification source stamp is missing".to_owned())?;
     let first_native_run = compact
-        .find("Invoke-Cargo-Arguments@(\"run\",\"--locked\",\"-p\",\"zephium-engine\",\"--features\",\"native-agentic-input-probe\",\"--bin\",\"windows-agentic-input-probe\",\"--\",\"--ci-hidden-fixed-dom\"")
+        .find("Invoke-Cargo-Arguments@(\"run\",\"--locked\",\"-p\",\"drift-engine\",\"--features\",\"native-agentic-input-probe\",\"--bin\",\"windows-agentic-input-probe\",\"--\",\"--ci-hidden-fixed-dom\"")
         .ok_or_else(|| "physical Windows qualification native run is missing".to_owned())?;
     if !(preflight < preflight_binary_hash
         && preflight_binary_hash < clean_recheck
@@ -3645,7 +3645,7 @@ fn validate_windows_physical_workflow(source: &str) -> Result<(), String> {
         );
     }
     let final_debugger_build = compact
-        .rfind("Invoke-Cargo-Arguments@(\"build\",\"--locked\",\"-p\",\"zephium-engine\",\"--features\",\"native-agentic-semantic-probe\",\"--bin\",\"windows-agentic-semantic-probe\")")
+        .rfind("Invoke-Cargo-Arguments@(\"build\",\"--locked\",\"-p\",\"drift-engine\",\"--features\",\"native-agentic-semantic-probe\",\"--bin\",\"windows-agentic-semantic-probe\")")
         .ok_or_else(|| "physical Windows qualification debugger build is missing".to_owned())?;
     let binary_hash_stamp = compact
         .find("Write-BinaryHashStamp-Path(Join-Path$evidenceDirectory$debuggerBinaryHashStampName)-Hash$semanticProbeBinaryHash")
@@ -3678,7 +3678,7 @@ fn validate_windows_physical_workflow(source: &str) -> Result<(), String> {
         .find("if($currentDebuggerBinaryHash-cne$recordedDebuggerBinaryHash)")
         .ok_or_else(|| "physical Windows qualification binary hash rejoin is missing".to_owned())?;
     let semantic_review = compact
-        .rfind("Invoke-Cargo-Arguments@(\"run\",\"--locked\",\"-p\",\"zephium-agentic\",\"--features\",\"probe-harness\",\"--bin\",\"windows-agentic-semantic-evidence-review\"")
+        .rfind("Invoke-Cargo-Arguments@(\"run\",\"--locked\",\"-p\",\"drift-agentic\",\"--features\",\"probe-harness\",\"--bin\",\"windows-agentic-semantic-evidence-review\"")
         .ok_or_else(|| "physical Windows qualification semantic reviewer is missing".to_owned())?;
     if !(recorded_binary_hash < binary_hash_rejoin && binary_hash_rejoin < semantic_review) {
         return Err(
@@ -3816,7 +3816,7 @@ fn validate_windows_probe_resource_sampler(module: &str, source: &str) -> Result
         "sample_resources_inner(environment,check_control,&mutfailure)",
         "pub(crate)fnsample_webview2_resources_diagnostic<E>(",
         "Ok((sample,failure))",
-        "usezephium_agentic::{MAX_RESOURCE_RESIDENT_BYTES,MAX_RESOURCE_WEBVIEW2_PROCESSES};",
+        "usedrift_agentic::{MAX_RESOURCE_RESIDENT_BYTES,MAX_RESOURCE_WEBVIEW2_PROCESSES};",
         "letenvironment=environment.cast::<ICoreWebView2Environment8>();check_control()?;letOk(environment)=environmentelse{*failure=Some(ResourceSampleFailure::Environment8Interface);returnOk(None);};",
         "letprocesses=unsafe{environment.GetProcessInfos()};check_control()?;letOk(processes)=processeselse{*failure=Some(ResourceSampleFailure::ProcessInfosQuery);returnOk(None);};",
         "letcount_result=unsafe{processes.Count(&mutcount)};check_control()?;ifcount_result.is_err()",
@@ -4304,19 +4304,19 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         .and_then(toml::Value::as_bool)
         != Some(false)
     {
-        return Err("zephium-agentic must remain an unpublished internal crate".to_owned());
+        return Err("drift-agentic must remain an unpublished internal crate".to_owned());
     }
     let harness = manifest
         .get("features")
         .and_then(|features| features.get("probe-harness"))
         .and_then(toml::Value::as_array)
-        .ok_or_else(|| "zephium-agentic probe-harness feature is missing".to_owned())?;
+        .ok_or_else(|| "drift-agentic probe-harness feature is missing".to_owned())?;
     // The harness may switch on the decision layer's eval corpus and nothing else.
     let harness = harness
         .iter()
         .map(|entry| entry.as_str().unwrap_or_default())
         .collect::<Vec<_>>();
-    if harness != ["zephium-decision?/evals"] {
+    if harness != ["drift-decision?/evals"] {
         return Err(
             "probe-harness must not activate an implicit dependency or shipping feature".to_owned(),
         );
@@ -4325,14 +4325,14 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         .get("features")
         .and_then(|features| features.get("default"))
         .and_then(toml::Value::as_array)
-        .ok_or_else(|| "zephium-agentic default feature is missing".to_owned())?;
+        .ok_or_else(|| "drift-agentic default feature is missing".to_owned())?;
     if !default.is_empty() {
-        return Err("zephium-agentic default feature set must remain empty".to_owned());
+        return Err("drift-agentic default feature set must remain empty".to_owned());
     }
     let dependencies = manifest
         .get("dependencies")
         .and_then(toml::Value::as_table)
-        .ok_or_else(|| "zephium-agentic dependency table is missing".to_owned())?;
+        .ok_or_else(|| "drift-agentic dependency table is missing".to_owned())?;
     let actual = dependencies
         .keys()
         .map(String::as_str)
@@ -4348,7 +4348,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         // typed decisions and their Retry-After parsing (77e1dbcf).
         "rig-core",
         "httpdate",
-        "zephium-decision",
+        "drift-decision",
         "serde",
         "serde_json",
         "sha2",
@@ -4357,13 +4357,13 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         "ulid",
         "url",
         "zeroize",
-        "zephium-core",
+        "drift-core",
     ]
     .into_iter()
     .collect::<BTreeSet<_>>();
     if actual != expected {
         return Err(
-            "zephium-agentic default dependency graph acquired unreviewed runtime authority"
+            "drift-agentic default dependency graph acquired unreviewed runtime authority"
                 .to_owned(),
         );
     }
@@ -4371,7 +4371,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         .get("features")
         .and_then(|features| features.get("provider-transport"))
         .and_then(toml::Value::as_array)
-        .ok_or_else(|| "zephium-agentic provider-transport feature is missing".to_owned())?;
+        .ok_or_else(|| "drift-agentic provider-transport feature is missing".to_owned())?;
     let actual_provider_transport = provider_transport
         .iter()
         .filter_map(toml::Value::as_str)
@@ -4386,22 +4386,22 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         "dep:security-framework-sys",
         "dep:tokio",
         "dep:zeroize",
-        "dep:zephium-decision",
-        "dep:zephium-credentials",
+        "dep:drift-decision",
+        "dep:drift-credentials",
     ]
     .into_iter()
     .collect::<BTreeSet<_>>();
     if actual_provider_transport != expected_provider_transport
         || actual_provider_transport.len() != provider_transport.len()
     {
-        return Err("zephium-agentic provider-transport feature graph drifted".to_owned());
+        return Err("drift-agentic provider-transport feature graph drifted".to_owned());
     }
     if dependencies
         .get("psl")
         .and_then(toml::Value::as_str)
         .is_none_or(|version| version != "=2.1.220")
     {
-        return Err("zephium-agentic suffix data must remain an exact plain pin".to_owned());
+        return Err("drift-agentic suffix data must remain an exact plain pin".to_owned());
     }
     let windows = manifest
         .get("target")
@@ -4410,7 +4410,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         .and_then(toml::Value::as_table)
         .ok_or_else(|| "Windows provider vault dependency is missing".to_owned())?;
     if windows.len() != 1
-        || windows.get("zephium-credentials").is_none_or(|dependency| {
+        || windows.get("drift-credentials").is_none_or(|dependency| {
             dependency.get("workspace").and_then(toml::Value::as_bool) != Some(true)
                 || dependency.get("optional").and_then(toml::Value::as_bool) != Some(true)
                 || dependency.as_table().is_none_or(|table| table.len() != 2)
@@ -4429,7 +4429,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         .and_then(|macos| macos.get("dirs"))
         .is_some_and(|dirs| dirs.get("optional").and_then(toml::Value::as_bool) != Some(true))
     {
-        return Err("zephium-agentic runtime dependency dirs must remain optional".to_owned());
+        return Err("drift-agentic runtime dependency dirs must remain optional".to_owned());
     }
     for runtime in [
         "futures-util",
@@ -4438,7 +4438,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         "zeroize",
         "rig-core",
         "httpdate",
-        "zephium-decision",
+        "drift-decision",
     ] {
         if dependencies
             .get(runtime)
@@ -4448,7 +4448,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
             != Some(true)
         {
             return Err(format!(
-                "zephium-agentic runtime dependency {runtime} must remain optional"
+                "drift-agentic runtime dependency {runtime} must remain optional"
             ));
         }
     }
@@ -4502,14 +4502,14 @@ fn validate_manifest(source: &str) -> Result<(), String> {
 fn validate_root(source: &str) -> Result<(), String> {
     if !compact(source).contains(RELEASE_REFUSAL) {
         return Err(
-            "zephium-agentic must retain its exact optimized probe-harness compile refusal"
+            "drift-agentic must retain its exact optimized probe-harness compile refusal"
                 .to_owned(),
         );
     }
     let source = compact(source);
     if !source.contains("#[cfg(feature=\"provider-transport\")]modprovider_transport;") {
         return Err(
-            "zephium-agentic provider transport must remain behind its optional feature".to_owned(),
+            "drift-agentic provider transport must remain behind its optional feature".to_owned(),
         );
     }
     if !source.contains(
@@ -5625,7 +5625,7 @@ fn validate_provider_transport_facade(manifest: &str, root: &str) -> Result<(), 
             .is_none_or(|feature| {
                 feature.as_slice()
                     != [toml::Value::String(
-                        "zephium-agentic/provider-transport".to_owned(),
+                        "drift-agentic/provider-transport".to_owned(),
                     )]
             })
         || features
@@ -5635,7 +5635,7 @@ fn validate_provider_transport_facade(manifest: &str, root: &str) -> Result<(), 
                 feature.as_slice()
                     != [
                         toml::Value::String("provider-transport".to_owned()),
-                        toml::Value::String("zephium-agentic/probe-harness".to_owned()),
+                        toml::Value::String("drift-agentic/probe-harness".to_owned()),
                     ]
             })
         || features.len() != 3
@@ -5646,7 +5646,7 @@ fn validate_provider_transport_facade(manifest: &str, root: &str) -> Result<(), 
     }
     let dependency = manifest
         .get("dependencies")
-        .and_then(|dependencies| dependencies.get("zephium-agentic"))
+        .and_then(|dependencies| dependencies.get("drift-agentic"))
         .and_then(toml::Value::as_table)
         .ok_or_else(|| "agent provider transport façade dependency is missing".to_owned())?;
     if dependency.get("workspace").and_then(toml::Value::as_bool) != Some(true)
@@ -5661,8 +5661,8 @@ fn validate_provider_transport_facade(manifest: &str, root: &str) -> Result<(), 
     let root = compact(root);
     for required in [
         "#[cfg(all(feature=\"probe-harness\",not(debug_assertions)))]compile_error!(\"theprovidertransportprobeharnessisforbiddeninoptimizedbuilds\");",
-        "#[cfg(feature=\"provider-transport\")]pubusezephium_agentic::{",
-        "#[cfg(feature=\"probe-harness\")]pubusezephium_agentic::{exact_loopback_url,ProviderEndpoints};",
+        "#[cfg(feature=\"provider-transport\")]pubusedrift_agentic::{",
+        "#[cfg(feature=\"probe-harness\")]pubusedrift_agentic::{exact_loopback_url,ProviderEndpoints};",
         "AgentProviderAbortReason,",
         "AgentProviderAttemptStateError,",
         "AgentProviderTransport,",
@@ -6335,9 +6335,9 @@ const WINDOWS_VAULT_LOADER: &str = r#"fn load_windows_credential<P: AgentCredent
     target: &str,
 ) -> Result<AgentProviderCredential<P>, AgentProviderVaultError> {
     let _turn = keychain_turn().map_err(vault_error)?;
-    let read = || zephium_credentials::read(target);
+    let read = || drift_credentials::read(target);
     let loaded = match read() {
-        Err(zephium_credentials::VaultError::Inaccessible) => {
+        Err(drift_credentials::VaultError::Inaccessible) => {
             std::thread::sleep(Duration::from_millis(40));
             read()
         }
@@ -6351,10 +6351,10 @@ const WINDOWS_VAULT_LOADER: &str = r#"fn load_windows_credential<P: AgentCredent
 }"#;
 const LEAD_WINDOWS_VAULT_LOADER: &str = r#"pub(super) fn read(service: &str) -> Result<LeadSecret, LeadKeyError> {
         let _turn = crate::provider_transport::keychain_turn().map_err(map)?;
-        let loaded = match zephium_credentials::read(service) {
+        let loaded = match drift_credentials::read(service) {
             Err(VaultError::Inaccessible) => {
                 std::thread::sleep(std::time::Duration::from_millis(40));
-                zephium_credentials::read(service)
+                drift_credentials::read(service)
             }
             loaded => loaded,
         };
@@ -6740,7 +6740,7 @@ fn validate_semantic_diff_policy_contract(
         "letbaseline_guard=acknowledgement.guard()",
         "letguard=semantic_diff_guard(baseline_guard,current_fingerprint.digest())",
         "fnsemantic_diff_guard(baseline_guard:[u8;32],current_guard:[u8;32])->[u8;32]",
-        "hasher.update(b\"ZEPHIUM-SEMANTIC-DIFF-1\\0\")",
+        "hasher.update(b\"DRIFT-SEMANTIC-DIFF-1\\0\")",
     ] {
         if !diff.contains(required) {
             return Err(format!(
@@ -7541,10 +7541,10 @@ fn validate_semantic_execution_contract(
     let action_method = &engine_port[start..end];
     for required in [
         "#[cfg(target_os=\"macos\")]",
-        "!matches!(request.kind(),zephium_agentic::SemanticActionKind::Click|zephium_agentic::SemanticActionKind::Fill|zephium_agentic::SemanticActionKind::Select)",
-        "request.frame().frame()!=zephium_agentic::FrameId::MAIN",
-        "request.frame().trust()!=zephium_agentic::SemanticFrameTrust::SameOrigin",
-        "request.frame().context().identity().kind()!=zephium_agentic::ContextKind::Owned",
+        "!matches!(request.kind(),drift_agentic::SemanticActionKind::Click|drift_agentic::SemanticActionKind::Fill|drift_agentic::SemanticActionKind::Select)",
+        "request.frame().frame()!=drift_agentic::FrameId::MAIN",
+        "request.frame().trust()!=drift_agentic::SemanticFrameTrust::SameOrigin",
+        "request.frame().context().identity().kind()!=drift_agentic::ContextKind::Owned",
         "self.schedule_action(request,completion)",
         "#[cfg(not(target_os=\"macos\"))]",
         "let_=(request,completion);ContextDispatch::Unsupported",
@@ -7574,7 +7574,7 @@ fn validate_semantic_execution_contract(
         "pub(super)fndispatch_guarded(",
         "authority:Option<Box<dynFn()->bool>>",
         // a246faf4: the adapter admits the shared closed set, pinned below.
-        "if!zephium_agentic::AGENT_BROWSER_SNAPSHOT_ACTION_KINDS.contains(&request.kind())",
+        "if!drift_agentic::AGENT_BROWSER_SNAPSHOT_ACTION_KINDS.contains(&request.kind())",
         "encode_semantic_action_runtime_invocation(&request)",
         "semantic.dispatch_action_guarded(invocation,authority,move|outcome|",
         "Ok(evidence)=>complete_runtime_recipe(request,evidence,admitted_at)",
@@ -8924,8 +8924,8 @@ fn validate_agent_app_lifecycle(
 
     let manifest = compact_without_line_comments(manifest);
     for required in [
-        "agentic-browser=[\"dep:zephium-agentic\"]",
-        "zephium-agentic={workspace=true,optional=true}",
+        "agentic-browser=[\"dep:drift-agentic\"]",
+        "drift-agentic={workspace=true,optional=true}",
     ] {
         if !manifest.contains(required) {
             return Err(format!(
@@ -8936,15 +8936,15 @@ fn validate_agent_app_lifecycle(
     let desktop_manifest = compact_without_line_comments(desktop_manifest);
     // Admits only the debug QA inspection lane (17dc25ff); that engine feature
     // refuses optimized builds and stays out of the ordinary graph.
-    const QA_LANE: &str = "work-integration-qa=[\"work-development-traces\",\"tauri/custom-protocol\",\"zephium-engine/agentic-browser-qa\"]";
+    const QA_LANE: &str = "work-integration-qa=[\"work-development-traces\",\"tauri/custom-protocol\",\"drift-engine/agentic-browser-qa\"]";
     let desktop_manifest = if desktop_manifest.matches("agentic-browser-qa").count() == 1 {
         desktop_manifest.replacen(QA_LANE, "", 1)
     } else {
         desktop_manifest
     };
     for forbidden in [
-        "zephium-app/agentic-browser",
-        "zephium-engine/agentic-browser",
+        "drift-app/agentic-browser",
+        "drift-engine/agentic-browser",
     ] {
         if desktop_manifest.contains(forbidden) {
             return Err(format!(
@@ -9318,7 +9318,7 @@ fn validate_agentic_zero_idle_sources(repository: &Path) -> Result<(), String> {
     // the optional feature, so they sit outside the zero-idle core.
     let root = compact(&read(repository.join(AGENTIC_ROOT))?);
     if !root.contains("#[cfg(feature=\"provider-transport\")]pubmodpublic_asset;") {
-        return Err("zephium-agentic public asset fetch escaped provider-transport".to_owned());
+        return Err("drift-agentic public asset fetch escaped provider-transport".to_owned());
     }
     let transport = source_directory.join("provider_transport");
     // Policy tests live beside agent_policy.rs and compile only under cfg(test).
@@ -9327,7 +9327,7 @@ fn validate_agentic_zero_idle_sources(repository: &Path) -> Result<(), String> {
     if !policy.contains(
         "#[cfg(test)]modtests{#[cfg(feature=\"provider-transport\")]modimage_tests;modnavigation_tests;",
     ) {
-        return Err("zephium-agentic policy test modules escaped cfg(test)".to_owned());
+        return Err("drift-agentic policy test modules escaped cfg(test)".to_owned());
     }
     let mut files = Vec::new();
     collect_files(&source_directory, &mut files)?;
@@ -9416,7 +9416,7 @@ fn validate_shipping_sources(repository: &Path) -> Result<(), String> {
         "windows-agentic-semantic-probe",
         "windows-cookie-persistence-control",
         "windows_cookie_persistence_control",
-        "__zephiumNativeInputFixtureV1",
+        "__driftNativeInputFixtureV1",
     ];
     let mut files = Vec::new();
     for root in SHIPPING_ROOTS {
@@ -9429,12 +9429,12 @@ fn validate_shipping_sources(repository: &Path) -> Result<(), String> {
         // is exempted from this scan.
         let source = if path == repository.join(APP_MANIFEST) {
             source
-                .replace("work-execution-probe = [\"work-execution\", \"zephium-agent-controller/probe-harness\"]", "")
+                .replace("work-execution-probe = [\"work-execution\", \"drift-agent-controller/probe-harness\"]", "")
                 // 68d28d51: the synthesis diagnostic lane, refused in optimized builds.
-                .replacen("# Explicit public synthesis diagnostics; agentic refuses probe-harness in optimized builds.\nwork-synthesis-probe = [\"work-runtime\", \"zephium-agentic/probe-harness\"]", "", 1)
+                .replacen("# Explicit public synthesis diagnostics; agentic refuses probe-harness in optimized builds.\nwork-synthesis-probe = [\"work-runtime\", \"drift-agentic/probe-harness\"]", "", 1)
         } else if path == repository.join(DESKTOP_MANIFEST) {
             // a119435e: the debug Work trace lane; probe-harness refuses optimized builds.
-            source.replacen("work-development-traces = [\"work-product\", \"zephium-work-composition/public-qualification\", \"zephium-work-composition/retained-lifetime-diagnostic\", \"zephium-agentic/probe-harness\"]", "", 1)
+            source.replacen("work-development-traces = [\"work-product\", \"drift-work-composition/public-qualification\", \"drift-work-composition/retained-lifetime-diagnostic\", \"drift-agentic/probe-harness\"]", "", 1)
         } else {
             source
         };
@@ -9469,23 +9469,23 @@ fn validate_release_graph(metadata: &CargoMetadata) -> Result<(), String> {
         .map(|package| (package.name.as_str(), package.id.as_str()))
         .collect::<BTreeMap<_, _>>();
     let desktop = package_names
-        .get("zephium-desktop")
-        .ok_or_else(|| "cargo metadata is missing zephium-desktop".to_owned())?;
+        .get("drift-desktop")
+        .ok_or_else(|| "cargo metadata is missing drift-desktop".to_owned())?;
     let agentic = package_names
-        .get("zephium-agentic")
-        .ok_or_else(|| "cargo metadata is missing zephium-agentic".to_owned())?;
+        .get("drift-agentic")
+        .ok_or_else(|| "cargo metadata is missing drift-agentic".to_owned())?;
     let app = package_names
-        .get("zephium-app")
-        .ok_or_else(|| "cargo metadata is missing zephium-app".to_owned())?;
+        .get("drift-app")
+        .ok_or_else(|| "cargo metadata is missing drift-app".to_owned())?;
     let engine = package_names
-        .get("zephium-engine")
-        .ok_or_else(|| "cargo metadata is missing zephium-engine".to_owned())?;
+        .get("drift-engine")
+        .ok_or_else(|| "cargo metadata is missing drift-engine".to_owned())?;
     let provider_transport = package_names
-        .get("zephium-agent-provider-transport")
-        .ok_or_else(|| "cargo metadata is missing zephium-agent-provider-transport".to_owned())?;
+        .get("drift-agent-provider-transport")
+        .ok_or_else(|| "cargo metadata is missing drift-agent-provider-transport".to_owned())?;
     let controller = package_names
-        .get("zephium-agent-controller")
-        .ok_or_else(|| "cargo metadata is missing zephium-agent-controller".to_owned())?;
+        .get("drift-agent-controller")
+        .ok_or_else(|| "cargo metadata is missing drift-agent-controller".to_owned())?;
     let resolve = metadata
         .resolve
         .as_ref()
@@ -9535,7 +9535,7 @@ fn validate_release_graph(metadata: &CargoMetadata) -> Result<(), String> {
                     .any(|feature| !admitted.contains(&feature.as_str()))
             {
                 return Err(
-                    "ordinary zephium-desktop Work product graph activates an unreviewed agentic feature"
+                    "ordinary drift-desktop Work product graph activates an unreviewed agentic feature"
                         .to_owned(),
                 );
             }
@@ -9550,7 +9550,7 @@ fn validate_release_graph(metadata: &CargoMetadata) -> Result<(), String> {
                 })
             {
                 return Err(
-                    "ordinary zephium-desktop Work product graph activates a native agentic probe"
+                    "ordinary drift-desktop Work product graph activates a native agentic probe"
                         .to_owned(),
                 );
             }
@@ -9559,7 +9559,7 @@ fn validate_release_graph(metadata: &CargoMetadata) -> Result<(), String> {
         }
         if package == *provider_transport {
             return Err(
-                "ordinary zephium-desktop release graph links the dormant agent provider transport"
+                "ordinary drift-desktop release graph links the dormant agent provider transport"
                     .to_owned(),
             );
         }
@@ -9571,7 +9571,7 @@ fn validate_release_graph(metadata: &CargoMetadata) -> Result<(), String> {
                     .any(|feature| feature == "agentic-browser")
             {
                 return Err(
-                    "ordinary zephium-desktop release graph activates the dormant agent lifecycle"
+                    "ordinary drift-desktop release graph activates the dormant agent lifecycle"
                         .to_owned(),
                 );
             }
@@ -9581,7 +9581,7 @@ fn validate_release_graph(metadata: &CargoMetadata) -> Result<(), String> {
                 })
             {
                 return Err(
-                    "ordinary zephium-desktop release graph activates an opt-in agentic runtime"
+                    "ordinary drift-desktop release graph activates an opt-in agentic runtime"
                         .to_owned(),
                 );
             }
@@ -9592,7 +9592,7 @@ fn validate_release_graph(metadata: &CargoMetadata) -> Result<(), String> {
                     .any(|feature| feature == "native-agentic-input-probe")
             {
                 return Err(
-                    "ordinary zephium-desktop release graph activates native agentic input probe"
+                    "ordinary drift-desktop release graph activates native agentic input probe"
                         .to_owned(),
                 );
             }
@@ -9603,7 +9603,7 @@ fn validate_release_graph(metadata: &CargoMetadata) -> Result<(), String> {
                     .any(|feature| feature == "native-agentic-semantic-probe")
             {
                 return Err(
-                    "ordinary zephium-desktop release graph activates native agentic semantic probe"
+                    "ordinary drift-desktop release graph activates native agentic semantic probe"
                         .to_owned(),
                 );
             }
@@ -9614,7 +9614,7 @@ fn validate_release_graph(metadata: &CargoMetadata) -> Result<(), String> {
                     .any(|feature| feature == "agentic-browser")
             {
                 return Err(
-                    "ordinary zephium-desktop release graph activates the unwired native agent-context adapter"
+                    "ordinary drift-desktop release graph activates the unwired native agent-context adapter"
                         .to_owned(),
                 );
             }
@@ -9720,7 +9720,7 @@ struct CargoNode {
 mod tests {
     #[test]
     fn sequential_native_lifetimes_cannot_reopen_or_replace_unproven_owners() {
-        let source = include_str!("../../crates/zephium-engine/src/agent_context_port.rs");
+        let source = include_str!("../../crates/drift-engine/src/agent_context_port.rs");
         super::validate_engine_agent_lifetime_boundary(source).unwrap();
         for boundary in [
             "active.retire_for_successor()",
@@ -9948,10 +9948,10 @@ mod tests {
 
     #[test]
     fn profile_release_requires_constructor_closed_supervisor_cleanup_proof() {
-        let root = include_str!("../../crates/zephium-agentic/src/lib.rs");
-        let profile_lease = include_str!("../../crates/zephium-agentic/src/profile_lease.rs");
+        let root = include_str!("../../crates/drift-agentic/src/lib.rs");
+        let profile_lease = include_str!("../../crates/drift-agentic/src/profile_lease.rs");
         let supervisor_context = include_str!(
-            "../../crates/zephium-agentic/src/agent_supervisor/runtime/context_schedule.rs"
+            "../../crates/drift-agentic/src/agent_supervisor/runtime/context_schedule.rs"
         );
         validate_profile_lease_release_contract(root, profile_lease, supervisor_context)
             .expect("profile release proof boundary");
@@ -9993,7 +9993,7 @@ mod tests {
 
     #[test]
     fn shutdown_seal_retains_queued_context_cleanup_authority() {
-        let registry = include_str!("../../crates/zephium-agentic/src/context_registry.rs");
+        let registry = include_str!("../../crates/drift-agentic/src/context_registry.rs");
         validate_context_shutdown_retention_contract(registry)
             .expect("retained queued shutdown authority");
         for invalid in [
@@ -10018,10 +10018,10 @@ mod tests {
 
     #[test]
     fn native_shutdown_coordinator_requires_full_logical_drain_and_exact_zero_audits() {
-        let root = include_str!("../../crates/zephium-agentic/src/lib.rs");
-        let lifecycle = include_str!("../../crates/zephium-agentic/src/agent_lifecycle.rs");
-        let shutdown = include_str!("../../crates/zephium-agentic/src/agent_native_shutdown.rs");
-        let screenshot = include_str!("../../crates/zephium-agentic/src/semantic_screenshot.rs");
+        let root = include_str!("../../crates/drift-agentic/src/lib.rs");
+        let lifecycle = include_str!("../../crates/drift-agentic/src/agent_lifecycle.rs");
+        let shutdown = include_str!("../../crates/drift-agentic/src/agent_native_shutdown.rs");
+        let screenshot = include_str!("../../crates/drift-agentic/src/semantic_screenshot.rs");
         validate_agent_native_shutdown_coordinator(root, lifecycle, shutdown, screenshot)
             .expect("native shutdown coordinator boundary");
 
@@ -10101,9 +10101,9 @@ mod tests {
 
     #[test]
     fn native_shutdown_driver_consumes_the_port_with_bounded_redacted_waits() {
-        let root = include_str!("../../crates/zephium-agentic/src/lib.rs");
+        let root = include_str!("../../crates/drift-agentic/src/lib.rs");
         let driver =
-            include_str!("../../crates/zephium-agentic/src/agent_native_shutdown_driver.rs");
+            include_str!("../../crates/drift-agentic/src/agent_native_shutdown_driver.rs");
         validate_agent_native_shutdown_driver(root, driver)
             .expect("bounded native shutdown driver boundary");
 
@@ -10151,20 +10151,20 @@ mod tests {
 
     #[test]
     fn application_agent_lifecycle_is_lossless_proof_gated_and_release_dormant() {
-        let manifest = include_str!("../../crates/zephium-app/Cargo.toml");
-        let root = include_str!("../../crates/zephium-app/src/lib.rs");
-        let api = include_str!("../../crates/zephium-app/src/api.rs");
-        let actor = include_str!("../../crates/zephium-app/src/actor/mod.rs");
-        let shell = include_str!("../../crates/zephium-app/src/shell/mod.rs");
+        let manifest = include_str!("../../crates/drift-app/Cargo.toml");
+        let root = include_str!("../../crates/drift-app/src/lib.rs");
+        let api = include_str!("../../crates/drift-app/src/api.rs");
+        let actor = include_str!("../../crates/drift-app/src/actor/mod.rs");
+        let shell = include_str!("../../crates/drift-app/src/shell/mod.rs");
         let desktop = include_str!("../../desktop/Cargo.toml");
         validate_agent_app_lifecycle(manifest, root, api, actor, shell, desktop)
             .expect("application agent lifecycle boundary");
 
         for (index, invalid) in [
-            manifest.replace("agentic-browser = [\"dep:zephium-agentic\"]", ""),
+            manifest.replace("agentic-browser = [\"dep:drift-agentic\"]", ""),
             manifest.replace(
-                "zephium-agentic = { workspace = true, optional = true }",
-                "zephium-agentic.workspace = true",
+                "drift-agentic = { workspace = true, optional = true }",
+                "drift-agentic.workspace = true",
             ),
         ]
         .into_iter()
@@ -10222,7 +10222,7 @@ mod tests {
 
         let invalid_desktop = desktop.replace(
             "macos-page-permission-prompts = [",
-            "agentic-browser = [\"zephium-app/agentic-browser\"]\nmacos-page-permission-prompts = [",
+            "agentic-browser = [\"drift-app/agentic-browser\"]\nmacos-page-permission-prompts = [",
         );
         assert!(
             validate_agent_app_lifecycle(manifest, root, api, actor, shell, &invalid_desktop)
@@ -10231,11 +10231,11 @@ mod tests {
         for invalid_desktop in [
             desktop.replace(
                 "work-product = [",
-                "work-product = [\n    \"zephium-engine/agentic-browser-qa\",",
+                "work-product = [\n    \"drift-engine/agentic-browser-qa\",",
             ),
             desktop.replace(
-                "\"zephium-engine/agentic-browser-qa\"]",
-                "\"zephium-engine/agentic-browser\"]",
+                "\"drift-engine/agentic-browser-qa\"]",
+                "\"drift-engine/agentic-browser\"]",
             ),
         ] {
             assert!(validate_agent_app_lifecycle(
@@ -10252,9 +10252,9 @@ mod tests {
 
     #[test]
     fn durable_agent_audit_actor_is_isolated_bounded_and_abort_free() {
-        let actor_root = include_str!("../../crates/zephium-store/src/actor.rs");
-        let actor = include_str!("../../crates/zephium-store/src/actor/agent_audit.rs");
-        let hub = include_str!("../../crates/zephium-store/src/hub/agent_audit.rs");
+        let actor_root = include_str!("../../crates/drift-store/src/actor.rs");
+        let actor = include_str!("../../crates/drift-store/src/actor/agent_audit.rs");
+        let hub = include_str!("../../crates/drift-store/src/hub/agent_audit.rs");
         validate_store_agent_audit_boundary(actor_root, actor, hub)
             .expect("isolated durable agent audit actor");
 
@@ -10317,9 +10317,9 @@ mod tests {
 
     #[test]
     fn native_shutdown_barrier_is_atomic_distinct_and_drain_auditable() {
-        let domain = include_str!("../../crates/zephium-agentic/src/context_port.rs");
-        let port = include_str!("../../crates/zephium-engine/src/agent_context_port.rs");
-        let host = include_str!("../../crates/zephium-engine/src/host/agent_context.rs");
+        let domain = include_str!("../../crates/drift-agentic/src/context_port.rs");
+        let port = include_str!("../../crates/drift-engine/src/agent_context_port.rs");
+        let host = include_str!("../../crates/drift-engine/src/host/agent_context.rs");
         validate_agent_context_shutdown_barrier_contract(domain, port, host)
             .expect("atomic native shutdown barrier");
 
@@ -10458,27 +10458,27 @@ mod tests {
             packages: vec![
                 CargoPackage {
                     id: "desktop".to_owned(),
-                    name: "zephium-desktop".to_owned(),
+                    name: "drift-desktop".to_owned(),
                 },
                 CargoPackage {
                     id: "engine".to_owned(),
-                    name: "zephium-engine".to_owned(),
+                    name: "drift-engine".to_owned(),
                 },
                 CargoPackage {
                     id: "app".to_owned(),
-                    name: "zephium-app".to_owned(),
+                    name: "drift-app".to_owned(),
                 },
                 CargoPackage {
                     id: "agentic".to_owned(),
-                    name: "zephium-agentic".to_owned(),
+                    name: "drift-agentic".to_owned(),
                 },
                 CargoPackage {
                     id: "transport".to_owned(),
-                    name: "zephium-agent-provider-transport".to_owned(),
+                    name: "drift-agent-provider-transport".to_owned(),
                 },
                 CargoPackage {
                     id: "controller".to_owned(),
-                    name: "zephium-agent-controller".to_owned(),
+                    name: "drift-agent-controller".to_owned(),
                 },
             ],
             resolve: Some(CargoResolve {
@@ -10534,7 +10534,7 @@ mod tests {
 
     #[test]
     fn snapshot_action_kinds_remain_the_closed_native_set() {
-        let provider = include_str!("../../crates/zephium-agentic/src/agent_provider.rs");
+        let provider = include_str!("../../crates/drift-agentic/src/agent_provider.rs");
         validate_snapshot_action_kinds(provider).expect("closed snapshot action kinds");
         assert!(validate_snapshot_action_kinds(&provider.replace(
             "crate::SemanticActionKind::Scroll,\n];",
@@ -10545,7 +10545,7 @@ mod tests {
 
     #[test]
     fn snapshot_press_does_not_admit_a_sixth_or_substitute_action() {
-        let provider = include_str!("../../crates/zephium-agentic/src/agent_provider.rs");
+        let provider = include_str!("../../crates/drift-agentic/src/agent_provider.rs");
         validate_snapshot_action_kinds(provider).expect("five reviewed native actions");
         for invalid in [
             provider.replacen(
@@ -10716,7 +10716,7 @@ mod tests {
                 baseline_guard: [u8; 32],
                 current_guard: [u8; 32]
             ) -> [u8; 32] {
-                hasher.update(b"ZEPHIUM-SEMANTIC-DIFF-1\0");
+                hasher.update(b"DRIFT-SEMANTIC-DIFF-1\0");
             }
         "#;
         let model = r#"
@@ -10766,17 +10766,17 @@ mod tests {
 
     #[test]
     fn semantic_locate_requires_acknowledged_bounded_non_document_search() {
-        let root = include_str!("../../crates/zephium-agentic/src/lib.rs");
-        let locate = include_str!("../../crates/zephium-agentic/src/semantic_locate.rs");
+        let root = include_str!("../../crates/drift-agentic/src/lib.rs");
+        let locate = include_str!("../../crates/drift-agentic/src/semantic_locate.rs");
         let locate_model =
-            include_str!("../../crates/zephium-agentic/src/semantic_locate_model.rs");
-        let provider_root = include_str!("../../crates/zephium-agentic/src/agent_provider.rs");
-        let provider_tool = include_str!("../../crates/zephium-agentic/src/agent_provider/tool.rs");
+            include_str!("../../crates/drift-agentic/src/semantic_locate_model.rs");
+        let provider_root = include_str!("../../crates/drift-agentic/src/agent_provider.rs");
+        let provider_tool = include_str!("../../crates/drift-agentic/src/agent_provider/tool.rs");
         let continuation =
-            include_str!("../../crates/zephium-agentic/src/agent_provider/continuation.rs");
+            include_str!("../../crates/drift-agentic/src/agent_provider/continuation.rs");
         let provider_request =
-            include_str!("../../crates/zephium-agentic/src/agent_provider/request.rs");
-        let policy = include_str!("../../crates/zephium-agentic/src/agent_policy.rs");
+            include_str!("../../crates/drift-agentic/src/agent_provider/request.rs");
+        let policy = include_str!("../../crates/drift-agentic/src/agent_policy.rs");
         validate_semantic_locate_contract(
             root,
             locate,
@@ -10904,15 +10904,15 @@ mod tests {
 
     #[test]
     fn semantic_read_continuation_requires_exact_baseline_and_local_counting() {
-        let root = include_str!("../../crates/zephium-agentic/src/lib.rs");
-        let read = include_str!("../../crates/zephium-agentic/src/semantic_read.rs");
-        let read_model = include_str!("../../crates/zephium-agentic/src/semantic_read_model.rs");
-        let provider_root = include_str!("../../crates/zephium-agentic/src/agent_provider.rs");
+        let root = include_str!("../../crates/drift-agentic/src/lib.rs");
+        let read = include_str!("../../crates/drift-agentic/src/semantic_read.rs");
+        let read_model = include_str!("../../crates/drift-agentic/src/semantic_read_model.rs");
+        let provider_root = include_str!("../../crates/drift-agentic/src/agent_provider.rs");
         let continuation =
-            include_str!("../../crates/zephium-agentic/src/agent_provider/continuation.rs");
+            include_str!("../../crates/drift-agentic/src/agent_provider/continuation.rs");
         let provider_request =
-            include_str!("../../crates/zephium-agentic/src/agent_provider/request.rs");
-        let policy = include_str!("../../crates/zephium-agentic/src/agent_policy.rs");
+            include_str!("../../crates/drift-agentic/src/agent_provider/request.rs");
+        let policy = include_str!("../../crates/drift-agentic/src/agent_policy.rs");
         validate_semantic_read_continuation_contract(
             root,
             read,
@@ -10989,19 +10989,19 @@ mod tests {
 
     #[test]
     fn semantic_extraction_requires_tool_free_schema_read_and_terminal_binding() {
-        let root = include_str!("../../crates/zephium-agentic/src/lib.rs");
-        let extract = include_str!("../../crates/zephium-agentic/src/semantic_extract.rs");
+        let root = include_str!("../../crates/drift-agentic/src/lib.rs");
+        let extract = include_str!("../../crates/drift-agentic/src/semantic_extract.rs");
         let extract_model =
-            include_str!("../../crates/zephium-agentic/src/semantic_extract_model.rs");
-        let provider_root = include_str!("../../crates/zephium-agentic/src/agent_provider.rs");
-        let provider_tool = include_str!("../../crates/zephium-agentic/src/agent_provider/tool.rs");
+            include_str!("../../crates/drift-agentic/src/semantic_extract_model.rs");
+        let provider_root = include_str!("../../crates/drift-agentic/src/agent_provider.rs");
+        let provider_tool = include_str!("../../crates/drift-agentic/src/agent_provider/tool.rs");
         let continuation =
-            include_str!("../../crates/zephium-agentic/src/agent_provider/continuation.rs");
+            include_str!("../../crates/drift-agentic/src/agent_provider/continuation.rs");
         let provider_request =
-            include_str!("../../crates/zephium-agentic/src/agent_provider/request.rs");
+            include_str!("../../crates/drift-agentic/src/agent_provider/request.rs");
         let provider_extraction =
-            include_str!("../../crates/zephium-agentic/src/agent_provider/extraction.rs");
-        let policy = include_str!("../../crates/zephium-agentic/src/agent_policy.rs");
+            include_str!("../../crates/drift-agentic/src/agent_provider/extraction.rs");
+        let policy = include_str!("../../crates/drift-agentic/src/agent_policy.rs");
         validate_semantic_extraction_provider_contract(
             root,
             extract,
@@ -11248,13 +11248,13 @@ mod tests {
                 {
                     if !matches!(
                         request.kind(),
-                        zephium_agentic::SemanticActionKind::Click
-                            | zephium_agentic::SemanticActionKind::Fill
-                            | zephium_agentic::SemanticActionKind::Select
-                    ) || request.frame().frame() != zephium_agentic::FrameId::MAIN
-                        || request.frame().trust() != zephium_agentic::SemanticFrameTrust::SameOrigin
+                        drift_agentic::SemanticActionKind::Click
+                            | drift_agentic::SemanticActionKind::Fill
+                            | drift_agentic::SemanticActionKind::Select
+                    ) || request.frame().frame() != drift_agentic::FrameId::MAIN
+                        || request.frame().trust() != drift_agentic::SemanticFrameTrust::SameOrigin
                         || request.frame().context().identity().kind()
-                            != zephium_agentic::ContextKind::Owned
+                            != drift_agentic::ContextKind::Owned
                     {
                         return ContextDispatch::Unsupported;
                     }
@@ -11273,7 +11273,7 @@ mod tests {
             pub(super) fn dispatch_guarded(
                 authority: Option<Box<dyn Fn() -> bool>>,
             ) {
-            if !zephium_agentic::AGENT_BROWSER_SNAPSHOT_ACTION_KINDS.contains(&request.kind()) {}
+            if !drift_agentic::AGENT_BROWSER_SNAPSHOT_ACTION_KINDS.contains(&request.kind()) {}
             encode_semantic_action_runtime_invocation(&request);
             semantic.dispatch_action_guarded(invocation, authority, move |outcome| {
                 match outcome {
@@ -12724,7 +12724,7 @@ mod tests {
 
     #[test]
     fn supervisor_cancellation_finalization_carries_its_proven_variant() {
-        let runtime = include_str!("../../crates/zephium-agentic/src/agent_supervisor/runtime.rs");
+        let runtime = include_str!("../../crates/drift-agentic/src/agent_supervisor/runtime.rs");
         validate_agent_supervisor_cancellation_finalization(runtime)
             .expect("fail-closed cancellation finalization");
 
@@ -12739,12 +12739,12 @@ mod tests {
 
     #[test]
     fn default_agentic_core_carries_invariants_without_release_aborts() {
-        let semantic = include_str!("../../crates/zephium-agentic/src/semantic.rs");
-        let wire = include_str!("../../crates/zephium-agentic/src/semantic_wire.rs");
-        let execution = include_str!("../../crates/zephium-agentic/src/semantic_execute.rs");
+        let semantic = include_str!("../../crates/drift-agentic/src/semantic.rs");
+        let wire = include_str!("../../crates/drift-agentic/src/semantic_wire.rs");
+        let execution = include_str!("../../crates/drift-agentic/src/semantic_execute.rs");
         let continuation =
-            include_str!("../../crates/zephium-agentic/src/agent_provider/continuation.rs");
-        let request = include_str!("../../crates/zephium-agentic/src/agent_provider/request.rs");
+            include_str!("../../crates/drift-agentic/src/agent_provider/continuation.rs");
+        let request = include_str!("../../crates/drift-agentic/src/agent_provider/request.rs");
 
         validate_agentic_default_core_panic_boundary(
             semantic,
@@ -12813,12 +12813,12 @@ mod tests {
 
     #[test]
     fn terminal_metric_closure_keeps_exact_private_coverage_joins() {
-        let root = include_str!("../../crates/zephium-agentic/src/lib.rs");
-        let closure = include_str!("../../crates/zephium-agentic/src/agent_metric_closure.rs");
-        let accounting = include_str!("../../crates/zephium-agentic/src/agent_metrics.rs");
-        let progress = include_str!("../../crates/zephium-agentic/src/agent_progress_metrics.rs");
-        let actions = include_str!("../../crates/zephium-agentic/src/agent_action_metrics.rs");
-        let inputs = include_str!("../../crates/zephium-agentic/src/agent_input_metrics.rs");
+        let root = include_str!("../../crates/drift-agentic/src/lib.rs");
+        let closure = include_str!("../../crates/drift-agentic/src/agent_metric_closure.rs");
+        let accounting = include_str!("../../crates/drift-agentic/src/agent_metrics.rs");
+        let progress = include_str!("../../crates/drift-agentic/src/agent_progress_metrics.rs");
+        let actions = include_str!("../../crates/drift-agentic/src/agent_action_metrics.rs");
+        let inputs = include_str!("../../crates/drift-agentic/src/agent_input_metrics.rs");
 
         validate_agent_metric_closure_contract(
             root, closure, accounting, progress, actions, inputs,
@@ -12858,11 +12858,11 @@ mod tests {
 
     #[test]
     fn clean_policy_settlement_stays_move_only_and_exactly_reconciled() {
-        let root = include_str!("../../crates/zephium-agentic/src/lib.rs");
-        let closure = include_str!("../../crates/zephium-agentic/src/agent_metric_closure.rs");
-        let accounting = include_str!("../../crates/zephium-agentic/src/agent_metrics.rs");
-        let audit = include_str!("../../crates/zephium-agentic/src/agent_audit.rs");
-        let policy = include_str!("../../crates/zephium-agentic/src/agent_policy.rs");
+        let root = include_str!("../../crates/drift-agentic/src/lib.rs");
+        let closure = include_str!("../../crates/drift-agentic/src/agent_metric_closure.rs");
+        let accounting = include_str!("../../crates/drift-agentic/src/agent_metrics.rs");
+        let audit = include_str!("../../crates/drift-agentic/src/agent_audit.rs");
+        let policy = include_str!("../../crates/drift-agentic/src/agent_policy.rs");
 
         validate_agent_policy_settlement_contract(root, closure, accounting, audit, policy)
             .expect("clean move-only policy settlement");
@@ -12928,8 +12928,8 @@ mod tests {
             publish = false
             [features]
             default = []
-            provider-transport = ["dep:futures-util", "dep:reqwest", "dep:rig-core", "dep:tokio", "dep:zeroize", "dep:security-framework", "dep:security-framework-sys", "dep:dirs", "dep:zephium-decision", "dep:httpdate", "dep:zephium-credentials"]
-            probe-harness = ["zephium-decision?/evals"]
+            provider-transport = ["dep:futures-util", "dep:reqwest", "dep:rig-core", "dep:tokio", "dep:zeroize", "dep:security-framework", "dep:security-framework-sys", "dep:dirs", "dep:drift-decision", "dep:httpdate", "dep:drift-credentials"]
+            probe-harness = ["drift-decision?/evals"]
             [[bin]]
             name = "windows-agentic-input-evidence-review"
             path = "src/bin/windows_agentic_input_evidence_review.rs"
@@ -12953,11 +12953,11 @@ mod tests {
             ulid = "1"
             url = "2"
             zeroize = { version = "1", optional = true }
-            zephium-decision = { workspace = true, optional = true }
+            drift-decision = { workspace = true, optional = true }
             httpdate = { version = "1", optional = true }
-            zephium-core = "1"
+            drift-core = "1"
             [target.'cfg(target_os = "windows")'.dependencies]
-            zephium-credentials = { workspace = true, optional = true }
+            drift-credentials = { workspace = true, optional = true }
             [target.'cfg(target_os = "macos")'.dependencies]
             security-framework = { version = "1", optional = true }
             security-framework-sys = { version = "1", optional = true }
@@ -12966,8 +12966,8 @@ mod tests {
         validate_manifest(manifest).expect("closed functional-core manifest");
         for (optional, eager) in [
             (
-                "zephium-decision = { workspace = true, optional = true }",
-                "zephium-decision.workspace = true",
+                "drift-decision = { workspace = true, optional = true }",
+                "drift-decision.workspace = true",
             ),
             (
                 "rig-core = { version = \"1\", optional = true }",
@@ -12986,12 +12986,12 @@ mod tests {
             assert!(validate_manifest(&manifest.replace(optional, eager)).is_err());
         }
         for harness in [
-            "[\"zephium-decision/evals\"]",
-            "[\"dep:zephium-decision\"]",
+            "[\"drift-decision/evals\"]",
+            "[\"dep:drift-decision\"]",
             "[]",
         ] {
             assert!(validate_manifest(&manifest.replace(
-                "probe-harness = [\"zephium-decision?/evals\"]",
+                "probe-harness = [\"drift-decision?/evals\"]",
                 &format!("probe-harness = {harness}")
             ))
             .is_err());
@@ -13113,31 +13113,31 @@ mod tests {
 
     #[test]
     fn provider_transport_facade_is_opt_in_and_authority_free() {
-        let manifest = include_str!("../../crates/zephium-agent-provider-transport/Cargo.toml");
-        let root = include_str!("../../crates/zephium-agent-provider-transport/src/lib.rs");
+        let manifest = include_str!("../../crates/drift-agent-provider-transport/Cargo.toml");
+        let root = include_str!("../../crates/drift-agent-provider-transport/src/lib.rs");
         validate_provider_transport_facade(manifest, root).expect("safe provider transport facade");
 
         for invalid_manifest in [
             manifest.replacen("publish = false", "publish = true", 1),
             manifest.replacen("default = []", "default = [\"provider-transport\"]", 1),
             manifest.replacen(
-                "provider-transport = [\"zephium-agentic/provider-transport\"]",
+                "provider-transport = [\"drift-agentic/provider-transport\"]",
                 "provider-transport = []",
                 1,
             ),
             manifest.replacen(
-                "provider-transport = [\"zephium-agentic/provider-transport\"]",
-                "provider-transport = [\"zephium-agentic/provider-transport\", \"zephium-agentic/probe-harness\"]",
+                "provider-transport = [\"drift-agentic/provider-transport\"]",
+                "provider-transport = [\"drift-agentic/provider-transport\", \"drift-agentic/probe-harness\"]",
                 1,
             ),
             manifest.replacen(
-                "probe-harness = [\"provider-transport\", \"zephium-agentic/probe-harness\"]",
-                "probe-harness = [\"zephium-agentic/probe-harness\"]",
+                "probe-harness = [\"provider-transport\", \"drift-agentic/probe-harness\"]",
+                "probe-harness = [\"drift-agentic/probe-harness\"]",
                 1,
             ),
             manifest.replacen(
-                "zephium-agentic.workspace = true",
-                "zephium-agentic = { workspace = true, features = [\"provider-transport\"] }",
+                "drift-agentic.workspace = true",
+                "drift-agentic = { workspace = true, features = [\"provider-transport\"] }",
                 1,
             ),
         ] {
@@ -13166,7 +13166,7 @@ mod tests {
 
     #[test]
     fn provider_transport_disclosure_commit_is_linearized_with_cancellation() {
-        let root = include_str!("../../crates/zephium-agentic/src/provider_transport.rs");
+        let root = include_str!("../../crates/drift-agentic/src/provider_transport.rs");
         validate_provider_transport_commit_boundary(root)
             .expect("provider transport disclosure commit boundary");
 
@@ -13209,7 +13209,7 @@ mod tests {
 
     #[test]
     fn provider_operation_retains_terminal_authority_across_dropped_drives() {
-        let transport = include_str!("../../crates/zephium-agentic/src/provider_transport.rs");
+        let transport = include_str!("../../crates/drift-agentic/src/provider_transport.rs");
         validate_abortable_provider_operation_contract(transport)
             .expect("abortable provider operation boundary");
 
@@ -13282,7 +13282,7 @@ mod tests {
 
     #[test]
     fn immediate_provider_settlement_retains_authority_before_policy_use() {
-        let transport = include_str!("../../crates/zephium-agentic/src/provider_transport.rs");
+        let transport = include_str!("../../crates/drift-agentic/src/provider_transport.rs");
         validate_immediate_provider_settlement_recovery_contract(transport)
             .expect("immediate settlement recovery boundary");
 
@@ -13330,8 +13330,8 @@ mod tests {
 
     #[test]
     fn provider_batch_consumer_panic_is_contained_and_fail_stopped() {
-        let transport = include_str!("../../crates/zephium-agentic/src/provider_transport.rs");
-        let provider = include_str!("../../crates/zephium-agentic/src/agent_provider.rs");
+        let transport = include_str!("../../crates/drift-agentic/src/provider_transport.rs");
+        let provider = include_str!("../../crates/drift-agentic/src/agent_provider.rs");
         validate_provider_consumer_panic_boundary(transport, provider)
             .expect("provider consumer panic boundary");
 
@@ -13356,7 +13356,7 @@ mod tests {
 
     #[test]
     fn provider_transport_bounds_decoded_headers_before_status_or_body() {
-        let root = include_str!("../../crates/zephium-agentic/src/provider_transport.rs");
+        let root = include_str!("../../crates/drift-agentic/src/provider_transport.rs");
         validate_provider_transport_response_header_boundary(root)
             .expect("provider transport response-header boundary");
 
@@ -13408,7 +13408,7 @@ mod tests {
 
     #[test]
     fn provider_transport_pins_http2_ingress_flow_control_and_frames() {
-        let root = include_str!("../../crates/zephium-agentic/src/provider_transport.rs");
+        let root = include_str!("../../crates/drift-agentic/src/provider_transport.rs");
         validate_provider_transport_http2_ingress_boundary(root)
             .expect("provider transport HTTP/2 ingress boundary");
 
@@ -13450,9 +13450,9 @@ mod tests {
 
     #[test]
     fn provider_transport_shutdown_proof_requires_sticky_seal_and_exact_idle() {
-        let root = include_str!("../../crates/zephium-agentic/src/provider_transport.rs");
+        let root = include_str!("../../crates/drift-agentic/src/provider_transport.rs");
         let lead_keys =
-            include_str!("../../crates/zephium-agentic/src/provider_transport/lead/keys.rs");
+            include_str!("../../crates/drift-agentic/src/provider_transport/lead/keys.rs");
         validate_provider_transport_shutdown_contract(root, lead_keys)
             .expect("provider transport shutdown proof boundary");
 
@@ -13505,8 +13505,8 @@ mod tests {
 
     #[test]
     fn keychain_retry_exceptions_are_single_exact_and_loader_local() {
-        let root = include_str!("../../crates/zephium-agentic/src/provider_transport.rs");
-        let keys = include_str!("../../crates/zephium-agentic/src/provider_transport/lead/keys.rs");
+        let root = include_str!("../../crates/drift-agentic/src/provider_transport.rs");
+        let keys = include_str!("../../crates/drift-agentic/src/provider_transport/lead/keys.rs");
         validate_provider_transport_shutdown_contract(root, keys).expect("reviewed retries");
         for (source, loader, is_lead) in [
             (root, KEYCHAIN_LOGIN_LOADER, false),
@@ -13694,15 +13694,15 @@ mod tests {
               "dep:serde",
               "dep:tempfile",
               "dep:windows-probe-sys",
-              "dep:zephium-agentic",
-              "zephium-agentic/probe-harness",
+              "dep:drift-agentic",
+              "drift-agentic/probe-harness",
             ]
-            agentic-browser = ["dep:zephium-agentic", "dep:zeroize", "dep:image"]
+            agentic-browser = ["dep:drift-agentic", "dep:zeroize", "dep:image"]
             native-agentic-semantic-probe = [
               "agentic-browser",
               "dep:tempfile",
               "dep:windows-probe-sys",
-              "zephium-agentic/probe-harness",
+              "drift-agentic/probe-harness",
             ]
             [[bin]]
             name = "macos-agentic-input-probe"
@@ -13725,7 +13725,7 @@ mod tests {
             path = "src/bin/windows_cookie_persistence_control.rs"
             required-features = ["native-agentic-semantic-probe"]
             [dependencies]
-            zephium-agentic = { optional = true }
+            drift-agentic = { optional = true }
             zeroize = { version = "=1.9.0", optional = true }
             image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg", "webp", "gif"], optional = true }
             [target.'cfg(target_os = "windows")'.dependencies]
@@ -13742,12 +13742,12 @@ mod tests {
                 .is_err()
         );
         assert!(validate_engine_manifest(
-            &valid.replace("zephium-agentic/probe-harness", "shipping-probe")
+            &valid.replace("drift-agentic/probe-harness", "shipping-probe")
         )
         .is_err());
         assert!(validate_engine_manifest(&valid.replace(
-            "agentic-browser = [\"dep:zephium-agentic\", \"dep:zeroize\", \"dep:image\"]",
-            "agentic-browser = [\"zephium-agentic/probe-harness\"]",
+            "agentic-browser = [\"dep:drift-agentic\", \"dep:zeroize\", \"dep:image\"]",
+            "agentic-browser = [\"drift-agentic/probe-harness\"]",
         ))
         .is_err());
         assert!(validate_engine_manifest(&valid.replace("=1.9.0", "=1.9.1")).is_err());
@@ -13771,13 +13771,13 @@ mod tests {
     fn presented_rendering_rejects_input_authority_hidden_hacks_unbounded_leases_and_missing_restore(
     ) {
         let source = include_str!(
-            "../../crates/zephium-engine/src/platform/macos/agentic_rendering_presented_probe.rs"
+            "../../crates/drift-engine/src/platform/macos/agentic_rendering_presented_probe.rs"
         );
         let parent = include_str!(
-            "../../crates/zephium-engine/src/platform/macos/agentic_semantic_probe.rs"
+            "../../crates/drift-engine/src/platform/macos/agentic_semantic_probe.rs"
         );
         let binary =
-            include_str!("../../crates/zephium-engine/src/bin/macos_agentic_semantic_probe.rs");
+            include_str!("../../crates/drift-engine/src/bin/macos_agentic_semantic_probe.rs");
         validate_macos_rendering_presented_probe(source, parent, binary).unwrap();
         for required in [
             "Duration::from_secs(5)",
@@ -13868,13 +13868,13 @@ mod tests {
     #[test]
     fn rendering_opportunity_rejects_policy_leaks_extra_dispatch_and_presentation_changes() {
         let source = include_str!(
-            "../../crates/zephium-engine/src/platform/macos/agentic_rendering_opportunity_probe.rs"
+            "../../crates/drift-engine/src/platform/macos/agentic_rendering_opportunity_probe.rs"
         );
         let parent = include_str!(
-            "../../crates/zephium-engine/src/platform/macos/agentic_semantic_probe.rs"
+            "../../crates/drift-engine/src/platform/macos/agentic_semantic_probe.rs"
         );
         let binary =
-            include_str!("../../crates/zephium-engine/src/bin/macos_agentic_semantic_probe.rs");
+            include_str!("../../crates/drift-engine/src/bin/macos_agentic_semantic_probe.rs");
         validate_macos_rendering_opportunity_probe(source, parent, binary).unwrap();
         for required in [
             "Duration::from_secs(1)",
@@ -13931,14 +13931,14 @@ mod tests {
     #[test]
     fn rendering_diagnostic_rejects_unbounded_sampling_policy_changes_and_false_evidence() {
         let source = include_str!(
-            "../../crates/zephium-engine/src/platform/macos/agentic_rendering_probe.rs"
+            "../../crates/drift-engine/src/platform/macos/agentic_rendering_probe.rs"
         );
         let parent = include_str!(
-            "../../crates/zephium-engine/src/platform/macos/agentic_semantic_probe.rs"
+            "../../crates/drift-engine/src/platform/macos/agentic_semantic_probe.rs"
         );
         let binary =
-            include_str!("../../crates/zephium-engine/src/bin/macos_agentic_semantic_probe.rs");
-        let fixture = include_str!("../../crates/zephium-agentic/src/fixture_server.rs");
+            include_str!("../../crates/drift-engine/src/bin/macos_agentic_semantic_probe.rs");
+        let fixture = include_str!("../../crates/drift-agentic/src/fixture_server.rs");
         validate_macos_rendering_probe(source, parent, binary, fixture).unwrap();
         for (required, replacement) in [
             (
@@ -14053,10 +14053,10 @@ mod tests {
             #[cfg(all(target_os = "windows", feature = "native-agentic-semantic-probe"))]
             pub fn run_windows_agentic_semantic_probe(
                 request_id: u64,
-                mode: zephium_agentic::WindowsSemanticProbeMode,
+                mode: drift_agentic::WindowsSemanticProbeMode,
             ) -> Result<
-                zephium_agentic::WindowsSemanticProbeEvidence,
-                zephium_agentic::WindowsSemanticProbeFailure,
+                drift_agentic::WindowsSemanticProbeEvidence,
+                drift_agentic::WindowsSemanticProbeFailure,
             > {
                 platform::windows::run_agentic_semantic_probe(request_id, mode)
             }
@@ -14239,7 +14239,7 @@ mod tests {
     #[test]
     fn production_cookie_preflight_is_bounded_and_secret_owning() {
         let preflight =
-            include_str!("../../crates/zephium-engine/src/platform/agent_cookie_preflight.rs");
+            include_str!("../../crates/drift-engine/src/platform/agent_cookie_preflight.rs");
         validate_engine_agent_cookie_preflight(preflight)
             .expect("bounded secret-owning cookie preflight");
         for invalid in [
@@ -14269,8 +14269,8 @@ mod tests {
 
     #[test]
     fn cookie_transfer_deadline_is_bounded_exact_and_clock_free() {
-        let root = include_str!("../../crates/zephium-agentic/src/lib.rs");
-        let transfer = include_str!("../../crates/zephium-agentic/src/cookie_transfer.rs");
+        let root = include_str!("../../crates/drift-agentic/src/lib.rs");
+        let transfer = include_str!("../../crates/drift-agentic/src/cookie_transfer.rs");
         validate_cookie_transfer_deadline_contract(root, transfer)
             .expect("bounded cookie transfer deadline");
         for invalid in [
@@ -14294,9 +14294,9 @@ mod tests {
 
     #[test]
     fn production_windows_cookie_adapter_is_bounded_callback_driven_and_recoverable() {
-        let module = include_str!("../../crates/zephium-engine/src/platform/windows/mod.rs");
+        let module = include_str!("../../crates/drift-engine/src/platform/windows/mod.rs");
         let transfer =
-            include_str!("../../crates/zephium-engine/src/platform/windows/cookie_transfer.rs");
+            include_str!("../../crates/drift-engine/src/platform/windows/cookie_transfer.rs");
         validate_engine_windows_cookie_transfer(module, transfer)
             .expect("bounded dormant Windows cookie adapter");
         // Target this module's gate: adding another preceding Windows module
@@ -14408,7 +14408,7 @@ mod tests {
                 self.phase == DocumentPhase::AuthorityRevoked && self.settling_action(attempt);
                 self.settling_action == Some(attempt);
                 super::semantic_action::map_runtime_fault(*fault) ==
-                    zephium_agentic::SemanticActionNativeFailure::AppliedUnverified;
+                    drift_agentic::SemanticActionNativeFailure::AppliedUnverified;
                 DocumentPhase::AuthorityRevoked;
                 let handed_off = self.awaiting_result
                     && matches!(
@@ -14460,7 +14460,7 @@ mod tests {
     #[test]
     fn isolated_command_program_cannot_escape_diagnostic_install_or_attestation_gate() {
         let runtime =
-            include_str!("../../crates/zephium-engine/src/platform/macos/semantic_runtime.rs");
+            include_str!("../../crates/drift-engine/src/platform/macos/semantic_runtime.rs");
         validate_engine_semantic_runtime_boundary(runtime).expect("closed diagnostic gate");
         for call in [
             "#[cfg(feature = \"native-agentic-semantic-probe\")]\n    let source =",
@@ -14480,15 +14480,15 @@ mod tests {
     #[test]
     fn preparation_only_control_stops_after_revalidation_inside_diagnostic_gate() {
         let candidate = include_str!(
-            "../../crates/zephium-engine/src/platform/macos/agentic_isolated_fill_candidate.js"
+            "../../crates/drift-engine/src/platform/macos/agentic_isolated_fill_candidate.js"
         );
         let probe = include_str!(
-            "../../crates/zephium-engine/src/platform/macos/agentic_semantic_program_probe.rs"
+            "../../crates/drift-engine/src/platform/macos/agentic_semantic_program_probe.rs"
         );
-        let shipping = include_str!("../../crates/zephium-agentic/assets/semantic-runtime-v1.js");
+        let shipping = include_str!("../../crates/drift-agentic/assets/semantic-runtime-v1.js");
         assert!(!shipping.contains("commandPreparationOnly"));
         assert!(!shipping.contains("applied_unverified_preparation_only"));
-        let engine = include_str!("../../crates/zephium-engine/src/lib.rs");
+        let engine = include_str!("../../crates/drift-engine/src/lib.rs");
         assert!(engine.contains("#[cfg(all(feature = \"native-agentic-semantic-probe\", not(debug_assertions)))]\ncompile_error!(\"the native agentic semantic probe is forbidden in optimized builds\");"));
         assert!(candidate.contains("return commandPreparationOnly ? \"unsupported_interaction\" : runSyntheticFill(target, descriptor, request, finish);"));
         let revalidation = candidate.find("if (!preparedCurrent()) return \"applied_unverified_beforeinput_revalidation\";\n      // The consumed").unwrap();
@@ -14666,8 +14666,8 @@ mod tests {
             mod agent_context;
             #[cfg(all(feature = "agentic-browser", target_os = "windows"))]
             mod agent_cookie_source;
-            agent_contexts: HashMap<zephium_agentic::ContextId, agent_context::AgentOwnedContext>,
-            agent_cookie_transfers: HashMap<zephium_agentic::ContextCookieTransferId, agent_context::AgentPendingCookieTransfer>,
+            agent_contexts: HashMap<drift_agentic::ContextId, agent_context::AgentOwnedContext>,
+            agent_cookie_transfers: HashMap<drift_agentic::ContextCookieTransferId, agent_context::AgentPendingCookieTransfer>,
             agent_cookie_quarantined_profiles: HashSet<ProfileId>,
         "#;
         let port = r#"
@@ -14790,7 +14790,7 @@ mod tests {
 
     #[test]
     fn production_agent_context_dispatch_is_panic_contained_and_fail_stopped() {
-        let port = include_str!("../../crates/zephium-engine/src/agent_context_port.rs");
+        let port = include_str!("../../crates/drift-engine/src/agent_context_port.rs");
         validate_engine_agent_context_panic_boundary(port).expect("agent-context panic boundary");
 
         for invalid in [
@@ -14831,13 +14831,13 @@ mod tests {
 
     #[test]
     fn production_location_observation_is_native_bounded_and_generation_exact() {
-        let port = include_str!("../../crates/zephium-engine/src/agent_context_port.rs");
-        let host = include_str!("../../crates/zephium-engine/src/host/agent_context.rs");
-        let macos = include_str!("../../crates/zephium-engine/src/platform/macos/agent_context.rs");
+        let port = include_str!("../../crates/drift-engine/src/agent_context_port.rs");
+        let host = include_str!("../../crates/drift-engine/src/host/agent_context.rs");
+        let macos = include_str!("../../crates/drift-engine/src/platform/macos/agent_context.rs");
         let windows =
-            include_str!("../../crates/zephium-engine/src/platform/windows/agent_context.rs");
+            include_str!("../../crates/drift-engine/src/platform/windows/agent_context.rs");
         let navigation =
-            include_str!("../../crates/zephium-engine/src/platform/agent_navigation.rs");
+            include_str!("../../crates/drift-engine/src/platform/agent_navigation.rs");
         validate_engine_agent_location_observation(port, host, macos, windows, navigation)
             .expect("repository location observation boundary");
 
@@ -14860,11 +14860,11 @@ mod tests {
 
     #[test]
     fn production_agent_redirects_are_scoped_bounded_and_identity_exact() {
-        let domain = include_str!("../../crates/zephium-agentic/src/context_port.rs");
-        let host = include_str!("../../crates/zephium-engine/src/host/agent_context.rs");
+        let domain = include_str!("../../crates/drift-agentic/src/context_port.rs");
+        let host = include_str!("../../crates/drift-engine/src/host/agent_context.rs");
         let navigation =
-            include_str!("../../crates/zephium-engine/src/platform/agent_navigation.rs");
-        let fixture = include_str!("../../crates/zephium-agentic/src/fixture_server.rs");
+            include_str!("../../crates/drift-engine/src/platform/agent_navigation.rs");
+        let fixture = include_str!("../../crates/drift-agentic/src/fixture_server.rs");
         validate_engine_agent_redirect_contract(domain, host, navigation, fixture)
             .expect("repository redirect contract");
 
@@ -14926,21 +14926,21 @@ mod tests {
 
     #[test]
     fn windows_production_agent_context_boundary_is_closed_and_bounded() {
-        let module = include_str!("../../crates/zephium-engine/src/platform/windows/mod.rs");
-        let platform_module = include_str!("../../crates/zephium-engine/src/platform/mod.rs");
+        let module = include_str!("../../crates/drift-engine/src/platform/windows/mod.rs");
+        let platform_module = include_str!("../../crates/drift-engine/src/platform/mod.rs");
         let adapter =
-            include_str!("../../crates/zephium-engine/src/platform/windows/agent_context.rs");
+            include_str!("../../crates/drift-engine/src/platform/windows/agent_context.rs");
         let suspension =
-            include_str!("../../crates/zephium-engine/src/platform/agent_suspension.rs");
-        let timeout = include_str!("../../crates/zephium-engine/src/platform/windows/timeout.rs");
+            include_str!("../../crates/drift-engine/src/platform/agent_suspension.rs");
+        let timeout = include_str!("../../crates/drift-engine/src/platform/windows/timeout.rs");
         let navigation =
-            include_str!("../../crates/zephium-engine/src/platform/agent_navigation.rs");
-        let host = include_str!("../../crates/zephium-engine/src/host/agent_context.rs");
-        let content_rules = include_str!("../../crates/zephium-engine/src/host/content_rules.rs");
-        let port = include_str!("../../crates/zephium-engine/src/agent_context_port.rs");
-        let host_root = include_str!("../../crates/zephium-engine/src/host/mod.rs");
+            include_str!("../../crates/drift-engine/src/platform/agent_navigation.rs");
+        let host = include_str!("../../crates/drift-engine/src/host/agent_context.rs");
+        let content_rules = include_str!("../../crates/drift-engine/src/host/content_rules.rs");
+        let port = include_str!("../../crates/drift-engine/src/agent_context_port.rs");
+        let host_root = include_str!("../../crates/drift-engine/src/host/mod.rs");
         let cookie_source =
-            include_str!("../../crates/zephium-engine/src/host/agent_cookie_source.rs");
+            include_str!("../../crates/drift-engine/src/host/agent_cookie_source.rs");
         validate_engine_windows_agent_context_boundary(module, adapter, timeout, navigation, host)
             .expect("closed Windows production owner");
         for mutation in [
@@ -15063,9 +15063,9 @@ mod tests {
 
     #[test]
     fn windows_production_semantic_protocol_is_closed_and_bounded() {
-        let module = include_str!("../../crates/zephium-engine/src/platform/mod.rs");
+        let module = include_str!("../../crates/drift-engine/src/platform/mod.rs");
         let source =
-            include_str!("../../crates/zephium-engine/src/platform/agent_semantic_cdp_protocol.rs");
+            include_str!("../../crates/drift-engine/src/platform/agent_semantic_cdp_protocol.rs");
         validate_engine_windows_semantic_protocol(module, source)
             .expect("closed Windows semantic protocol");
         assert!(validate_engine_windows_semantic_protocol(
@@ -15095,9 +15095,9 @@ mod tests {
 
     #[test]
     fn windows_production_semantic_runtime_is_serialized_and_non_universal() {
-        let module = include_str!("../../crates/zephium-engine/src/platform/windows/mod.rs");
+        let module = include_str!("../../crates/drift-engine/src/platform/windows/mod.rs");
         let source =
-            include_str!("../../crates/zephium-engine/src/platform/windows/semantic_runtime.rs");
+            include_str!("../../crates/drift-engine/src/platform/windows/semantic_runtime.rs");
         validate_engine_windows_semantic_runtime(module, source)
             .expect("bounded Windows semantic runtime");
         assert!(validate_engine_windows_semantic_runtime(
@@ -15114,13 +15114,13 @@ mod tests {
 
     #[test]
     fn windows_semantic_probe_is_fixed_hidden_and_release_excluded() {
-        let module = include_str!("../../crates/zephium-engine/src/platform/windows/mod.rs");
+        let module = include_str!("../../crates/drift-engine/src/platform/windows/mod.rs");
         let source = include_str!(
-            "../../crates/zephium-engine/src/platform/windows/agentic_semantic_probe.rs"
+            "../../crates/drift-engine/src/platform/windows/agentic_semantic_probe.rs"
         );
         let binary =
-            include_str!("../../crates/zephium-engine/src/bin/windows_agentic_semantic_probe.rs");
-        let fixture = include_str!("../../crates/zephium-agentic/src/fixture_server.rs");
+            include_str!("../../crates/drift-engine/src/bin/windows_agentic_semantic_probe.rs");
+        let fixture = include_str!("../../crates/drift-agentic/src/fixture_server.rs");
         validate_windows_semantic_probe(module, source, binary, fixture)
             .expect("closed Windows semantic qualifier");
         assert!(validate_windows_semantic_probe(
@@ -15271,11 +15271,11 @@ mod tests {
 
     #[test]
     fn production_owned_context_viewport_is_fixed_and_natively_attested() {
-        let context_port = include_str!("../../crates/zephium-agentic/src/context_port.rs");
-        let host = include_str!("../../crates/zephium-engine/src/host/agent_context.rs");
-        let macos = include_str!("../../crates/zephium-engine/src/platform/macos/agent_context.rs");
+        let context_port = include_str!("../../crates/drift-agentic/src/context_port.rs");
+        let host = include_str!("../../crates/drift-engine/src/host/agent_context.rs");
+        let macos = include_str!("../../crates/drift-engine/src/platform/macos/agent_context.rs");
         let windows =
-            include_str!("../../crates/zephium-engine/src/platform/windows/agent_context.rs");
+            include_str!("../../crates/drift-engine/src/platform/windows/agent_context.rs");
         validate_owned_context_viewport_contract(context_port, host, macos, windows)
             .expect("fixed native viewport");
         assert!(validate_owned_context_viewport_contract(
@@ -15325,7 +15325,7 @@ mod tests {
     #[test]
     fn macos_probe_requires_isolated_runtime_and_preflighted_native_dispatch() {
         let valid =
-            include_str!("../../crates/zephium-engine/src/platform/macos/agentic_input_probe.rs");
+            include_str!("../../crates/drift-engine/src/platform/macos/agentic_input_probe.rs");
         validate_macos_probe_source(valid).expect("valid bounded macOS probe");
         assert!(validate_macos_probe_source(&valid.replacen(
             "#![deny(unsafe_op_in_unsafe_fn)]\n",
@@ -15396,7 +15396,7 @@ mod tests {
     #[test]
     fn windows_probe_requires_closed_scoped_input_and_bounded_cdp() {
         let valid =
-            include_str!("../../crates/zephium-engine/src/platform/windows/agentic_input_probe.rs");
+            include_str!("../../crates/drift-engine/src/platform/windows/agentic_input_probe.rs");
         validate_windows_probe_source(valid).expect("valid bounded Windows probe");
         assert!(validate_windows_probe_source(&valid.replacen(
             "#![deny(unsafe_op_in_unsafe_fn)]\n",
@@ -15538,9 +15538,9 @@ mod tests {
 
     #[test]
     fn windows_probe_resource_sampler_is_shared_bounded_and_release_excluded() {
-        let module = include_str!("../../crates/zephium-engine/src/platform/windows/mod.rs");
+        let module = include_str!("../../crates/drift-engine/src/platform/windows/mod.rs");
         let valid = include_str!(
-            "../../crates/zephium-engine/src/platform/windows/agentic_probe_resources.rs"
+            "../../crates/drift-engine/src/platform/windows/agentic_probe_resources.rs"
         )
         .replace("\r\n", "\n");
         let valid = valid.as_str();
@@ -15666,16 +15666,16 @@ mod tests {
                 if ($parseErrors.Count -ne 0) {
                   throw "physical Windows agentic orchestrator did not parse"
                 }
-            cargo clippy --locked -p zephium-engine \
+            cargo clippy --locked -p drift-engine \
               --features native-agentic-input-probe \
               --bin windows-agentic-input-probe
-            cargo build --locked -p zephium-engine \
+            cargo build --locked -p drift-engine \
               --features native-agentic-input-probe \
               --bin windows-agentic-input-probe
-            cargo clippy --locked -p zephium-engine \
+            cargo clippy --locked -p drift-engine \
               --features native-agentic-semantic-probe \
               --bin windows-agentic-semantic-probe
-            cargo build --locked -p zephium-engine \
+            cargo build --locked -p drift-engine \
               --features native-agentic-semantic-probe \
               --bin windows-agentic-semantic-probe
         "#;
@@ -15786,7 +15786,7 @@ mod tests {
 
     #[test]
     fn windows_evidence_paths_reject_every_reparse_point_class() {
-        let source = include_str!("../../crates/zephium-agentic/src/probe_evidence_path.rs");
+        let source = include_str!("../../crates/drift-agentic/src/probe_evidence_path.rs");
         validate_probe_evidence_path(source).expect("direct Windows evidence paths");
         assert!(
             validate_probe_evidence_path(&source.replace("0x0000_0400", "0x0000_0000")).is_err()

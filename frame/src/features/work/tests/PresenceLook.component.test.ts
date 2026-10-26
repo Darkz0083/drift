@@ -22,7 +22,7 @@ const working = [
   {
     id: "code",
     title: "Code",
-    now: "Running cargo test -p zephium-core duration",
+    now: "Running cargo test -p drift-core duration",
     helper: "computer" as const,
   },
   {

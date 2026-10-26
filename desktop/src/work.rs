@@ -2,17 +2,17 @@
 
 use std::sync::{Arc, Mutex};
 use tauri::Manager;
-use zephium_app::{AgentWorkApplicationHandle, PreparedAgentWork};
-use zephium_work_composition::{MacosWorkComposition, TrustedWorkRequest};
+use drift_app::{AgentWorkApplicationHandle, PreparedAgentWork};
+use drift_work_composition::{MacosWorkComposition, TrustedWorkRequest};
 
 /// Nonblocking selected-session query for an ordinary Work invocation. Wait for
 /// Ready before passing that exact binding to launch. Selecting a browser
 /// profile does not identify an authenticated service account.
 pub fn selected_work_profile(
     app: &tauri::AppHandle,
-) -> Result<zephium_app::AgentWorkProfileRequest, WorkAdmissionFailure> {
+) -> Result<drift_app::AgentWorkProfileRequest, WorkAdmissionFailure> {
     let shell = app
-        .try_state::<zephium_app::Handle>()
+        .try_state::<drift_app::Handle>()
         .ok_or(WorkAdmissionFailure::Unavailable)?;
     Ok(shell.work_profile_binding())
 }
@@ -23,9 +23,9 @@ pub fn selected_work_profile(
 /// events releases bounded runtime backpressure. Queue admission is not success.
 pub fn launch_public_read_work(
     app: &tauri::AppHandle,
-    profile: zephium_app::AgentWorkProfileBinding,
-    invocation: zephium_work_composition::PublicReadWorkInvocation,
-) -> Result<zephium_app::RetainedWorkHandle, WorkAdmissionFailure> {
+    profile: drift_app::AgentWorkProfileBinding,
+    invocation: drift_work_composition::PublicReadWorkInvocation,
+) -> Result<drift_app::RetainedWorkHandle, WorkAdmissionFailure> {
     let request = invocation
         .into_request(profile)
         .map_err(WorkAdmissionFailure::Contract)?;
@@ -37,9 +37,9 @@ pub fn launch_public_read_work(
 /// neither the UI nor this adapter can manufacture refs or widen its effects.
 pub fn launch_public_local_action_work(
     app: &tauri::AppHandle,
-    profile: zephium_app::AgentWorkProfileBinding,
-    invocation: zephium_work_composition::PublicLocalActionWorkInvocation,
-) -> Result<zephium_app::RetainedWorkHandle, WorkAdmissionFailure> {
+    profile: drift_app::AgentWorkProfileBinding,
+    invocation: drift_work_composition::PublicLocalActionWorkInvocation,
+) -> Result<drift_app::RetainedWorkHandle, WorkAdmissionFailure> {
     let request = invocation
         .into_request(profile)
         .map_err(WorkAdmissionFailure::Contract)?;
@@ -55,8 +55,8 @@ struct CompositionAdmission {
 
 pub(crate) fn install(
     app: &tauri::AppHandle,
-    engine: Arc<zephium_engine::WebviewEngine>,
-    store: Arc<zephium_store::SqliteStore>,
+    engine: Arc<drift_engine::WebviewEngine>,
+    store: Arc<drift_store::SqliteStore>,
 ) -> bool {
     app.manage(WorkCompositionState(Mutex::new(CompositionAdmission {
         composition: Some(MacosWorkComposition::new(engine, store)),
@@ -69,7 +69,7 @@ pub enum WorkAdmissionFailure {
     /// Desktop startup or this process's one-shot composition is unavailable.
     Unavailable,
     /// Trusted input did not meet the existing controller contract.
-    Contract(zephium_work_composition::AgentWorkFailure),
+    Contract(drift_work_composition::AgentWorkFailure),
     /// Attachment was not queued. Both original non-executing owners remain
     /// available for an explicit attachment/admission retry, without preparation.
     AttachmentMailbox {
@@ -118,9 +118,9 @@ pub fn admit_trusted_work(
 pub fn admit_retained_trusted_work(
     app: &tauri::AppHandle,
     request: TrustedWorkRequest,
-) -> Result<zephium_app::RetainedWorkHandle, WorkAdmissionFailure> {
+) -> Result<drift_app::RetainedWorkHandle, WorkAdmissionFailure> {
     let shell = app
-        .try_state::<zephium_app::Handle>()
+        .try_state::<drift_app::Handle>()
         .ok_or(WorkAdmissionFailure::Unavailable)?;
     let state = app
         .try_state::<WorkCompositionState>()
@@ -150,8 +150,8 @@ pub fn admit_retained_trusted_work(
 ))]
 pub(crate) fn retained_resource_failure_cause(
     app: &tauri::AppHandle,
-    view: &zephium_app::RetainedWorkHandle,
-) -> Option<zephium_engine::WorkResourceFailureCause> {
+    view: &drift_app::RetainedWorkHandle,
+) -> Option<drift_engine::WorkResourceFailureCause> {
     let state = app.try_state::<WorkCompositionState>()?;
     let owner = state.0.lock().ok()?;
     owner
@@ -177,7 +177,7 @@ fn admit_after(
     predecessor: Option<&AgentWorkApplicationHandle>,
 ) -> Result<AgentWorkApplicationHandle, WorkAdmissionFailure> {
     let shell = app
-        .try_state::<zephium_app::Handle>()
+        .try_state::<drift_app::Handle>()
         .ok_or(WorkAdmissionFailure::Unavailable)?;
     let state = app
         .try_state::<WorkCompositionState>()

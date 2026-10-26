@@ -17,7 +17,7 @@ let heard = false;
 export function fullscreen(): boolean {
   if (IS_MAC && !watching) {
     watching = true;
-    window.addEventListener("zephium:fullscreen", (event) => {
+    window.addEventListener("drift:fullscreen", (event) => {
       heard = true;
       full = (event as CustomEvent<unknown>).detail === true;
     });

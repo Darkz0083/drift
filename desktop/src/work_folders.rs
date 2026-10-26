@@ -13,10 +13,10 @@ pub(crate) async fn work_choose_folder(
     app: AppHandle,
     expected_profile: String,
     start: Option<String>,
-) -> Result<Option<zephium_ipc::WorkFolderAdmitV1>, ()> {
+) -> Result<Option<drift_ipc::WorkFolderAdmitV1>, ()> {
     if !super::authorize(&caller, super::CallerPolicy::Main, "work_choose_folder")
         || super::shutdown_started(&app)
-        || zephium_core::ids::ProfileId::parse(&expected_profile)
+        || drift_core::ids::ProfileId::parse(&expected_profile)
             .is_none_or(|id| id.to_string() != expected_profile)
     {
         return Ok(None);
@@ -49,8 +49,8 @@ pub(crate) async fn work_choose_folder(
     Ok(Some(admit(path.to_string_lossy().into_owned())))
 }
 
-fn admit(path: String) -> zephium_ipc::WorkFolderAdmitV1 {
-    use zephium_ipc::WorkFolderAdmitV1;
+fn admit(path: String) -> drift_ipc::WorkFolderAdmitV1 {
+    use drift_ipc::WorkFolderAdmitV1;
     let not_a_folder = std::path::Path::new(&path).is_file();
     #[cfg(not(feature = "work-product"))]
     {
@@ -58,7 +58,7 @@ fn admit(path: String) -> zephium_ipc::WorkFolderAdmitV1 {
     }
     #[cfg(feature = "work-product")]
     {
-        let (grant, _) = zephium_app::work_files::WorkFileGrant::admit(&[path]);
+        let (grant, _) = drift_app::work_files::WorkFileGrant::admit(&[path]);
         match grant.roots().first() {
             Some(root) => WorkFolderAdmitV1::Admitted {
                 path: root.to_string_lossy().into_owned(),

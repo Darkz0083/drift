@@ -82,8 +82,8 @@ async function fixture() {
   document.body.append(frame);
   await loaded;
   const win = frame.contentWindow!;
-  const api = (win as unknown as { __zephium_content_style_v1__: StyleApi })
-    .__zephium_content_style_v1__;
+  const api = (win as unknown as { __drift_content_style_v1__: StyleApi })
+    .__drift_content_style_v1__;
   const { token, url } = api.inspect();
   const index = JSON.stringify([
     [".ad", [".ad"]],

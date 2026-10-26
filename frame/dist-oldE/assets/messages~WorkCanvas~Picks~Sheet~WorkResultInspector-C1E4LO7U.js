@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`Actions`)),n=((t={},n={})=>(n.locale??e(),`No data available.`)),r=((t={},n={})=>(n.locale??e(),`Next`)),i=((t={},n={})=>(n.locale??e(),`Previous`)),a=((t,n={})=>(n.locale??e(),`${t?.first}–${t?.last} of ${t?.total}`));export{t as a,n as i,i as n,r,a as t};

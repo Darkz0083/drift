@@ -1,0 +1,1 @@
+var e=e=>e.replace(/\r?\n$/u,``).split(/\r?\n/u);function t(e,t){let n=Array.from({length:t});return e.forEach((e,r)=>{let i=Math.max(1,Math.trunc(e.from)),a=Math.min(t,Math.trunc(e.to));for(let e=i;e<=a;e+=1)n[e-1]??=r}),n}export{t as n,e as t};

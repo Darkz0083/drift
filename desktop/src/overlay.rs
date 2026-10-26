@@ -10,8 +10,8 @@ use model::{Model, Owner};
 use std::sync::{Arc, Mutex};
 use tauri::{LogicalSize, Manager, PhysicalPosition, WebviewWindow};
 #[cfg(target_os = "macos")]
-use zephium_core::ports::store::Store;
-use zephium_ipc::{
+use drift_core::ports::store::Store;
+use drift_ipc::{
     OperationDisposition, OperationOutcome, PanelIntent, PanelLayout, PanelOwner, PanelState,
     SearchContext, ToolKind,
 };
@@ -19,7 +19,7 @@ pub const PANEL_LABEL: &str = "panel";
 pub const PANEL_SIZE: (f64, f64) = (geometry::WIDTH, geometry::INITIAL_HEIGHT);
 #[cfg(target_os = "macos")]
 pub const PANEL_RADIUS: u16 = model::RADIUS;
-pub const EVENT_STATE: &str = "zephium:panel-state";
+pub const EVENT_STATE: &str = "drift:panel-state";
 #[derive(Default)]
 pub struct ContextCache(Mutex<Option<Owner>>);
 impl ContextCache {
@@ -372,9 +372,9 @@ impl Overlay {
         }
     }
     fn cancel_search(&self, session_id: String) {
-        if let Some(shell) = self.window.app_handle().try_state::<zephium_app::Handle>() {
+        if let Some(shell) = self.window.app_handle().try_state::<drift_app::Handle>() {
             crate::search_providers::cancel(&session_id);
-            shell.dispatch(zephium_app::Command::CancelSearch { session_id });
+            shell.dispatch(drift_app::Command::CancelSearch { session_id });
         }
     }
     fn publish(&self) {

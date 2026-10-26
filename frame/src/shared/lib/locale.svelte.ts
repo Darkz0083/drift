@@ -66,7 +66,7 @@ export const interfaceLanguages = (): string[] => [baseLocale, ...loaders.keys()
 
 /** Every language the interface may be set to, translated or not yet; also
  *  the spoken languages dictation offers. Mirrors
- *  `zephium_core::preferences::LANGUAGES`. */
+ *  `drift_core::preferences::LANGUAGES`. */
 const INTERFACE_LANGUAGES = [
   "en",
   "ar",

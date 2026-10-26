@@ -4,18 +4,18 @@ use std::borrow::Cow;
 use std::time::Duration;
 use tauri::{AppHandle, Manager, State, WebviewWindow};
 use tauri_plugin_dialog::DialogExt;
-use zephium_core::ids::{ProfileId, ResourceId};
-use zephium_core::resources::{
+use drift_core::ids::{ProfileId, ResourceId};
+use drift_core::resources::{
     MediaAssetV1, MediaImport, MediaKind, MediaOrigin, ResourceCall, ResourceContent,
     ResourceError, ResourceResponse, MAX_MEDIA_FILE_BYTES, MAX_MEDIA_IMAGE_BYTES,
 };
-use zephium_ipc::MediaImportV1;
+use drift_ipc::MediaImportV1;
 
-pub(crate) const SCHEME: &str = "zephium-media";
+pub(crate) const SCHEME: &str = "drift-media";
 
 /// Blob paths for the custom scheme; bytes are admitted only through the
 /// store actor.
-pub(crate) struct MediaBlobs(pub(crate) zephium_store::MediaStore);
+pub(crate) struct MediaBlobs(pub(crate) drift_store::MediaStore);
 
 fn profile_of(value: &str) -> Option<ProfileId> {
     ProfileId::parse(value).filter(|id| id.to_string() == value)
@@ -26,7 +26,7 @@ fn profile_of(value: &str) -> Option<ProfileId> {
 pub(crate) async fn media_import(
     caller: WebviewWindow,
     app: AppHandle,
-    shell: State<'_, zephium_app::Handle>,
+    shell: State<'_, drift_app::Handle>,
     expected_profile: String,
 ) -> Result<MediaImportV1, ()> {
     let refused = |error| Ok(MediaImportV1::Refused { error });
@@ -122,11 +122,11 @@ fn read_import_bytes(reader: impl std::io::Read, limit: u64) -> Result<Vec<u8>, 
 }
 
 async fn media_asset(
-    shell: &zephium_app::Handle,
+    shell: &drift_app::Handle,
     profile: ProfileId,
     id: &str,
 ) -> Result<MediaAssetV1, ResourceError> {
-    if !zephium_core::resources::valid_id(id) {
+    if !drift_core::resources::valid_id(id) {
         return Err(ResourceError::Invalid);
     }
     let receiver = shell.resource_call(profile, ResourceCall::Get { id: id.to_owned() });
@@ -151,7 +151,7 @@ async fn media_asset(
 pub(crate) async fn media_open(
     caller: WebviewWindow,
     app: AppHandle,
-    shell: State<'_, zephium_app::Handle>,
+    shell: State<'_, drift_app::Handle>,
     expected_profile: String,
     id: String,
 ) -> Result<bool, ()> {
@@ -298,7 +298,7 @@ fn respond(
         .unwrap_or_else(|_| tauri::http::Response::new(Cow::Borrowed(b"" as &[u8])))
 }
 
-/// `zephium-media://localhost/<profile>/<digest>[?w=<px>]` from privileged main
+/// `drift-media://localhost/<profile>/<digest>[?w=<px>]` from privileged main
 /// chrome only. Serves admitted image blobs, scaled down to `w` when the
 /// picture is wider and one is asked for; every other request is 404. Work
 /// happens off the main thread.
@@ -372,7 +372,7 @@ fn resolve(
 /// profile. No URL or fetch is derived from this descriptive reference.
 fn serve_record_media(app: &AppHandle, encoded: &str) -> tauri::http::Response<Cow<'static, [u8]>> {
     use base64::Engine as _;
-    use zephium_core::work::{media::WorkRecordMediaRefV1, port::WorkReply};
+    use drift_core::work::{media::WorkRecordMediaRefV1, port::WorkReply};
     if encoded.len() > 3072 || super::shutdown_started(app) {
         return respond(404, Vec::new(), "text/plain");
     }
@@ -382,7 +382,7 @@ fn serve_record_media(app: &AppHandle, encoded: &str) -> tauri::http::Response<C
         .filter(|bytes| bytes.len() <= 2048)
         .and_then(|bytes| serde_json::from_slice::<WorkRecordMediaRefV1>(&bytes).ok())
         .filter(|media| media.validate().is_ok());
-    let (Some(media), Some(shell)) = (media, app.try_state::<zephium_app::Handle>()) else {
+    let (Some(media), Some(shell)) = (media, app.try_state::<drift_app::Handle>()) else {
         return respond(404, Vec::new(), "text/plain");
     };
     let profile = media.profile;
@@ -422,7 +422,7 @@ fn serve_page_frame(
     let ids = (parts.next(), parts.next());
     #[cfg(feature = "work-product")]
     {
-        use zephium_core::work::{WorkAttemptId, WorkStepId};
+        use drift_core::work::{WorkAttemptId, WorkStepId};
         let (Some(attempt), Some(step)) = (
             ids.0.and_then(WorkAttemptId::parse),
             ids.1.and_then(WorkStepId::parse),
@@ -568,8 +568,8 @@ mod thumb {
             return None;
         }
         let mut limits = image::Limits::default();
-        limits.max_image_width = Some(zephium_core::resources::MAX_MEDIA_DIMENSION);
-        limits.max_image_height = Some(zephium_core::resources::MAX_MEDIA_DIMENSION);
+        limits.max_image_width = Some(drift_core::resources::MAX_MEDIA_DIMENSION);
+        limits.max_image_height = Some(drift_core::resources::MAX_MEDIA_DIMENSION);
         limits.max_alloc = Some(256 * 1024 * 1024);
         let mut reader = ImageReader::with_format(Cursor::new(bytes), format);
         reader.limits(limits.clone());
@@ -714,15 +714,15 @@ fn image_name(url: &tauri::Url) -> String {
 
 #[cfg(feature = "work-product")]
 async fn environment_snapshot(
-    shell: &zephium_app::Handle,
+    shell: &drift_app::Handle,
     profile: ProfileId,
-    id: zephium_core::work::WorkEnvironmentId,
-) -> Result<zephium_core::work::environment::WorkEnvironmentSnapshot, ResourceError> {
-    use zephium_core::work::{environment::*, port::*};
+    id: drift_core::work::WorkEnvironmentId,
+) -> Result<drift_core::work::environment::WorkEnvironmentSnapshot, ResourceError> {
+    use drift_core::work::{environment::*, port::*};
     let request = shell
         .work_call(
             profile,
-            zephium_ipc::work::WorkCallV1::Environment {
+            drift_ipc::work::WorkCallV1::Environment {
                 version: 1,
                 request: WorkEnvironmentCall::Read { id },
             },
@@ -744,17 +744,17 @@ async fn environment_snapshot(
 
 #[cfg(feature = "work-product")]
 async fn environment_edit(
-    shell: &zephium_app::Handle,
+    shell: &drift_app::Handle,
     profile: ProfileId,
-    id: zephium_core::work::WorkEnvironmentId,
-    expected: zephium_core::work::WorkRevision,
-    edit: zephium_core::work::environment::WorkEnvironmentEdit,
-) -> Result<zephium_core::work::environment::WorkEnvironmentSnapshot, ResourceError> {
-    use zephium_core::work::{environment::*, port::*, WorkCommandId};
+    id: drift_core::work::WorkEnvironmentId,
+    expected: drift_core::work::WorkRevision,
+    edit: drift_core::work::environment::WorkEnvironmentEdit,
+) -> Result<drift_core::work::environment::WorkEnvironmentSnapshot, ResourceError> {
+    use drift_core::work::{environment::*, port::*, WorkCommandId};
     let request = shell
         .work_call(
             profile,
-            zephium_ipc::work::WorkCallV1::Environment {
+            drift_ipc::work::WorkCallV1::Environment {
                 version: 1,
                 request: WorkEnvironmentCall::Command {
                     command: WorkCommandId::generate(),
@@ -789,8 +789,8 @@ pub(crate) async fn work_admit_folder(
     app: AppHandle,
     expected_profile: String,
     path: String,
-) -> Result<zephium_ipc::WorkFolderAdmitV1, ()> {
-    use zephium_ipc::WorkFolderAdmitV1;
+) -> Result<drift_ipc::WorkFolderAdmitV1, ()> {
+    use drift_ipc::WorkFolderAdmitV1;
     if !super::authorize(&caller, super::CallerPolicy::Main, "work_admit_folder")
         || super::shutdown_started(&app)
         || profile_of(&expected_profile).is_none()
@@ -809,7 +809,7 @@ pub(crate) async fn work_pick_folder(
     caller: WebviewWindow,
     app: AppHandle,
     expected_profile: String,
-) -> Result<Option<zephium_ipc::WorkFolderAdmitV1>, ()> {
+) -> Result<Option<drift_ipc::WorkFolderAdmitV1>, ()> {
     if !super::authorize(&caller, super::CallerPolicy::Main, "work_pick_folder")
         || super::shutdown_started(&app)
         || profile_of(&expected_profile).is_none()
@@ -877,7 +877,7 @@ pub(crate) async fn work_reveal_path(
             }
         };
         let (grant, _) =
-            zephium_app::work_files::WorkFileGrant::admit(&[folder.to_string_lossy().into_owned()]);
+            drift_app::work_files::WorkFileGrant::admit(&[folder.to_string_lossy().into_owned()]);
         if grant.is_empty() {
             return Ok(false);
         }
@@ -896,8 +896,8 @@ pub(crate) async fn work_reveal_path(
     }
 }
 
-fn admit_folder(path: String) -> zephium_ipc::WorkFolderAdmitV1 {
-    use zephium_ipc::WorkFolderAdmitV1;
+fn admit_folder(path: String) -> drift_ipc::WorkFolderAdmitV1 {
+    use drift_ipc::WorkFolderAdmitV1;
     let not_a_folder = std::path::Path::new(&path).is_file();
     #[cfg(not(feature = "work-product"))]
     {
@@ -905,7 +905,7 @@ fn admit_folder(path: String) -> zephium_ipc::WorkFolderAdmitV1 {
     }
     #[cfg(feature = "work-product")]
     {
-        let (grant, _) = zephium_app::work_files::WorkFileGrant::admit(&[path]);
+        let (grant, _) = drift_app::work_files::WorkFileGrant::admit(&[path]);
         let Some(root) = grant.roots().first() else {
             return WorkFolderAdmitV1::Refused { not_a_folder };
         };
@@ -928,13 +928,13 @@ fn admit_folder(path: String) -> zephium_ipc::WorkFolderAdmitV1 {
 pub(crate) async fn media_admit_remote(
     caller: WebviewWindow,
     app: AppHandle,
-    shell: State<'_, zephium_app::Handle>,
+    shell: State<'_, drift_app::Handle>,
     expected_profile: String,
     environment: String,
     element: String,
     url: String,
-) -> Result<zephium_ipc::MediaAdmitV1, ()> {
-    use zephium_ipc::MediaAdmitV1;
+) -> Result<drift_ipc::MediaAdmitV1, ()> {
+    use drift_ipc::MediaAdmitV1;
     let refused = |error| Ok(MediaAdmitV1::Refused { error });
     if !super::authorize(&caller, super::CallerPolicy::Main, "media_admit_remote")
         || super::shutdown_started(&app)
@@ -973,7 +973,7 @@ pub(crate) async fn media_admit_remote(
 pub(crate) async fn link_describe(
     caller: WebviewWindow,
     app: AppHandle,
-    shell: State<'_, zephium_app::Handle>,
+    shell: State<'_, drift_app::Handle>,
     expected_profile: String,
     environment: String,
     element: String,
@@ -993,8 +993,8 @@ pub(crate) async fn link_describe(
     }
     #[cfg(feature = "work-product")]
     {
-        use zephium_core::work::environment::{WorkEnvironmentEdit, WorkEnvironmentReference};
-        use zephium_core::work::{WorkElementId, WorkEnvironmentId};
+        use drift_core::work::environment::{WorkEnvironmentEdit, WorkEnvironmentReference};
+        use drift_core::work::{WorkElementId, WorkEnvironmentId};
         let (Some(environment), Some(element)) = (
             WorkEnvironmentId::parse(&environment),
             WorkElementId::parse(&element),
@@ -1020,7 +1020,7 @@ pub(crate) async fn link_describe(
         if title.trim_start_matches("www.") != host.trim_start_matches("www.") {
             return Ok(false);
         }
-        let Some(details) = zephium_agentic::youtube_oembed::fetch(url).await else {
+        let Some(details) = drift_agentic::youtube_oembed::fetch(url).await else {
             return Ok(false);
         };
         let title = format!("{}\n{}", details.title, details.channel);
@@ -1060,21 +1060,21 @@ pub(crate) async fn link_describe(
 struct MediaAdmitTrace {
     bytes: usize,
     #[cfg(feature = "work-product")]
-    fetch: Option<zephium_agentic::public_asset::PublicAssetError>,
+    fetch: Option<drift_agentic::public_asset::PublicAssetError>,
     #[cfg(not(feature = "work-product"))]
     fetch: Option<()>,
 }
 
 async fn admit_remote(
     app: &AppHandle,
-    shell: &zephium_app::Handle,
+    shell: &drift_app::Handle,
     profile: ProfileId,
     environment: String,
     element: String,
     url: String,
     trace: &mut MediaAdmitTrace,
-) -> Result<zephium_ipc::MediaAdmitV1, ()> {
-    use zephium_ipc::MediaAdmitV1;
+) -> Result<drift_ipc::MediaAdmitV1, ()> {
+    use drift_ipc::MediaAdmitV1;
     let refused = |error| Ok(MediaAdmitV1::Refused { error });
     #[cfg(not(feature = "work-product"))]
     {
@@ -1083,7 +1083,7 @@ async fn admit_remote(
     }
     #[cfg(feature = "work-product")]
     {
-        use zephium_core::work::{WorkElementId, WorkEnvironmentId};
+        use drift_core::work::{WorkElementId, WorkEnvironmentId};
         let (Some(environment), Some(element)) = (
             WorkEnvironmentId::parse(&environment),
             WorkElementId::parse(&element),
@@ -1093,7 +1093,7 @@ async fn admit_remote(
         let Ok(parsed) = tauri::Url::parse(&url) else {
             return refused(ResourceError::Invalid);
         };
-        if !zephium_agentic::public_asset::public_https(&parsed) {
+        if !drift_agentic::public_asset::public_https(&parsed) {
             return refused(ResourceError::Invalid);
         }
         let snapshot = match environment_snapshot(shell, profile, environment).await {
@@ -1117,12 +1117,12 @@ async fn admit_remote(
         };
         let resource = {
             let bytes =
-                match zephium_agentic::public_asset::fetch_public_image(parsed.as_str()).await {
+                match drift_agentic::public_asset::fetch_public_image(parsed.as_str()).await {
                     Ok(bytes) => bytes,
                     Err(error) => {
                         trace.fetch = Some(error);
                         return refused(match error {
-                            zephium_agentic::public_asset::PublicAssetError::TooLarge => {
+                            drift_agentic::public_asset::PublicAssetError::TooLarge => {
                                 ResourceError::Capacity
                             }
                             _ => ResourceError::Unavailable,
@@ -1174,33 +1174,33 @@ async fn admit_remote(
 trait Canvas {
     async fn read(
         &self,
-    ) -> Result<zephium_core::work::environment::WorkEnvironmentSnapshot, ResourceError>;
+    ) -> Result<drift_core::work::environment::WorkEnvironmentSnapshot, ResourceError>;
     async fn edit(
         &self,
-        expected: zephium_core::work::WorkRevision,
-        edit: zephium_core::work::environment::WorkEnvironmentEdit,
-    ) -> Result<zephium_core::work::environment::WorkEnvironmentSnapshot, ResourceError>;
+        expected: drift_core::work::WorkRevision,
+        edit: drift_core::work::environment::WorkEnvironmentEdit,
+    ) -> Result<drift_core::work::environment::WorkEnvironmentSnapshot, ResourceError>;
 }
 
 #[cfg(feature = "work-product")]
 struct ShellCanvas<'a> {
-    shell: &'a zephium_app::Handle,
+    shell: &'a drift_app::Handle,
     profile: ProfileId,
-    environment: zephium_core::work::WorkEnvironmentId,
+    environment: drift_core::work::WorkEnvironmentId,
 }
 
 #[cfg(feature = "work-product")]
 impl Canvas for ShellCanvas<'_> {
     async fn read(
         &self,
-    ) -> Result<zephium_core::work::environment::WorkEnvironmentSnapshot, ResourceError> {
+    ) -> Result<drift_core::work::environment::WorkEnvironmentSnapshot, ResourceError> {
         environment_snapshot(self.shell, self.profile, self.environment).await
     }
     async fn edit(
         &self,
-        expected: zephium_core::work::WorkRevision,
-        edit: zephium_core::work::environment::WorkEnvironmentEdit,
-    ) -> Result<zephium_core::work::environment::WorkEnvironmentSnapshot, ResourceError> {
+        expected: drift_core::work::WorkRevision,
+        edit: drift_core::work::environment::WorkEnvironmentEdit,
+    ) -> Result<drift_core::work::environment::WorkEnvironmentSnapshot, ResourceError> {
         environment_edit(self.shell, self.profile, self.environment, expected, edit).await
     }
 }
@@ -1212,10 +1212,10 @@ impl Canvas for ShellCanvas<'_> {
 #[cfg(feature = "work-product")]
 async fn attach_picture(
     canvas: &impl Canvas,
-    subject: zephium_core::work::WorkElementId,
+    subject: drift_core::work::WorkElementId,
     resource: ResourceId,
-) -> Result<zephium_core::work::WorkElementId, ResourceError> {
-    use zephium_core::work::environment::*;
+) -> Result<drift_core::work::WorkElementId, ResourceError> {
+    use drift_core::work::environment::*;
     const ATTEMPTS: usize = 3;
     let reference = WorkEnvironmentReference::Resource { resource };
     for _ in 0..ATTEMPTS {
@@ -1295,13 +1295,13 @@ async fn attach_picture(
 fn fit_for_display(bytes: Vec<u8>) -> Option<Vec<u8>> {
     use image::{ImageFormat, ImageReader};
     use std::io::Cursor;
-    const EDGE: u32 = zephium_agentic::public_asset::DISPLAY_EDGE;
-    let limit = zephium_core::resources::MAX_MEDIA_FETCHED_IMAGE_BYTES as usize;
+    const EDGE: u32 = drift_agentic::public_asset::DISPLAY_EDGE;
+    let limit = drift_core::resources::MAX_MEDIA_FETCHED_IMAGE_BYTES as usize;
     let format = image::guess_format(&bytes).ok()?;
     let mut reader = ImageReader::with_format(Cursor::new(bytes.as_slice()), format);
     let mut limits = image::Limits::default();
-    limits.max_image_width = Some(zephium_core::resources::MAX_MEDIA_DIMENSION);
-    limits.max_image_height = Some(zephium_core::resources::MAX_MEDIA_DIMENSION);
+    limits.max_image_width = Some(drift_core::resources::MAX_MEDIA_DIMENSION);
+    limits.max_image_height = Some(drift_core::resources::MAX_MEDIA_DIMENSION);
     limits.max_alloc = Some(256 * 1024 * 1024);
     reader.limits(limits.clone());
     let (width, height) = reader.into_dimensions().ok()?;
@@ -1340,9 +1340,9 @@ fn fit_for_display(bytes: Vec<u8>) -> Option<Vec<u8>> {
 
 #[cfg(feature = "work-product")]
 fn remote_image_target(
-    reference: &zephium_core::work::environment::WorkEnvironmentReference,
+    reference: &drift_core::work::environment::WorkEnvironmentReference,
 ) -> bool {
-    use zephium_core::work::environment::WorkEnvironmentReference;
+    use drift_core::work::environment::WorkEnvironmentReference;
     // A lead's picks object is one artifact element whose items each name
     // their own pictures; each admitted picture relates to that element.
     matches!(
@@ -1380,7 +1380,7 @@ mod display_tests {
             let decoded = image::load_from_memory(&fitted).unwrap();
             assert_eq!((decoded.width(), decoded.height()), (1600, 1200));
             assert!(
-                fitted.len() <= zephium_core::resources::MAX_MEDIA_FETCHED_IMAGE_BYTES as usize
+                fitted.len() <= drift_core::resources::MAX_MEDIA_FETCHED_IMAGE_BYTES as usize
             );
             assert_eq!(
                 image::guess_format(&fitted).unwrap(),
@@ -1399,7 +1399,7 @@ mod date_tests {
     #[cfg(feature = "work-product")]
     #[test]
     fn remote_thumbnails_accept_subjects_links_and_placed_objects_only() {
-        use zephium_core::work::environment::WorkEnvironmentReference;
+        use drift_core::work::environment::WorkEnvironmentReference;
         assert!(super::remote_image_target(
             &WorkEnvironmentReference::Link {
                 url: "https://example.com/video".into(),
@@ -1439,9 +1439,9 @@ mod date_tests {
 mod attach_tests {
     use super::{attach_picture, Canvas, ResourceError};
     use std::sync::Mutex;
-    use zephium_core::ids::ResourceId;
-    use zephium_core::work::environment::*;
-    use zephium_core::work::{WorkElementId, WorkRevision};
+    use drift_core::ids::ResourceId;
+    use drift_core::work::environment::*;
+    use drift_core::work::{WorkElementId, WorkRevision};
 
     /// A canvas that applies the real pure edit and can lose the next
     /// compare-and-set to a concurrent writer.

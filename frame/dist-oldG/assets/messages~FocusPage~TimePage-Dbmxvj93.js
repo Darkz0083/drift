@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`These sites stay closed while a focus round runs. Breaks open them again.`)),n=((t={},n={})=>(n.locale??e(),`Time`));export{t as n,n as t};

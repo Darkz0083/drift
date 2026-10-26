@@ -115,7 +115,7 @@ test("a Finder drop admits its folders, keeps quiet about the files beside them,
   root.style.height = "720px";
   root.style.width = "1100px";
   window.dispatchEvent(
-    new CustomEvent("zephium:work-paths-dropped", {
+    new CustomEvent("drift:work-paths-dropped", {
       detail: { paths: ["/Users/reader/Papers", "/Users/reader/Papers/notes.pdf"], x: 420, y: 300 },
     }),
   );

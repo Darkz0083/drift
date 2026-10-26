@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t,n={})=>(n.locale??e(),`Line ${t?.line}`)),n=((t,n={})=>(n.locale??e(),`Lines ${t?.from}–${t?.to}`)),r=((t={},n={})=>(n.locale??e(),`Notes`));export{n,t as r,r as t};

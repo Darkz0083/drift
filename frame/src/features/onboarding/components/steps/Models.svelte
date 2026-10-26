@@ -5,7 +5,7 @@
   import * as m from "$shared/i18n/messages";
   import { commands, type WorkLocalServerV1 } from "$shared/ipc/bindings";
   import Icon from "$shared/ui/Icon";
-  import ZephiumTile from "$shared/ui/ZephiumTile";
+  import DriftTile from "$shared/ui/DriftTile";
   import type { Mind } from "../../lib/minds";
 
   let {
@@ -44,7 +44,7 @@
 
   type Option = {
     id: Mind;
-    /** Zephium shows its own app icon instead. */
+    /** Drift shows its own app icon instead. */
     icon?: IconSvgElement;
     title: string;
     body: string;
@@ -55,9 +55,9 @@
     const list: Option[] = [];
     if (hosted)
       list.push({
-        id: "zephium",
-        title: m.onb_ai_zephium(),
-        body: m.onb_ai_zephium_body(),
+        id: "drift",
+        title: m.onb_ai_drift(),
+        body: m.onb_ai_drift_body(),
         found: null,
       });
     list.push(
@@ -92,7 +92,7 @@
       />
       <span class="top">
         {#if option.icon}<span class="tile"><Icon icon={option.icon} size={18} /></span
-          >{:else}<ZephiumTile size={36} />{/if}
+          >{:else}<DriftTile size={36} />{/if}
         {#if option.found}<span class="found">{option.found}</span>{/if}
       </span>
       <span class="title">{option.title}</span>

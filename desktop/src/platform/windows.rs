@@ -13,13 +13,13 @@ use windows::core::Interface;
 
 use crate::startup_alert::{runtime_failure, StartupFailure, StartupProblem};
 
-use zephium_app::{
+use drift_app::{
     ChromePresentation, ChromePresentationCallback, ChromePresentationDispatch, PresentationChrome,
     SharedChrome,
 };
-use zephium_core::geometry::Size;
-use zephium_core::ports::chrome::{Chrome, ChromeFrame};
-use zephium_engine::MainThreadDispatch;
+use drift_core::geometry::Size;
+use drift_core::ports::chrome::{Chrome, ChromeFrame};
+use drift_engine::MainThreadDispatch;
 
 static MATERIALS: std::sync::LazyLock<
     std::sync::Mutex<std::collections::HashMap<String, crate::material::Material>>,
@@ -65,11 +65,11 @@ fn take_pwstr_bounded(
 }
 
 pub fn remove_privileged_version_observer(label: &str) -> bool {
-    zephium_engine::detach_privileged_environment_update(label)
+    drift_engine::detach_privileged_environment_update(label)
 }
 
 pub fn finalize_privileged_environment_observers(expected_labels: &[&str]) -> bool {
-    zephium_engine::finalize_privileged_environment_registrations(expected_labels)
+    drift_engine::finalize_privileged_environment_registrations(expected_labels)
 }
 
 /// Starts the log before anything can fail, in the folder Tauri will resolve
@@ -104,11 +104,11 @@ pub fn open_startup_log(identifier: &str) {
 /// Capability checks still run per-view; an outdated runtime is reported as
 /// an update advisory instead of refused.
 pub fn enforce_runtime_security_floor(
-) -> Result<zephium_core::runtime_security::RuntimeSecurityAdvisories, StartupFailure> {
+) -> Result<drift_core::runtime_security::RuntimeSecurityAdvisories, StartupFailure> {
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |elapsed| elapsed.as_secs());
-    if let Some(name) = zephium_core::webview2::first_present_environment_override(|name| {
+    if let Some(name) = drift_core::webview2::first_present_environment_override(|name| {
         std::env::var_os(name).is_some()
     }) {
         return Err(StartupFailure::new(StartupProblem::WebViewOverride, name));
@@ -129,7 +129,7 @@ pub fn enforce_runtime_security_floor(
     crate::write_diagnostic(format_args!(
         "startup: WebView2 runtime selected at launch: {reported}"
     ));
-    let (_, advisory) = zephium_core::webview2::assess_runtime(&reported, now)
+    let (_, advisory) = drift_core::webview2::assess_runtime(&reported, now)
         .map_err(|error| runtime_failure(&reported, error))?;
     Ok(advisory)
 }
@@ -207,7 +207,7 @@ pub fn harden_privileged(
             crate::write_diagnostic(format_args!(
                 "startup: privileged WebView2 environment runs on {reported_version}"
             ));
-            zephium_core::webview2::admit_runtime(&reported_version)
+            drift_core::webview2::admit_runtime(&reported_version)
                 .map_err(|error| runtime_failure(&reported_version, error))?;
 
             let environment7 = require::<ICoreWebView2Environment7>(&environment, "Environment7")?;
@@ -224,7 +224,7 @@ pub fn harden_privileged(
                     "privileged WebView2 user-data folder is malformed or exceeds the Windows path bound",
                 )
             })?;
-            let matches = zephium_core::webview2::user_data_directory_matches(
+            let matches = drift_core::webview2::user_data_directory_matches(
                 &expected_user_data_folder,
                 Path::new(&actual_user_data_folder),
             )
@@ -397,7 +397,7 @@ pub fn harden_privileged(
                 })),
                 &mut external_token,
             )?;
-            zephium_engine::install_privileged_environment_registration(
+            drift_engine::install_privileged_environment_registration(
                 label,
                 &environment,
                 on_runtime_update,
@@ -437,7 +437,7 @@ pub fn harden_privileged(
 }
 
 /// The interface, or the missing feature named in the error: a runtime
-/// that lacks one is too old for Zephium rather than broken.
+/// that lacks one is too old for Drift rather than broken.
 fn require<T: Interface>(source: &impl Interface, feature: &str) -> windows::core::Result<T> {
     source.cast::<T>().map_err(|error| {
         windows::core::Error::new(
@@ -526,7 +526,7 @@ pub fn apply_material(window: &WebviewWindow, dark: bool) -> bool {
         });
     }
     if let Ok(value) = serde_json::to_string(&material) {
-        let _ = window.eval(format!("window.dispatchEvent(new CustomEvent('zephium:ui-command',{{detail:'material.'+{value}}}))"));
+        let _ = window.eval(format!("window.dispatchEvent(new CustomEvent('drift:ui-command',{{detail:'material.'+{value}}}))"));
     }
     result.is_ok()
 }
@@ -591,7 +591,7 @@ impl PresentationChrome for ChromeAdapter {
     fn restore_browser_chrome(
         &self,
         revision: u64,
-        items: zephium_ipc::ItemsState,
+        items: drift_ipc::ItemsState,
         done: ChromePresentationCallback,
     ) -> ChromePresentationDispatch {
         crate::restore_browser_chrome(&self.window, revision, items, done)

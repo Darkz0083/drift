@@ -19,7 +19,7 @@ test("a new work's start screen, at rest and with a workflow picked, in both the
       { requests: ["Research how competitors price issue trackers"], touched_ms: "300" },
       { requests: ["Plan my day"], touched_ms: "200" },
       {
-        requests: ["Explain how this code works: ~/Dev/zephium/crates/zephium-app"],
+        requests: ["Explain how this code works: ~/Dev/drift/crates/drift-app"],
         touched_ms: "100",
       },
     ],

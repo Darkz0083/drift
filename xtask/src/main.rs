@@ -30,7 +30,7 @@ const NATIVE_ADAPTERS: [(&str, Option<&str>); 3] = [
     ("vendor/tauri/Cargo.toml", Some("macos-private-api,specta")),
 ];
 const ADBLOCK_MANIFEST: &str = "vendor/adblock/Cargo.toml";
-const BLOCKER_FUZZ_MANIFEST: &str = "crates/zephium-blocker/fuzz/Cargo.toml";
+const BLOCKER_FUZZ_MANIFEST: &str = "crates/drift-blocker/fuzz/Cargo.toml";
 const BLOCKER_FEATURE_SETS: [&str; 5] = [
     "runtime",
     "runtime-exact",
@@ -521,66 +521,66 @@ fn check_engine_floors(strict: bool) {
         })
         .as_secs();
     let mut expired = Vec::new();
-    if !zephium_core::webview2::security_floor_review_is_current(now) {
+    if !drift_core::webview2::security_floor_review_is_current(now) {
         expired.push(format!(
             "WebView2 security review (hard floor {}, latest reviewed {}) expired after {}. Review {}, {}, and exact runtime availability at {}, then update the versions, publication dates, and review deadline together.",
-            zephium_core::webview2::SECURITY_FLOOR_TEXT,
-            zephium_core::webview2::LATEST_REVIEWED_TEXT,
-            zephium_core::webview2::SECURITY_FLOOR_REVIEW_BY,
-            zephium_core::webview2::SECURITY_FLOOR_SOURCE_URL,
-            zephium_core::webview2::LATEST_REVIEWED_SOURCE_URL,
-            zephium_core::webview2::RUNTIME_AVAILABILITY_SOURCE_URL,
+            drift_core::webview2::SECURITY_FLOOR_TEXT,
+            drift_core::webview2::LATEST_REVIEWED_TEXT,
+            drift_core::webview2::SECURITY_FLOOR_REVIEW_BY,
+            drift_core::webview2::SECURITY_FLOOR_SOURCE_URL,
+            drift_core::webview2::LATEST_REVIEWED_SOURCE_URL,
+            drift_core::webview2::RUNTIME_AVAILABILITY_SOURCE_URL,
         ));
     } else {
         eprintln!(
             "WebView2 hard floor {} and latest reviewed Stable {} are reviewed through {}",
-            zephium_core::webview2::SECURITY_FLOOR_TEXT,
-            zephium_core::webview2::LATEST_REVIEWED_TEXT,
-            zephium_core::webview2::SECURITY_FLOOR_REVIEW_BY,
+            drift_core::webview2::SECURITY_FLOOR_TEXT,
+            drift_core::webview2::LATEST_REVIEWED_TEXT,
+            drift_core::webview2::SECURITY_FLOOR_REVIEW_BY,
         );
     }
 
-    if !zephium_core::macos::security_floor_review_is_current(now) {
+    if !drift_core::macos::security_floor_review_is_current(now) {
         expired.push(format!(
             "macOS/WebKit security floors expired after {}. Review {}, {}, {}, and {} and update the OS/Safari versions, publication date, and review deadline together.",
-            zephium_core::macos::SECURITY_FLOOR_REVIEW_BY,
-            zephium_core::macos::SECURITY_FLOOR_SOURCE_URL,
-            zephium_core::macos::SAFARI_SECURITY_SOURCE_URL,
-            zephium_core::macos::TAHOE_SECURITY_SOURCE_URL,
-            zephium_core::macos::SEQUOIA_SECURITY_SOURCE_URL,
+            drift_core::macos::SECURITY_FLOOR_REVIEW_BY,
+            drift_core::macos::SECURITY_FLOOR_SOURCE_URL,
+            drift_core::macos::SAFARI_SECURITY_SOURCE_URL,
+            drift_core::macos::TAHOE_SECURITY_SOURCE_URL,
+            drift_core::macos::SEQUOIA_SECURITY_SOURCE_URL,
         ));
     } else {
         eprintln!(
         "macOS/WebKit hard floors Sonoma {}, Sequoia {}, Tahoe {}, macOS 27 {}, and Safari {}; latest recommendations Sonoma {} + Safari {}, Sequoia {}, Tahoe {}, macOS 27 {}, with Safari {}; reviewed through {}",
-        zephium_core::macos::SONOMA_SECURITY_FLOOR_TEXT,
-        zephium_core::macos::SEQUOIA_SECURITY_FLOOR_TEXT,
-        zephium_core::macos::TAHOE_SECURITY_FLOOR_TEXT,
-        zephium_core::macos::GOLDEN_GATE_SECURITY_FLOOR_TEXT,
-        zephium_core::macos::SAFARI_SECURITY_FLOOR_TEXT,
-        zephium_core::macos::SONOMA_RECOMMENDED_TEXT,
-        zephium_core::macos::SONOMA_SAFARI_RECOMMENDED_TEXT,
-        zephium_core::macos::SEQUOIA_RECOMMENDED_TEXT,
-        zephium_core::macos::TAHOE_RECOMMENDED_TEXT,
-        zephium_core::macos::GOLDEN_GATE_RECOMMENDED_TEXT,
-        zephium_core::macos::SAFARI_RECOMMENDED_TEXT,
-        zephium_core::macos::SECURITY_FLOOR_REVIEW_BY,
+        drift_core::macos::SONOMA_SECURITY_FLOOR_TEXT,
+        drift_core::macos::SEQUOIA_SECURITY_FLOOR_TEXT,
+        drift_core::macos::TAHOE_SECURITY_FLOOR_TEXT,
+        drift_core::macos::GOLDEN_GATE_SECURITY_FLOOR_TEXT,
+        drift_core::macos::SAFARI_SECURITY_FLOOR_TEXT,
+        drift_core::macos::SONOMA_RECOMMENDED_TEXT,
+        drift_core::macos::SONOMA_SAFARI_RECOMMENDED_TEXT,
+        drift_core::macos::SEQUOIA_RECOMMENDED_TEXT,
+        drift_core::macos::TAHOE_RECOMMENDED_TEXT,
+        drift_core::macos::GOLDEN_GATE_RECOMMENDED_TEXT,
+        drift_core::macos::SAFARI_RECOMMENDED_TEXT,
+        drift_core::macos::SECURITY_FLOOR_REVIEW_BY,
     );
     }
 
-    if !zephium_core::webkitgtk::security_floor_review_is_current(now) {
+    if !drift_core::webkitgtk::security_floor_review_is_current(now) {
         expired.push(format!(
             "WebKitGTK security floor {} expired after {}. Review {} and {} and update the advisory floor, latest-reviewed release, and deadline together.",
-            zephium_core::webkitgtk::SECURITY_FLOOR_TEXT,
-            zephium_core::webkitgtk::SECURITY_FLOOR_REVIEW_BY,
-            zephium_core::webkitgtk::SECURITY_FLOOR_SOURCE_URL,
-            zephium_core::webkitgtk::LATEST_REVIEWED_SOURCE_URL,
+            drift_core::webkitgtk::SECURITY_FLOOR_TEXT,
+            drift_core::webkitgtk::SECURITY_FLOOR_REVIEW_BY,
+            drift_core::webkitgtk::SECURITY_FLOOR_SOURCE_URL,
+            drift_core::webkitgtk::LATEST_REVIEWED_SOURCE_URL,
         ));
     } else {
         eprintln!(
             "WebKitGTK security floor {} (latest reviewed {}) is reviewed through {}",
-            zephium_core::webkitgtk::SECURITY_FLOOR_TEXT,
-            zephium_core::webkitgtk::LATEST_REVIEWED_TEXT,
-            zephium_core::webkitgtk::SECURITY_FLOOR_REVIEW_BY,
+            drift_core::webkitgtk::SECURITY_FLOOR_TEXT,
+            drift_core::webkitgtk::LATEST_REVIEWED_TEXT,
+            drift_core::webkitgtk::SECURITY_FLOOR_REVIEW_BY,
         );
     }
     report_expired_reviews("Engine security review expired", &expired, strict);
@@ -608,12 +608,12 @@ fn check_release_engine_security() {
         eprintln!("production release is blocked by bundled blocker seed freshness: {error}");
         exit(1);
     }
-    if !zephium_core::webview2::production_release_security_is_current(now) {
+    if !drift_core::webview2::production_release_security_is_current(now) {
         eprintln!(
             "production release is blocked: Microsoft acknowledged an outstanding Chromium security fix on {} (status reviewed {}); review {} and publish only after a fixed Stable WebView2 runtime is available and the floor is updated",
-            zephium_core::webview2::OUTSTANDING_VENDOR_FIX_NOTICE_ON,
-            zephium_core::webview2::OUTSTANDING_VENDOR_FIX_REVIEWED_ON,
-            zephium_core::webview2::OUTSTANDING_VENDOR_FIX_SOURCE_URL,
+            drift_core::webview2::OUTSTANDING_VENDOR_FIX_NOTICE_ON,
+            drift_core::webview2::OUTSTANDING_VENDOR_FIX_REVIEWED_ON,
+            drift_core::webview2::OUTSTANDING_VENDOR_FIX_SOURCE_URL,
         );
         exit(1);
     }
@@ -658,7 +658,7 @@ fn ci() {
                 "clippy",
                 "--locked",
                 "-p",
-                "zephium-agent-controller",
+                "drift-agent-controller",
                 "--features",
                 "provider-transport",
                 target,
@@ -674,7 +674,7 @@ fn ci() {
             "test",
             "--locked",
             "-p",
-            "zephium-agent-controller",
+            "drift-agent-controller",
             "--features",
             "probe-harness",
         ],
@@ -686,14 +686,14 @@ fn ci() {
             "--locked",
             "--release",
             "-p",
-            "zephium-agent-controller",
+            "drift-agent-controller",
             "--features",
             "provider-transport",
         ],
     );
     // Work admission and Store fencing are intentionally absent from the
     // default desktop graph; exercise their real shipping paths explicitly.
-    for package in ["zephium-app", "zephium-store"] {
+    for package in ["drift-app", "drift-store"] {
         for target in ["--all-targets", "--lib"] {
             run(
                 "cargo",
@@ -737,8 +737,8 @@ fn ci() {
     }
     #[cfg(any(target_os = "macos", target_os = "windows"))]
     for (package, features) in [
-        ("zephium-work-composition", "durable-runtime"),
-        ("zephium-desktop", "work-product"),
+        ("drift-work-composition", "durable-runtime"),
+        ("drift-desktop", "work-product"),
     ] {
         for target in ["--all-targets", "--lib"] {
             run(
@@ -820,7 +820,7 @@ fn check_agentic_probe_boundary() {
         eprintln!("agentic diagnostic release boundary failed: {error}");
         exit(1);
     }
-    let runtime = repository.join("crates/zephium-agentic/assets/semantic-runtime-v1.js");
+    let runtime = repository.join("crates/drift-agentic/assets/semantic-runtime-v1.js");
     let runtime = runtime.to_str().unwrap_or_else(|| {
         eprintln!("semantic runtime asset path is not valid UTF-8");
         exit(1);
@@ -880,7 +880,7 @@ fn run_macos_principal_isolation_probe() {
     const COMMON: [&str; 7] = [
         "--locked",
         "-p",
-        "zephium-engine",
+        "drift-engine",
         "--features",
         "native-isolation-probes",
         "--bin",
@@ -902,7 +902,7 @@ fn check_macos_page_permission_probe() {
     const COMMON: [&str; 7] = [
         "--locked",
         "-p",
-        "zephium-engine",
+        "drift-engine",
         "--features",
         "native-page-permission-probes",
         "--bin",
@@ -931,9 +931,9 @@ fn check_blocker_security_fork() {
         exit(1);
     }
     for package in [
-        "zephium-blocker",
-        "zephium-blocker-service",
-        "zephium-blocker-update",
+        "drift-blocker",
+        "drift-blocker-service",
+        "drift-blocker-update",
     ] {
         run("cargo", &["fmt", "--package", package, "--", "--check"]);
     }
@@ -981,7 +981,7 @@ fn run_blocker_feature_gates() {
             &[
                 "check",
                 "-p",
-                "zephium-blocker",
+                "drift-blocker",
                 "--lib",
                 "--locked",
                 "--no-default-features",
@@ -994,7 +994,7 @@ fn run_blocker_feature_gates() {
             &[
                 "clippy",
                 "-p",
-                "zephium-blocker",
+                "drift-blocker",
                 "--lib",
                 "--tests",
                 "--locked",
@@ -1011,7 +1011,7 @@ fn run_blocker_feature_gates() {
             &[
                 "test",
                 "-p",
-                "zephium-blocker",
+                "drift-blocker",
                 "--lib",
                 "--locked",
                 "--no-default-features",
@@ -1024,15 +1024,15 @@ fn run_blocker_feature_gates() {
 
 fn run_blocker_product_gates() {
     for (package, features) in [
-        ("zephium-update-transport", None),
-        ("zephium-blocker-update", None),
-        ("zephium-blocker-update", Some("tuf")),
-        ("zephium-blocker-update", Some("official-https")),
-        ("zephium-blocker-update", Some("tuf,official-https")),
-        ("zephium-blocker-service", None),
-        ("zephium-blocker-service", Some("tuf")),
-        ("zephium-blocker-service", Some("official-https")),
-        ("zephium-blocker-service", Some("tuf,official-https")),
+        ("drift-update-transport", None),
+        ("drift-blocker-update", None),
+        ("drift-blocker-update", Some("tuf")),
+        ("drift-blocker-update", Some("official-https")),
+        ("drift-blocker-update", Some("tuf,official-https")),
+        ("drift-blocker-service", None),
+        ("drift-blocker-service", Some("tuf")),
+        ("drift-blocker-service", Some("official-https")),
+        ("drift-blocker-service", Some("tuf,official-https")),
     ] {
         let mut common = vec![
             "-p",
@@ -1063,7 +1063,7 @@ fn run_blocker_product_gates() {
         &[
             "test",
             "-p",
-            "zephium-blocker",
+            "drift-blocker",
             "--test",
             "synthetic_quality",
             "--locked",
@@ -1097,7 +1097,7 @@ fn run_blocker_product_gates() {
         &[
             "run",
             "-p",
-            "zephium-blocker",
+            "drift-blocker",
             "--example",
             "synthetic_blocker_lab",
             "--locked",
@@ -1115,7 +1115,7 @@ fn run_blocker_product_gates() {
 fn check_blocker_dependency_graphs() {
     let bundled = cargo_tree(&[
         "-p",
-        "zephium-desktop",
+        "drift-desktop",
         "--no-default-features",
         "--locked",
         "-e",
@@ -1123,16 +1123,16 @@ fn check_blocker_dependency_graphs() {
         "--prefix",
         "none",
     ]);
-    for forbidden in ["zephium-blocker-update feature \"tuf\"", "tough v"] {
+    for forbidden in ["drift-blocker-update feature \"tuf\"", "tough v"] {
         if bundled.lines().any(|line| line.starts_with(forbidden)) {
             eprintln!("official HTTPS desktop graph unexpectedly contains `{forbidden}`");
             exit(1);
         }
     }
     for required in [
-        "zephium-blocker-service feature \"official-https\"",
-        "zephium-blocker-update feature \"official-https\"",
-        "zephium-update-transport v",
+        "drift-blocker-service feature \"official-https\"",
+        "drift-blocker-update feature \"official-https\"",
+        "drift-update-transport v",
         "reqwest v",
         "rustls-platform-verifier v",
     ] {
@@ -1143,7 +1143,7 @@ fn check_blocker_dependency_graphs() {
     }
     if !bundled
         .lines()
-        .any(|line| line.starts_with("zephium-blocker-update v"))
+        .any(|line| line.starts_with("drift-blocker-update v"))
     {
         eprintln!("bundled desktop graph lost canonical blocker package validation");
         exit(1);
@@ -1151,7 +1151,7 @@ fn check_blocker_dependency_graphs() {
 
     let tuf = cargo_tree(&[
         "-p",
-        "zephium-blocker-update",
+        "drift-blocker-update",
         "--no-default-features",
         "--features",
         "tuf",
@@ -1162,8 +1162,8 @@ fn check_blocker_dependency_graphs() {
         "none",
     ]);
     for required in [
-        "zephium-blocker-update v",
-        "zephium-update-transport v",
+        "drift-blocker-update v",
+        "drift-update-transport v",
         "tough v",
         "reqwest v",
         "rustls-platform-verifier v",

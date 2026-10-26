@@ -121,7 +121,7 @@ function bake({ name, paper, follow }) {
     }
 
   // Through a file: ffmpeg cuts a frame this large short when it is piped.
-  const scratch = mkdtempSync(join(tmpdir(), "zephium-sky-"));
+  const scratch = mkdtempSync(join(tmpdir(), "drift-sky-"));
   const raw = join(scratch, `${name}.rgb`);
   writeFileSync(raw, baked);
   execFileSync(

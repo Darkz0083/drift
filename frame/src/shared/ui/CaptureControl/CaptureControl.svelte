@@ -57,7 +57,7 @@
     aria-busy={busy || undefined}
     disabled={busy}
     onclick={stop}
-    data-zephium-capture-control
+    data-drift-capture-control
   >
     <Icon icon={camera ? Camera01Icon : Mic01Icon} size={14} />
     <span class="sr-only">{title}</span>

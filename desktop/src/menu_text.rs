@@ -45,12 +45,12 @@ fn translated(tag: &str) -> Option<&'static str> {
 }
 
 /// Follows `ui.language`, resolving "system" the way the frame does: the
-/// first of the system's languages Zephium is translated into. Returns
+/// first of the system's languages Drift is translated into. Returns
 /// whether the language shown changed, so the menus can be rebuilt.
 pub(crate) fn set_language(preference: Option<&str>) -> bool {
     let wanted = match preference {
         Some(tag) if tag != "system" => translated(tag),
-        _ => zephium_voice::preferred_languages()
+        _ => drift_voice::preferred_languages()
             .iter()
             .find_map(|tag| {
                 translated(tag)
@@ -155,7 +155,7 @@ mod tests {
                 .filter(|label| label.chars().next().is_some_and(char::is_uppercase))
         });
         for label in labels.chain(
-            zephium_core::commands::REGISTRY
+            drift_core::commands::REGISTRY
                 .iter()
                 .map(|command| command.title),
         ) {

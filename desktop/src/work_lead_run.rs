@@ -4,25 +4,25 @@
 //! it with no model; the chosen models' own search, or the OpenAI public
 //! search, answers only when that page cannot be used, a few times a run.
 use super::*;
-use zephium_app::work_lead::{LeadModel, WorkLeadModels, WorkLeadService};
-use zephium_core::work::model::WorkModelRole;
+use drift_app::work_lead::{LeadModel, WorkLeadModels, WorkLeadService};
+use drift_core::work::model::WorkModelRole;
 
 /// The models for each role; a helper role without its own model uses the
 /// lead's. `None` when no lead model resolves, and the run is refused.
 pub(crate) async fn models(
     profile: ProfileId,
-    work: Option<zephium_core::work::WorkId>,
+    work: Option<drift_core::work::WorkId>,
 ) -> Option<WorkLeadModels> {
     // Hosted calls are noted against their task on this computer, for the
     // usage history; the service is never told the task.
-    let source = work.map(|work| zephium_app::work_models::WorkCallSource::Task {
+    let source = work.map(|work| drift_app::work_models::WorkCallSource::Task {
         profile: profile.to_string(),
         work: work.to_string(),
     });
     let resolve = |role| {
         let source = source.clone();
         async move {
-            zephium_app::work_models::resolve_entry_for(profile, role, source)
+            drift_app::work_models::resolve_entry_for(profile, role, source)
                 .await
                 .ok()
                 .map(|(entry, client)| LeadModel { entry, client })
@@ -47,10 +47,10 @@ pub(crate) async fn models(
 async fn search_backend(
     profile: ProfileId,
     models: &WorkLeadModels,
-) -> Result<Box<dyn zephium_core::work::search::WorkPublicSearchProvider>, WorkError> {
+) -> Result<Box<dyn drift_core::work::search::WorkPublicSearchProvider>, WorkError> {
     let fallback = provider_search(profile, models).await?;
     let (engine, template) = search_engine().await;
-    let Ok(browser) = zephium_agentic::BrowserSearch::try_new(engine, &template) else {
+    let Ok(browser) = drift_agentic::BrowserSearch::try_new(engine, &template) else {
         return Ok(match fallback {
             Some((search, _)) => search,
             None => {
@@ -65,9 +65,9 @@ async fn search_backend(
         fallback
             .as_ref()
             .map_or("none", |(_, grant)| match grant.provider {
-                zephium_core::work::search::WorkSearchProvider::Native => "native",
-                zephium_core::work::search::WorkSearchProvider::OpenAi => "openai",
-                zephium_core::work::search::WorkSearchProvider::Browser => "browser",
+                drift_core::work::search::WorkSearchProvider::Native => "native",
+                drift_core::work::search::WorkSearchProvider::OpenAi => "openai",
+                drift_core::work::search::WorkSearchProvider::Browser => "browser",
             })
     ));
     Ok(match fallback {
@@ -78,15 +78,15 @@ async fn search_backend(
 
 /// The engine the person searches with in the address bar, and their
 /// custom engine's address.
-async fn search_engine() -> (zephium_core::search::SearchEngine, String) {
-    use zephium_core::ports::store::Store;
+async fn search_engine() -> (drift_core::search::SearchEngine, String) {
+    use drift_core::ports::store::Store;
     tauri::async_runtime::spawn_blocking(|| {
         let store = crate::APP_STORE.get()?;
         Some((
             store
                 .app_setting("search.engine")
                 .as_deref()
-                .and_then(zephium_core::search::SearchEngine::from_id)
+                .and_then(drift_core::search::SearchEngine::from_id)
                 .unwrap_or_default(),
             store.app_setting("search.custom-url").unwrap_or_default(),
         ))
@@ -105,22 +105,22 @@ async fn provider_search(
     models: &WorkLeadModels,
 ) -> Result<
     Option<(
-        Box<dyn zephium_core::work::search::WorkPublicSearchProvider>,
-        zephium_core::work::search::WorkSearchFallbackV1,
+        Box<dyn drift_core::work::search::WorkPublicSearchProvider>,
+        drift_core::work::search::WorkSearchFallbackV1,
     )>,
     WorkError,
 > {
-    use zephium_agentic::{AgentProviderTransport, AgentProviderTransportConfig};
-    use zephium_core::work::search::{WorkSearchFallbackV1, WorkSearchProvider};
+    use drift_agentic::{AgentProviderTransport, AgentProviderTransportConfig};
+    use drift_core::work::search::{WorkSearchFallbackV1, WorkSearchProvider};
     for model in [&models.light, &models.lead, &models.page] {
         if let Ok(search) =
-            zephium_agentic::ModelNativeSearch::try_new(model.entry.clone(), model.client.clone())
+            drift_agentic::ModelNativeSearch::try_new(model.entry.clone(), model.client.clone())
         {
             record_diagnostic(format_args!(
                 "work: phase=lead state=search provider=native model={}",
                 model.entry.id
             ));
-            let search: Box<dyn zephium_core::work::search::WorkPublicSearchProvider> =
+            let search: Box<dyn drift_core::work::search::WorkPublicSearchProvider> =
                 Box::new(search);
             return Ok(Some((
                 search,
@@ -136,25 +136,25 @@ async fn provider_search(
     };
     let transport = AgentProviderTransport::try_new(AgentProviderTransportConfig::STANDARD)
         .map_err(|_| WorkError::Unavailable)?;
-    let config = zephium_agentic::OpenAiPublicSearchConfig::try_new(
-        zephium_agent_model_catalog::try_public_search_provider_exact_call_config(
-            zephium_core::work::search::PUBLIC_SEARCH_MODEL,
+    let config = drift_agentic::OpenAiPublicSearchConfig::try_new(
+        drift_agent_model_catalog::try_public_search_provider_exact_call_config(
+            drift_core::work::search::PUBLIC_SEARCH_MODEL,
             4096,
         )
         .map_err(|_| WorkError::Unavailable)?,
     )?;
     let search =
-        zephium_agentic::OpenAiPublicSearch::try_new(transport.clone(), credential, config)?;
+        drift_agentic::OpenAiPublicSearch::try_new(transport.clone(), credential, config)?;
     record_diagnostic(format_args!(
         "work: phase=lead state=search provider=openai"
     ));
-    let search: Box<dyn zephium_core::work::search::WorkPublicSearchProvider> =
+    let search: Box<dyn drift_core::work::search::WorkPublicSearchProvider> =
         Box::new(configure_search_ranking(search, profile, transport).await?);
     Ok(Some((
         search,
         WorkSearchFallbackV1 {
             provider: WorkSearchProvider::OpenAi,
-            model: zephium_core::work::search::PUBLIC_SEARCH_MODEL.into(),
+            model: drift_core::work::search::PUBLIC_SEARCH_MODEL.into(),
         },
     )))
 }
@@ -163,10 +163,10 @@ async fn provider_search(
 /// cannot call tools leaves the page to the lead model.
 fn page_model(
     models: &WorkLeadModels,
-) -> Result<zephium_agentic::AgentProviderModelClient, WorkError> {
+) -> Result<drift_agentic::AgentProviderModelClient, WorkError> {
     for model in [&models.page, &models.lead] {
         if let Ok(page) =
-            zephium_agentic::AgentProviderModelClient::try_new(&model.entry, model.client.clone())
+            drift_agentic::AgentProviderModelClient::try_new(&model.entry, model.client.clone())
         {
             record_diagnostic(format_args!(
                 "work: phase=lead state=page_model model={} vision={} priced={}",
@@ -184,16 +184,16 @@ fn page_model(
 /// No search backend: every search is refused before anything is sent.
 struct NoSearch;
 
-impl zephium_core::work::search::WorkPublicSearchProvider for NoSearch {
+impl drift_core::work::search::WorkPublicSearchProvider for NoSearch {
     fn search<'a>(
         &'a self,
-        _scope: &'a zephium_core::work::search::WorkPublicSearchScope,
-        _context: &'a [zephium_core::work::context::WorkContextBody],
-        _limits: zephium_core::work::runtime::WorkExecutionLimits,
-    ) -> zephium_core::work::search::WorkPublicSearchFuture<'a> {
+        _scope: &'a drift_core::work::search::WorkPublicSearchScope,
+        _context: &'a [drift_core::work::context::WorkContextBody],
+        _limits: drift_core::work::runtime::WorkExecutionLimits,
+    ) -> drift_core::work::search::WorkPublicSearchFuture<'a> {
         Box::pin(async {
             Err(
-                zephium_core::work::search::WorkPublicSearchError::NotDispatched(
+                drift_core::work::search::WorkPublicSearchError::NotDispatched(
                     WorkError::Unavailable,
                 ),
             )
@@ -204,16 +204,16 @@ impl zephium_core::work::search::WorkPublicSearchProvider for NoSearch {
 impl WorkProviders {
     pub(super) async fn lead(
         &self,
-        shell: zephium_app::Handle,
+        shell: drift_app::Handle,
         profile: ProfileId,
-        command: zephium_ipc::work::WorkCommandV1,
-        context: Option<zephium_core::work::context::WorkContextSelectionV1>,
+        command: drift_ipc::work::WorkCommandV1,
+        context: Option<drift_core::work::context::WorkContextSelectionV1>,
         models: WorkLeadModels,
     ) -> Result<WorkOperationStateV1, WorkError> {
-        use zephium_agentic::AgentProviderTransportConfig;
+        use drift_agentic::AgentProviderTransportConfig;
         if !matches!(
             command.intent,
-            zephium_core::work::runtime::WorkRuntimeIntent::BeginAgent { .. }
+            drift_core::work::runtime::WorkRuntimeIntent::BeginAgent { .. }
         ) {
             return Err(WorkError::Invalid);
         }
@@ -228,7 +228,7 @@ impl WorkProviders {
         })
         .await
         .map_err(|_| WorkError::Unavailable)?;
-        let zephium_app::AgentWorkProfileReadiness::Ready(binding) = binding else {
+        let drift_app::AgentWorkProfileReadiness::Ready(binding) = binding else {
             return Err(WorkError::ProfileUnavailable);
         };
         if binding.profile() != profile {
@@ -242,7 +242,7 @@ impl WorkProviders {
         let page = page_model(&models)?;
         // Typed decisions the recommended backend leaves open go to the light
         // model; one that cannot call tools leaves them to the page model.
-        let light = zephium_agentic::AgentProviderModelClient::try_new(
+        let light = drift_agentic::AgentProviderModelClient::try_new(
             &models.light.entry,
             models.light.client.clone(),
         )
@@ -266,14 +266,14 @@ impl WorkProviders {
                     let light = light.clone();
                     async move {
                         // The catalog model is unused: the chosen page model carries its own.
-                        let mut settings = zephium_work_composition::durable_runtime::WorkBrowserAdapterSettings::new(
+                        let mut settings = drift_work_composition::durable_runtime::WorkBrowserAdapterSettings::new(
                             binding,
-                            zephium_agent_controller::AgentBrowserModel::Gpt6Luna,
-                            zephium_app::AgentWorkApplicationConfig::new(
-                                zephium_agent_runtime::AgentRuntimeConfig::STANDARD,
+                            drift_agent_controller::AgentBrowserModel::Gpt6Luna,
+                            drift_app::AgentWorkApplicationConfig::new(
+                                drift_agent_runtime::AgentRuntimeConfig::STANDARD,
                                 AgentProviderTransportConfig::STANDARD,
                             ),
-                            zephium_agent_controller::AgentBrowserModelAccess::Chosen(page),
+                            drift_agent_controller::AgentBrowserModelAccess::Chosen(page),
                         );
                         settings.decisions = super::super::work_decision::composition_preference(
                             super::super::work_decision::selected_choice(profile).await,

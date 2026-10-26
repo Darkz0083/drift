@@ -2,7 +2,7 @@
 set -eu
 
 repo=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-target=${CARGO_TARGET_DIR:-/private/tmp/zephium-engine-target}
+target=${CARGO_TARGET_DIR:-/private/tmp/drift-engine-target}
 case "$target" in /*) ;; *) target="$repo/$target" ;; esac
 probe=${1:-"$target/debug/macos-terra-agentic-probe"}
 if [ "$#" -gt 1 ]; then
@@ -30,5 +30,5 @@ if [ -z "$identity" ]; then
 fi
 
 /usr/bin/codesign --force --sign "$identity" --keychain "$keychain" \
-    --identifier app.zephium.work-integration.probe --timestamp=none "$probe"
+    --identifier app.drift.work-integration.probe --timestamp=none "$probe"
 /usr/bin/codesign --verify --strict "$probe"

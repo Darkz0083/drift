@@ -1,10 +1,10 @@
 //! Trusted capability-provider composition. This module is dormant until an
 //! admitted user operation; no model selects credentials, configuration or ports.
 use std::sync::Arc;
-use zephium_core::{ids::ProfileId, work::WorkError};
-use zephium_ipc::work::{WorkOperationStateV1, WorkOperationV1};
+use drift_core::{ids::ProfileId, work::WorkError};
+use drift_ipc::work::{WorkOperationStateV1, WorkOperationV1};
 #[cfg(any(target_os = "macos", target_os = "windows"))]
-use zephium_ipc::work::{WorkReplyV1, WorkResponseV1};
+use drift_ipc::work::{WorkReplyV1, WorkResponseV1};
 
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 #[path = "work_lead_run.rs"]
@@ -13,28 +13,28 @@ mod lead;
 pub(crate) struct WorkProviders {
     pub(crate) activity: super::work_activity::WorkActivity,
     #[cfg(any(target_os = "macos", target_os = "windows"))]
-    pub(crate) browser: zephium_work_composition::NativeWorkComposition,
+    pub(crate) browser: drift_work_composition::NativeWorkComposition,
     #[cfg(any(target_os = "macos", target_os = "windows"))]
-    engine: Arc<zephium_engine::WebviewEngine>,
+    engine: Arc<drift_engine::WebviewEngine>,
 }
 impl WorkProviders {
     pub(crate) fn new(
-        engine: Arc<zephium_engine::WebviewEngine>,
-        store: Arc<zephium_store::SqliteStore>,
-        frames: Option<Arc<zephium_store::WorkFrameStore>>,
+        engine: Arc<drift_engine::WebviewEngine>,
+        store: Arc<drift_store::SqliteStore>,
+        frames: Option<Arc<drift_store::WorkFrameStore>>,
     ) -> Self {
         #[cfg(not(any(target_os = "macos", target_os = "windows")))]
         let _ = (engine, store);
         // The page lane and searches log their refusals as closed facts.
-        zephium_app::work_trace::install(Arc::new(record_diagnostic));
-        zephium_app::work_trace::install_record_media(Arc::new(|event| {
+        drift_app::work_trace::install(Arc::new(record_diagnostic));
+        drift_app::work_trace::install_record_media(Arc::new(|event| {
             record_diagnostic(format_args!(
                 "work: phase=record_media detail={event:?}; content=redacted"
             ));
         }));
         record_diagnostic(format_args!(
             "work: event=session_started build={} content=redacted",
-            option_env!("ZEPHIUM_BUILD_REVISION").unwrap_or("unknown")
+            option_env!("DRIFT_BUILD_REVISION").unwrap_or("unknown")
         ));
         // A request may offer a grant for a signed-in attached tab: the engine
         // answers whether the profile holds cookies for a site, nothing more.
@@ -42,17 +42,17 @@ impl WorkProviders {
         {
             let engine = engine.clone();
             let loads = engine.clone();
-            zephium_app::work_context::install_session_presence(Arc::new(move |profile, hosts| {
+            drift_app::work_context::install_session_presence(Arc::new(move |profile, hosts| {
                 engine.work_sessions_present(profile, hosts)
             }));
-            zephium_app::work_context::install_site_loads(Arc::new(move |profile, site| {
+            drift_app::work_context::install_site_loads(Arc::new(move |profile, site| {
                 loads.work_site_loads(profile, site)
             }));
         }
         Self {
             activity: super::work_activity::WorkActivity::new(frames),
             #[cfg(any(target_os = "macos", target_os = "windows"))]
-            browser: zephium_work_composition::NativeWorkComposition::new(engine.clone(), store),
+            browser: drift_work_composition::NativeWorkComposition::new(engine.clone(), store),
             #[cfg(any(target_os = "macos", target_os = "windows"))]
             engine,
         }
@@ -67,7 +67,7 @@ impl WorkProviders {
 
     pub(crate) async fn run(
         &self,
-        shell: zephium_app::Handle,
+        shell: drift_app::Handle,
         profile: ProfileId,
         input: WorkOperationV1,
     ) -> WorkOperationStateV1 {
@@ -115,7 +115,7 @@ impl WorkProviders {
 
     async fn try_run(
         &self,
-        shell: zephium_app::Handle,
+        shell: drift_app::Handle,
         profile: ProfileId,
         input: WorkOperationV1,
     ) -> Result<WorkOperationStateV1, WorkError> {
@@ -132,7 +132,7 @@ impl WorkProviders {
                 }
                 #[cfg(any(target_os = "macos", target_os = "windows"))]
                 {
-                    let zephium_core::work::runtime::WorkRuntimeIntent::BeginAgent {
+                    let drift_core::work::runtime::WorkRuntimeIntent::BeginAgent {
                         grant, ..
                     } = &command.intent
                     else {
@@ -175,10 +175,10 @@ impl WorkProviders {
 // original attempt's token/cost limits still decide whether generation starts.
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 async fn configure_search_ranking(
-    search: zephium_agentic::OpenAiPublicSearch,
+    search: drift_agentic::OpenAiPublicSearch,
     profile: ProfileId,
-    transport: zephium_agentic::AgentProviderTransport,
-) -> Result<zephium_agentic::OpenAiPublicSearch, WorkError> {
+    transport: drift_agentic::AgentProviderTransport,
+) -> Result<drift_agentic::OpenAiPublicSearch, WorkError> {
     let Some(settings) = public_decision_settings(profile, transport).await? else {
         return Ok(search);
     };
@@ -187,18 +187,18 @@ async fn configure_search_ranking(
 
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 struct PublicDecisionSettings {
-    primary: Option<zephium_agentic::JevDecisionClient>,
-    emulation: zephium_agentic::WorkPlanningConfig,
-    diagnostic: Option<fn(zephium_agentic::DecisionCallDiagnostic)>,
+    primary: Option<drift_agentic::JevDecisionClient>,
+    emulation: drift_agentic::WorkPlanningConfig,
+    diagnostic: Option<fn(drift_agentic::DecisionCallDiagnostic)>,
 }
 
 /// `None` is the person's Off: no typed decisions are configured at all.
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 async fn public_decision_settings(
     profile: ProfileId,
-    transport: zephium_agentic::AgentProviderTransport,
+    transport: drift_agentic::AgentProviderTransport,
 ) -> Result<Option<PublicDecisionSettings>, WorkError> {
-    use zephium_ipc::work::WorkDecisionChoiceV1;
+    use drift_ipc::work::WorkDecisionChoiceV1;
     let choice = super::work_decision::selected_choice(profile).await;
     if choice == WorkDecisionChoiceV1::Off {
         return Ok(None);
@@ -207,12 +207,12 @@ async fn public_decision_settings(
     let primary = if choice == WorkDecisionChoiceV1::Recommended {
         let key_epoch = super::work_decision::typesafe_presence_epoch();
         let loaded =
-            tokio::task::spawn_blocking(zephium_agentic::load_development_typesafe_credential)
+            tokio::task::spawn_blocking(drift_agentic::load_development_typesafe_credential)
                 .await
                 .ok()
                 .and_then(Result::ok);
         super::work_decision::observe_typesafe_key(profile, key_epoch, loaded.is_some());
-        loaded.and_then(|key| zephium_agentic::JevDecisionClient::direct(transport, key).ok())
+        loaded.and_then(|key| drift_agentic::JevDecisionClient::direct(transport, key).ok())
     } else {
         None
     };
@@ -221,10 +221,10 @@ async fn public_decision_settings(
         let _ = transport;
         None
     };
-    let emulation = zephium_agentic::WorkPlanningConfig::try_new(
-        zephium_agent_model_catalog::try_gpt6_luna_decision_call_config(
+    let emulation = drift_agentic::WorkPlanningConfig::try_new(
+        drift_agent_model_catalog::try_gpt6_luna_decision_call_config(
             4096,
-            zephium_agent_model_catalog::Gpt6LunaDecisionEffort::Low,
+            drift_agent_model_catalog::Gpt6LunaDecisionEffort::Low,
         )
         .map_err(|_| WorkError::Unavailable)?,
         32_768,
@@ -235,9 +235,9 @@ async fn public_decision_settings(
     let diagnostic = Some(
         (|fact| {
             record_browser_diagnostic(
-                zephium_agent_controller::AgentWorkEventKind::DecisionSettled(fact),
+                drift_agent_controller::AgentWorkEventKind::DecisionSettled(fact),
             )
-        }) as fn(zephium_agentic::DecisionCallDiagnostic),
+        }) as fn(drift_agentic::DecisionCallDiagnostic),
     );
     #[cfg(not(feature = "work-development-traces"))]
     let diagnostic = None;
@@ -248,13 +248,13 @@ async fn public_decision_settings(
     }))
 }
 
-async fn credential() -> Result<zephium_agentic::AgentProviderCredential, WorkError> {
+async fn credential() -> Result<drift_agentic::AgentProviderCredential, WorkError> {
     #[cfg(any(target_os = "macos", target_os = "windows"))]
     {
         let started = std::time::Instant::now();
         record_diagnostic(format_args!("work: phase=credential state=requested"));
         let loaded =
-            tokio::task::spawn_blocking(zephium_agentic::load_development_openai_credential).await;
+            tokio::task::spawn_blocking(drift_agentic::load_development_openai_credential).await;
         let fault = match &loaded {
             Ok(Ok(_)) => None,
             Ok(Err(error)) => Some(format!("{error:?}")),
@@ -279,8 +279,8 @@ async fn credential() -> Result<zephium_agentic::AgentProviderCredential, WorkEr
 // Only this module's closed facts enter the development log; generic application
 // diagnostics may contain page/provider text and are deliberately excluded.
 #[cfg(feature = "work-development-traces")]
-fn record_browser_diagnostic(event: zephium_agent_controller::AgentWorkEventKind) {
-    use zephium_agent_controller::AgentWorkEventKind;
+fn record_browser_diagnostic(event: drift_agent_controller::AgentWorkEventKind) {
+    use drift_agent_controller::AgentWorkEventKind;
     match event {
         AgentWorkEventKind::DecisionSettled(fact) => {
             record_diagnostic(format_args!(

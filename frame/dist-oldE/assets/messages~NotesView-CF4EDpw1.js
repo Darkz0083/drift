@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`New Note from Page`)),n=((t={},n={})=>(n.locale??e(),`More`)),r=((t={},n={})=>(n.locale??e(),`Open Notes`));export{n,t as r,r as t};

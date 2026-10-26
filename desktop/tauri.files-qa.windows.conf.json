@@ -1,13 +1,13 @@
 {
-  "productName": "Zephium Files Integration QA",
-  "identifier": "app.zephium.files-integration-qa",
+  "productName": "Drift Files Integration QA",
+  "identifier": "app.drift.files-integration-qa",
   "build": { "devUrl": null, "beforeBuildCommand": null },
   "app": {
     "windows": [
       {
         "label": "main",
         "create": false,
-        "title": "Zephium Files Integration QA",
+        "title": "Drift Files Integration QA",
         "width": 1200,
         "height": 800,
         "minWidth": 680,

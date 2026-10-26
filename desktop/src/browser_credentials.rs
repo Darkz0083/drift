@@ -16,7 +16,7 @@ use crate::{authorize, shutdown_started, CallerPolicy};
 use crate::{emit_to_privileged, MAIN_LABEL};
 
 #[cfg(target_os = "macos")]
-const EVENT_BROWSER_CREDENTIAL_CAPABILITY: &str = "zephium:browser-credential-capability";
+const EVENT_BROWSER_CREDENTIAL_CAPABILITY: &str = "drift:browser-credential-capability";
 #[cfg(target_os = "macos")]
 static PASSKEY_AUTHORIZATION_REQUEST_PENDING: AtomicBool = AtomicBool::new(false);
 
@@ -44,30 +44,30 @@ pub(crate) struct BrowserCredentialCapabilityView {
 
 #[cfg(target_os = "macos")]
 fn capability_view() -> BrowserCredentialCapabilityView {
-    capability_view_from_state(zephium_engine::macos_passkey_authorization_state())
+    capability_view_from_state(drift_engine::macos_passkey_authorization_state())
 }
 
 #[cfg(target_os = "macos")]
 fn capability_view_from_state(
-    state: zephium_engine::MacosPasskeyAuthorizationState,
+    state: drift_engine::MacosPasskeyAuthorizationState,
 ) -> BrowserCredentialCapabilityView {
     let passkey_authorization = match state {
-        zephium_engine::MacosPasskeyAuthorizationState::Authorized => {
+        drift_engine::MacosPasskeyAuthorizationState::Authorized => {
             BrowserPasskeyAuthorizationView::Authorized
         }
-        zephium_engine::MacosPasskeyAuthorizationState::Denied => {
+        drift_engine::MacosPasskeyAuthorizationState::Denied => {
             BrowserPasskeyAuthorizationView::Denied
         }
-        zephium_engine::MacosPasskeyAuthorizationState::NotDetermined => {
+        drift_engine::MacosPasskeyAuthorizationState::NotDetermined => {
             BrowserPasskeyAuthorizationView::NotDetermined
         }
-        zephium_engine::MacosPasskeyAuthorizationState::EntitlementRequired => {
+        drift_engine::MacosPasskeyAuthorizationState::EntitlementRequired => {
             BrowserPasskeyAuthorizationView::EntitlementRequired
         }
-        zephium_engine::MacosPasskeyAuthorizationState::Unknown => {
+        drift_engine::MacosPasskeyAuthorizationState::Unknown => {
             BrowserPasskeyAuthorizationView::Unknown
         }
-        zephium_engine::MacosPasskeyAuthorizationState::Unavailable => {
+        drift_engine::MacosPasskeyAuthorizationState::Unavailable => {
             BrowserPasskeyAuthorizationView::Unavailable
         }
     };
@@ -147,7 +147,7 @@ pub(crate) fn browser_passkey_authorization_request(caller: WebviewWindow) -> bo
         let callback_app = app.clone();
         let scheduled = app.run_on_main_thread(move || {
             let completion_app = callback_app.clone();
-            let result = zephium_engine::request_macos_passkey_authorization(move |state| {
+            let result = drift_engine::request_macos_passkey_authorization(move |state| {
                 PASSKEY_AUTHORIZATION_REQUEST_PENDING.store(false, Ordering::Release);
                 let view = capability_view_from_state(state);
                 emit_to_privileged(

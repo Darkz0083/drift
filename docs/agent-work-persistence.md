@@ -4,7 +4,7 @@ The optional application Work coordinator now owns admission and durable
 recovery classification. This is not executable session restoration and does
 not reopen the engine's single-use agent port.
 
-The optional `zephium-store/work-execution` adapter uses the existing Store
+The optional `drift-store/work-execution` adapter uses the existing Store
 actor and a lazy four-operation admission counter. It starts no worker, timer,
 provider or browser. Default Store dependencies do not include the private
 filesystem adapter. Meta migration 17 adds empty, bounded Work tables; no Work
@@ -37,7 +37,7 @@ reconstructs authority, or reuses an old execution owner. Unreviewed records,
 foreign nonterminal fences and unknown-debt `FailedClosed` history still block.
 Cancellation, malformed ACKs and uncertain persistence keep admission closed.
 
-For the release-excluded developer runner, set `ZEPHIUM_WORK_REVIEW` to a review
+For the release-excluded developer runner, set `DRIFT_WORK_REVIEW` to a review
 sidecar path. The runner reports exact content-free interrupted record hex while
 waiting. An explicit JSON decision `{ "record": "<reported hex>", "decision":
 "accept_fresh_admission" }` (or `"reject"`) submits that one review. No file means
@@ -114,7 +114,7 @@ decoded historical facts cannot qualify. Unreviewed records still become
 
 ## Application admission and reconciliation
 
-`zephium-app/work-execution` provides `CallbackHandle::attach_work`,
+`drift-app/work-execution` provides `CallbackHandle::attach_work`,
 `PreparedAgentWork` and the content-free `AgentWorkApplicationHandle`. The
 composition root supplies the same `Arc<SqliteStore>` allocation for ordinary
 Store, Work journal and audit ports, and the same engine owner for ordinary
@@ -222,7 +222,7 @@ site tools, platform suspend support or battery qualification is included.
 
 ## Product Work authoring (profile schema 15)
 
-The product aggregate now starts at `zephium_core::work::WorkSnapshot`, separate
+The product aggregate now starts at `drift_core::work::WorkSnapshot`, separate
 from the content-free execution journal above. The existing agentic `WorkId`
 is re-exported from Core with the same canonical ULID encoding and redacted
 Debug representation. Browser resources and orchestration still use that same
@@ -350,7 +350,7 @@ existing ignored test. All four Store documentation tests passed. These suites
 include 26 focused authoring tests covering the intent, lifecycle, recovery,
 retention, provenance, and migration boundaries. The profile-erasure fixture was
 updated for v2's required fields before the final full Store rerun.
-`cargo clippy --no-deps -p zephium-core -p zephium-store -p zephium-app
+`cargo clippy --no-deps -p drift-core -p drift-store -p drift-app
 --all-targets --offline -- -D warnings` passed for the default authoring build;
 this does not supersede the earlier findings in the optional execution build.
 Formatting and diff whitespace checks passed. No provider calls or GUI
@@ -359,7 +359,7 @@ qualification were used for this authoring follow-up.
 
 ## On-demand model-backed planning
 
-`zephium-app/work-planning` adds `WorkPlanningService::plan(profile, id,
+`drift-app/work-planning` adds `WorkPlanningService::plan(profile, id,
 expected_revision)`. The service uses the existing Handle/Shell/Store boundary
 for both its read and its final write. Shell checks the selected regular,
 non-quarantined profile against the caller's displayed owner each time. Store
@@ -427,7 +427,7 @@ qualifies model planning and durable application integration, not native
 browser execution, frontend behavior, or general planning quality.
 
 The live test is ignored by default and uses only a public comparison objective.
-Run it explicitly with `cargo test -p zephium-app --features work-planning
+Run it explicitly with `cargo test -p drift-app --features work-planning
 planning_live_openai_through_application_and_reopened_store --offline --
 --ignored --nocapture`. It reads the existing fixed development Keychain item;
 it does not accept credential strings through frontend input or log secrets.

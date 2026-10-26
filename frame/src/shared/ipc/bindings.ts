@@ -97,7 +97,7 @@ export const commands = {
 	/**  Ollama and LM Studio on their default ports, for one-click setup. */
 	workLocalServers: () => __TAURI_INVOKE<WorkLocalServerV1[]>("work_local_servers"),
 	voiceStatus: () => __TAURI_INVOKE<VoiceStatusV1>("voice_status"),
-	voiceChooseEngine: (engine: "on_device" | "zephium" | "open_ai" | "groq" | null) => __TAURI_INVOKE<VoiceStatusV1>("voice_choose_engine", { engine }),
+	voiceChooseEngine: (engine: "on_device" | "drift" | "open_ai" | "groq" | null) => __TAURI_INVOKE<VoiceStatusV1>("voice_choose_engine", { engine }),
 	voiceChooseLanguage: (language: string | null) => __TAURI_INVOKE<VoiceStatusV1>("voice_choose_language", { language }),
 	/**
 	 *  Opens the microphone and starts a take. On first use this waits while
@@ -187,7 +187,7 @@ export const commands = {
 	accountPlanDismiss: () => __TAURI_INVOKE<AccountReplyV1>("account_plan_dismiss"),
 	accountSessions: () => __TAURI_INVOKE<AccountSessionsV1>("account_sessions"),
 	accountRevokeSession: (id: string) => __TAURI_INVOKE<AccountReplyV1>("account_revoke_session", { id }),
-	/**  Points accounts at another server, or back at Zephium's with null. */
+	/**  Points accounts at another server, or back at Drift's with null. */
 	accountSetServer: (server: string | null) => __TAURI_INVOKE<AccountReplyV1>("account_set_server", { server }),
 	accountDeletionCode: () => __TAURI_INVOKE<AccountReplyV1>("account_deletion_code"),
 	accountDelete: (code: string) => __TAURI_INVOKE<AccountReplyV1>("account_delete", { code }),
@@ -273,7 +273,7 @@ export const commands = {
 	tabsNavigate: (id: string, input: string) => __TAURI_INVOKE<OperationAdmission>("tabs_navigate", { id, input }),
 	tabsReload: (id: string) => __TAURI_INVOKE<OperationAdmission>("tabs_reload", { id }),
 	tabsAnswerPageRequest: (id: string, answer: PageRequestAnswer) => __TAURI_INVOKE<OperationAdmission>("tabs_answer_page_request", { id, answer }),
-	/**  Shows the folder with Zephium's local log and crash report. */
+	/**  Shows the folder with Drift's local log and crash report. */
 	diagnosticsShowLogs: () => __TAURI_INVOKE<boolean>("diagnostics_show_logs"),
 	tabsBack: (id: string) => __TAURI_INVOKE<OperationAdmission>("tabs_back", { id }),
 	tabsForward: (id: string) => __TAURI_INVOKE<OperationAdmission>("tabs_forward", { id }),
@@ -557,7 +557,7 @@ export const commands = {
 	can_request: boolean,
 } | null>("default_browser_status"),
 	/**
-	 *  Asks the system to make Zephium the default browser, then reports what is
+	 *  Asks the system to make Drift the default browser, then reports what is
 	 *  true afterwards. On Windows the answer arrives later, from Settings; chrome
 	 *  reads the status again when the window regains focus.
 	 */
@@ -581,7 +581,7 @@ export const commands = {
 	focusControl: (control: FocusControl) => __TAURI_INVOKE<OperationAdmission>("focus_control", { control }),
 	/**
 	 *  Finds `query` in the page in front, stepping forward or back when it
-	 *  repeats; no query ends the search. Results arrive as `zephium:find`.
+	 *  repeats; no query ends the search. Results arrive as `drift:find`.
 	 */
 	pageFind: (query: string | null, forward: boolean) => __TAURI_INVOKE<boolean>("page_find", { query, forward }),
 	importSources: () => __TAURI_INVOKE<ImportSourceView[]>("import_sources"),
@@ -636,16 +636,16 @@ export const events = {
 	webExtensionAccessRequested: makeEvent<WebExtensionAccessRequested>("web-extension-access-requested"),
 	workChanged: makeEvent<WorkChanged>("work-changed"),
 	workEnvironmentChanged: makeEvent<WorkEnvironmentChanged>("work-environment-changed"),
-	zephiumAccountChanged: makeEvent<AccountChanged>("zephium:account-changed"),
-	zephiumImportProgress: makeEvent<ImportJobView>("zephium:import-progress"),
-	zephiumKeymapChanged: makeEvent<KeymapChanged>("zephium:keymap-changed"),
-	zephiumPageAssistChanged: makeEvent<PageAssistChanged>("zephium:page-assist-changed"),
-	zephiumSwipe: makeEvent<SwipeScroll>("zephium:swipe"),
-	zephiumVoiceChanged: makeEvent<VoiceChanged>("zephium:voice-changed"),
-	zephiumVoiceLevels: makeEvent<VoiceLevels>("zephium:voice-levels"),
-	zephiumWorkDecisionPreferenceChanged: makeEvent<WorkDecisionPreferenceChanged>("zephium:work-decision-preference-changed"),
-	zephiumWorkHumanChanged: makeEvent<WorkHumanChanged>("zephium:work-human-changed"),
-	zephiumWorkModelsChanged: makeEvent<WorkModelsChanged>("zephium:work-models-changed"),
+	driftAccountChanged: makeEvent<AccountChanged>("drift:account-changed"),
+	driftImportProgress: makeEvent<ImportJobView>("drift:import-progress"),
+	driftKeymapChanged: makeEvent<KeymapChanged>("drift:keymap-changed"),
+	driftPageAssistChanged: makeEvent<PageAssistChanged>("drift:page-assist-changed"),
+	driftSwipe: makeEvent<SwipeScroll>("drift:swipe"),
+	driftVoiceChanged: makeEvent<VoiceChanged>("drift:voice-changed"),
+	driftVoiceLevels: makeEvent<VoiceLevels>("drift:voice-levels"),
+	driftWorkDecisionPreferenceChanged: makeEvent<WorkDecisionPreferenceChanged>("drift:work-decision-preference-changed"),
+	driftWorkHumanChanged: makeEvent<WorkHumanChanged>("drift:work-human-changed"),
+	driftWorkModelsChanged: makeEvent<WorkModelsChanged>("drift:work-models-changed"),
 };
 
 /* Types */
@@ -879,7 +879,7 @@ export type AccountV1 = {
 	/**  Purchases and the billing portal are offered here. */
 	billing: boolean | null,
 	signup_open: boolean | null,
-	/**  The server asks for a newer Zephium than this one. */
+	/**  The server asks for a newer Drift than this one. */
 	update_required: boolean,
 	signed_in: boolean,
 	/**  The address a sign-in code was sent to, while waiting for it. */
@@ -888,7 +888,7 @@ export type AccountV1 = {
 	email: string | null,
 	name: string | null,
 	/**
-	 *  The account picture's revision, served by `zephium-media` at
+	 *  The account picture's revision, served by `drift-media` at
 	 *  `account-avatar/<revision>`; null shows initials. Never the service's
 	 *  address for it.
 	 */
@@ -1524,7 +1524,7 @@ export type ImportKindView =
 export type ImportProblemView =
 /**  The browser holds its files locked; quitting it lets the import run. */
 "busy" | "permission" | "unreadable" | "missing" |
-/**  Zephium could not keep what was read. */
+/**  Drift could not keep what was read. */
 "storage";
 
 export type ImportProfileView = {
@@ -1883,7 +1883,7 @@ export type PageAssistAvailabilityV1 = "ready" |
 "not_web" |
 /**  Banks, payments, health and government sites are never read. */
 "sensitive" |
-/**  No model is set up: no Zephium account and no key. */
+/**  No model is set up: no Drift account and no key. */
 "no_model" |
 /**  The page is still loading; ask again when it settles. */
 "loading" |
@@ -1910,8 +1910,8 @@ export type PageAssistBringKindV1 = "task" | "note" | "tab" | "repository" | "fo
 export type PageAssistBringV1 = {
 	kind: PageAssistBringKindV1,
 	/**
-	 *  Such as "Set up status.zephium.app", "zephium-browser/Zephium" or
-	 *  "~/Dev/zephium-infra".
+	 *  Such as "Set up status.drift.app", "drift-browser/Drift" or
+	 *  "~/Dev/drift-infra".
 	 */
 	label: string,
 	/**
@@ -1926,7 +1926,7 @@ export type PageAssistBringV1 = {
 /**  One change to an assistant conversation. */
 export type PageAssistChanged = PageAssistChangedV1;
 
-/**  Payload of `zephium:page-assist-changed`. */
+/**  Payload of `drift:page-assist-changed`. */
 export type PageAssistChangedV1 = {
 	space: string,
 	conversation: string,
@@ -1970,7 +1970,7 @@ export type PageAssistConversationV1 = {
 /**  What a reply cost. */
 export type PageAssistCostV1 =
 /**
- *  Zephium AI. `credits` is a decimal string such as "0.3"; null while
+ *  Drift AI. `credits` is a decimal string such as "0.3"; null while
  *  the charge is being confirmed.
  */
 { kind: "hosted"; model: string; credits: string | null } |
@@ -2087,7 +2087,7 @@ export type PageAssistModelV1 = {
 	id: string,
 	/**  Display name, such as GPT-6 Luna. */
 	name: string,
-	/**  Zephium AI (credits) rather than the person's own key. */
+	/**  Drift AI (credits) rather than the person's own key. */
 	hosted: boolean,
 	/**  The effort it runs at, such as "high"; null when it has none. */
 	effort: string | null,
@@ -2709,7 +2709,7 @@ export type RuntimeSecurityAdvisoryKind = "review_overdue" | "update_recommended
  *  Fixed destination of the recommended maintenance action. No page or
  *  network response can select this value.
  */
-export type RuntimeSecurityUpdateTarget = "zephium" | "operating_system" | "browser_runtime";
+export type RuntimeSecurityUpdateTarget = "drift" | "operating_system" | "browser_runtime";
 
 /**
  *  Process-local browser-runtime status. Once `restart_required` becomes true
@@ -3111,7 +3111,7 @@ export type VoiceChanged = {
 	fault: VoiceFaultV1 | null,
 };
 
-export type VoiceEngineV1 = "on_device" | "zephium" | "open_ai" | "groq";
+export type VoiceEngineV1 = "on_device" | "drift" | "open_ai" | "groq";
 
 /**  Why a take could not start or produce words. Closed; no system text. */
 export type VoiceFaultV1 = "microphone_denied" | "recognition_denied" | "no_microphone" | "language_unavailable" |
@@ -3122,21 +3122,21 @@ export type VoiceFaultV1 = "microphone_denied" | "recognition_denied" | "no_micr
 "dictation_off" |
 /**  No engine can run: nothing on this device and no account or key. */
 "no_engine" | "key_refused" | "signed_out" | "out_of_credit" |
-/**  The chosen Zephium AI speech model needs another plan. */
+/**  The chosen Drift AI speech model needs another plan. */
 "plan_required" |
-/**  The Zephium account is under billing review. */
+/**  The Drift account is under billing review. */
 "billing_review" |
-/**  The account's daily Zephium AI limit is reached. */
+/**  The account's daily Drift AI limit is reached. */
 "daily_limit" |
-/**  Free Zephium AI usage is paused for now. */
+/**  Free Drift AI usage is paused for now. */
 "free_usage_paused" |
-/**  Zephium AI is paused as a spending protection. */
+/**  Drift AI is paused as a spending protection. */
 "hosted_paused" |
 /**  The server could not read the recording. */
 "invalid_audio" |
 /**  The server does not take the recording's encoding. */
 "unsupported_audio" |
-/**  The recording is longer than Zephium AI takes. */
+/**  The recording is longer than Drift AI takes. */
 "audio_too_long" | "rate_limited" | "offline" | "provider_down" | "too_long" | "busy" | "unavailable";
 
 /**
@@ -3286,13 +3286,13 @@ export type WorkAccountEffectV1_Serialize = ({ kind: "read" }) & { update?: neve
 
 /**
  *  One origin read with the profile's signed-in session for one request.
- *  The person's approval attests the account; Zephium never infers it.
+ *  The person's approval attests the account; Drift never infers it.
  */
 export type WorkAccountGrantV1 = WorkAccountGrantV1_Serialize | WorkAccountGrantV1_Deserialize;
 
 /**
  *  One origin read with the profile's signed-in session for one request.
- *  The person's approval attests the account; Zephium never infers it.
+ *  The person's approval attests the account; Drift never infers it.
  */
 export type WorkAccountGrantV1_Deserialize = {
 	/**  Exact HTTPS origin. */
@@ -3307,7 +3307,7 @@ export type WorkAccountGrantV1_Deserialize = {
 
 /**
  *  One origin read with the profile's signed-in session for one request.
- *  The person's approval attests the account; Zephium never infers it.
+ *  The person's approval attests the account; Drift never infers it.
  */
 export type WorkAccountGrantV1_Serialize = {
 	/**  Exact HTTPS origin. */
@@ -3827,7 +3827,7 @@ export type WorkCapability_Deserialize =
 ({ kind: "synthesize" }) & { grant?: never; max_hops?: never; model?: never; provider?: never; scope?: never; update?: never } |
 /**
  *  Read one exact page with the profile's own signed-in session. The
- *  approving user attests the account; Zephium cannot verify it.
+ *  approving user attests the account; Drift cannot verify it.
  */
 ({ kind: "account_read"; scope: WorkAccountScope }) & { grant?: never; max_hops?: never; model?: never; provider?: never; update?: never } |
 /**
@@ -3864,7 +3864,7 @@ export type WorkCapability_Serialize =
 ({ kind: "synthesize" }) & { grant?: never; max_hops?: never; model?: never; provider?: never; scope?: never; update?: never } |
 /**
  *  Read one exact page with the profile's own signed-in session. The
- *  approving user attests the account; Zephium cannot verify it.
+ *  approving user attests the account; Drift cannot verify it.
  */
 ({ kind: "account_read"; scope: WorkAccountScope }) & { grant?: never; max_hops?: never; model?: never; provider?: never; update?: never } |
 /**
@@ -5132,7 +5132,7 @@ export type WorkInterventionKindV1 =
 "challenge" |
 /**  A permission or operating-system boundary needs a person. */
 "permission" |
-/**  The page needs an interaction Zephium cannot automate safely. */
+/**  The page needs an interaction Drift cannot automate safely. */
 "unsupported_interaction" |
 /**  The effect or its verification needs the user's review. */
 "review" |
@@ -5289,7 +5289,7 @@ export type WorkMemoryKindV1 =
 "preference" |
 /**  "Anna is the design lead", "My manager is Tom". */
 "person" |
-/**  "Zephium ships from the work-mode-integration branch". */
+/**  "Drift ships from the work-mode-integration branch". */
 "project" | "fact";
 
 /**  Which memories to list: the words to look for, or one work's. */
@@ -5407,21 +5407,21 @@ export type WorkModelFaultV1 =
 "provider_credit" |
 /**  The provider plan's per-minute limit is smaller than one request. */
 "plan_limit" |
-/**  The account's included Zephium AI usage, and any extra, is spent. */
+/**  The account's included Drift AI usage, and any extra, is spent. */
 "hosted_usage" |
-/**  The chosen Zephium AI model needs another plan. */
+/**  The chosen Drift AI model needs another plan. */
 "plan_required" |
-/**  The Zephium account is under billing review. */
+/**  The Drift account is under billing review. */
 "billing_review" |
-/**  The account's daily Zephium AI limit is reached. */
+/**  The account's daily Drift AI limit is reached. */
 "daily_limit" |
-/**  Free Zephium AI usage is paused for now; credits and keys still work. */
+/**  Free Drift AI usage is paused for now; credits and keys still work. */
 "free_usage_paused" |
-/**  Earlier Zephium AI requests are still being confirmed. */
+/**  Earlier Drift AI requests are still being confirmed. */
 "hosted_busy" |
-/**  Zephium AI is paused as a spending protection. */
+/**  Drift AI is paused as a spending protection. */
 "hosted_paused" |
-/**  The Zephium account's session ended. */
+/**  The Drift account's session ended. */
 "signed_out" | "rate_limited" | "provider_down" | "unreachable" | "too_large";
 
 /**  Per million tokens, in millionths of a US dollar. */
@@ -5434,7 +5434,7 @@ export type WorkModelPrice = {
 export type WorkModelProvider = "open_ai" | "anthropic" | "google" | "deep_seek" | "open_router" | "xai" | "mistral" | "groq" | "cerebras" |
 /**  Any OpenAI-compatible chat endpoint the person configured. */
 "compatible" |
-/**  Zephium Cloud: the upstream's native body, our base URL and bearer. */
+/**  Drift Cloud: the upstream's native body, our base URL and bearer. */
 "cloud";
 
 export type WorkModelReasoning = "low" | "medium" | "high" | "xhigh" | "max";
@@ -6864,7 +6864,7 @@ export type WorkSiteAccessResponseV1 = {
 export type WorkSiteAccessV1 =
 /**  Work in the person's session without asking. */
 "always" |
-/**  Ask once per run, including on a site Zephium treats as sensitive. */
+/**  Ask once per run, including on a site Drift treats as sensitive. */
 "ask" |
 /**  Never use the person's session here; pages open privately. */
 "never";

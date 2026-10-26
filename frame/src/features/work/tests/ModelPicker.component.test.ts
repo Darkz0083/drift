@@ -452,14 +452,14 @@ test("without any key the control is one calm way to add a key, straight to Sett
   expect(page.getByRole("listbox").query()).toBeNull();
 });
 
-test("signed out where hosted models exist, Zephium AI is one sign-in away", async () => {
+test("signed out where hosted models exist, Drift AI is one sign-in away", async () => {
   await page.viewport(1200, 800);
   native.read.mockResolvedValue(view("anthropic/claude-opus-5-5"));
   native.account.mockResolvedValue({
     account: {
       version: 1,
       available: true,
-      server: "https://api.zephium.app",
+      server: "https://api.drift.app",
       custom_server: false,
       hosted_models: true,
       billing: true,
@@ -487,11 +487,11 @@ test("signed out where hosted models exist, Zephium AI is one sign-in away", asy
   native.ready.mockImplementation(ready(true));
   const screen = await render(ModelPicker, { profile: PROFILE });
   await screen.getByRole("button", { name: /Model: Claude Opus 5\.5/u }).click();
-  // Zephium's own is pinned above every provider, ready or not.
+  // Drift's own is pinned above every provider, ready or not.
   const rail = page.getByRole("tab").all();
-  expect(rail[0]!.element().getAttribute("aria-label")).toBe("Zephium AI, sign in to use");
+  expect(rail[0]!.element().getAttribute("aria-label")).toBe("Drift AI, sign in to use");
   expect(rail[1]!.element().getAttribute("aria-label")).toBe("Anthropic");
-  await page.getByRole("tab", { name: "Zephium AI, sign in to use" }).click();
+  await page.getByRole("tab", { name: "Drift AI, sign in to use" }).click();
   await expect.element(page.getByText("hosted models", { exact: false })).toBeVisible();
   await page.getByRole("button", { name: "Sign in" }).click();
   expect(native.command).toHaveBeenCalledWith("settings.account");
@@ -574,8 +574,8 @@ test("a hosted model the plan leaves out names the plan that opens it and leads 
   native.choose.mockClear();
   const hosted = models({
     cloud: true,
-    lead: "zephium/claude-sonnet-5-5",
-    chosen: "zephium/claude-sonnet-5-5",
+    lead: "drift/claude-sonnet-5-5",
+    chosen: "drift/claude-sonnet-5-5",
   });
   const max = entry("cloud", "claude-opus-5-5", "Claude Opus 5.5", true, ["lead"]);
   const other = entry("cloud", "claude-fable-5-1", "Claude Fable 5.1", true, ["lead"]);

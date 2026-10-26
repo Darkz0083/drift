@@ -5,43 +5,43 @@ use std::path::Path;
 
 use toml::Value;
 
-const MANIFEST: &str = "crates/zephium-agent-controller/Cargo.toml";
-const ROOT: &str = "crates/zephium-agent-controller/src/lib.rs";
-const PROBE: &str = "crates/zephium-agent-controller/src/probe.rs";
-const TERRA: &str = "crates/zephium-agent-controller/src/terra.rs";
-const ACTION: &str = "crates/zephium-agent-controller/src/action.rs";
-const DECISION: &str = "crates/zephium-agent-controller/src/decision.rs";
-const ACTION_REFUSAL: &str = "crates/zephium-agentic/src/agent_provider/action_refusal.rs";
-const REINSPECTION: &str = "crates/zephium-agent-controller/src/work_reinspection.rs";
-const WORK: &str = "crates/zephium-agent-controller/src/work.rs";
-const WORK_DECISION: &str = "crates/zephium-agent-controller/src/work_decision.rs";
-const INSPECTION: &str = "crates/zephium-agent-controller/src/work_inspection.rs";
+const MANIFEST: &str = "crates/drift-agent-controller/Cargo.toml";
+const ROOT: &str = "crates/drift-agent-controller/src/lib.rs";
+const PROBE: &str = "crates/drift-agent-controller/src/probe.rs";
+const TERRA: &str = "crates/drift-agent-controller/src/terra.rs";
+const ACTION: &str = "crates/drift-agent-controller/src/action.rs";
+const DECISION: &str = "crates/drift-agent-controller/src/decision.rs";
+const ACTION_REFUSAL: &str = "crates/drift-agentic/src/agent_provider/action_refusal.rs";
+const REINSPECTION: &str = "crates/drift-agent-controller/src/work_reinspection.rs";
+const WORK: &str = "crates/drift-agent-controller/src/work.rs";
+const WORK_DECISION: &str = "crates/drift-agent-controller/src/work_decision.rs";
+const INSPECTION: &str = "crates/drift-agent-controller/src/work_inspection.rs";
 const OBSERVATION_CHECKPOINT: &str =
-    "crates/zephium-agentic/src/agent_provider/observation_checkpoint.rs";
-const FORM: &str = "crates/zephium-agent-controller/src/work_form.rs";
+    "crates/drift-agentic/src/agent_provider/observation_checkpoint.rs";
+const FORM: &str = "crates/drift-agent-controller/src/work_form.rs";
 // Work actor children that act only through its owned paths (code-owned reads,
 // prepared actions): listing loads (a8d9b097) and compound forms (68ecb4c8).
 const WORK_CHILDREN: [&str; 2] = [
-    "crates/zephium-agent-controller/src/work_listing.rs",
-    "crates/zephium-agent-controller/src/work_compound_form.rs",
+    "crates/drift-agent-controller/src/work_listing.rs",
+    "crates/drift-agent-controller/src/work_compound_form.rs",
 ];
-const NAVIGATION: &str = "crates/zephium-agent-controller/src/work_navigation.rs";
-const NAVIGATION_POLICY: &str = "crates/zephium-agentic/src/agent_policy/navigation.rs";
-const RUN_MANIFEST: &str = "crates/zephium-agentic/src/agent_manifest.rs";
-const READ: &str = "crates/zephium-agentic/src/semantic_read.rs";
-const CONTINUATION: &str = "crates/zephium-agentic/src/agent_provider/continuation.rs";
-const PROVIDER_REQUEST: &str = "crates/zephium-agentic/src/agent_provider/request.rs";
-const POLICY: &str = "crates/zephium-agentic/src/agent_policy.rs";
-const QUALIFIER: &str = "crates/zephium-terra-macos-probe/src/main.rs";
-const WORK_QUALIFIER: &str = "crates/zephium-terra-macos-probe/src/work_actor.rs";
+const NAVIGATION: &str = "crates/drift-agent-controller/src/work_navigation.rs";
+const NAVIGATION_POLICY: &str = "crates/drift-agentic/src/agent_policy/navigation.rs";
+const RUN_MANIFEST: &str = "crates/drift-agentic/src/agent_manifest.rs";
+const READ: &str = "crates/drift-agentic/src/semantic_read.rs";
+const CONTINUATION: &str = "crates/drift-agentic/src/agent_provider/continuation.rs";
+const PROVIDER_REQUEST: &str = "crates/drift-agentic/src/agent_provider/request.rs";
+const POLICY: &str = "crates/drift-agentic/src/agent_policy.rs";
+const QUALIFIER: &str = "crates/drift-terra-macos-probe/src/main.rs";
+const WORK_QUALIFIER: &str = "crates/drift-terra-macos-probe/src/work_actor.rs";
 const ALLOWED_DEPENDENCIES: [&str; 7] = [
     "thiserror",
     "tokio",
-    "zephium-agentic",
-    "zephium-agent-model-catalog",
-    "zephium-agent-provider-transport",
-    "zephium-agent-runtime",
-    "zephium-decision",
+    "drift-agentic",
+    "drift-agent-model-catalog",
+    "drift-agent-provider-transport",
+    "drift-agent-runtime",
+    "drift-decision",
 ];
 const FORBIDDEN_TERRA_TOKENS: [&str; 16] = [
     "reqwest",
@@ -49,9 +49,9 @@ const FORBIDDEN_TERRA_TOKENS: [&str; 16] = [
     "load_macos_development",
     "load_development",
     "load_probe",
-    "zephium_engine",
-    "zephium_store",
-    "zephium_app",
+    "drift_engine",
+    "drift_store",
+    "drift_app",
     "tauri",
     "wry",
     "webkit",
@@ -112,7 +112,7 @@ pub(crate) fn check(repository: &Path) -> Result<(), String> {
     )?;
     validate_workflow_qualifier(&read(repository.join(QUALIFIER))?)?;
     validate_work_actor_qualifier(&read(repository.join(WORK_QUALIFIER))?)?;
-    validate_inventory(&repository.join("crates/zephium-agent-controller"))?;
+    validate_inventory(&repository.join("crates/drift-agent-controller"))?;
     Ok(())
 }
 
@@ -319,7 +319,7 @@ fn validate_scoped_extraction(read: &str, continuation: &str, policy: &str) -> R
                 "if &exact != request",
                 "frame.generation() <= anchor.snapshot_generation()",
                 "root.key() != anchor.capability().node_key()",
-                "ZEPHIUM-SEMANTIC-SUBTREE-READ-GUARD-1",
+                "DRIFT-SEMANTIC-SUBTREE-READ-GUARD-1",
             ][..],
         ),
         (
@@ -363,7 +363,7 @@ fn validate_navigation_route_contract(source: &str) -> Result<(), String> {
         "|| self.navigation_discovery.is_some()",
         "|| self.origins.binary_search(route.origin()).is_err()",
         "if routed != 0",
-        "ZEPHIUM-AGENT-NAVIGATION-ROUTES-1",
+        "DRIFT-AGENT-NAVIGATION-ROUTES-1",
         "hasher.update(node.id().bytes())",
         "std::iter::once(route.departure()).chain(route.destinations())",
         "hasher.update((bytes.len() as u64).to_be_bytes())",
@@ -397,7 +397,7 @@ fn validate_navigation_progress(
             "policy.validate_provider_navigation_checkpoint(request, checkpoint.binding)",
         ][..]),
         (request, &[
-            "struct AgentProviderNavigationContext", "ZEPHIUM_HOST_NAVIGATION_CHECKPOINT_V1",
+            "struct AgentProviderNavigationContext", "DRIFT_HOST_NAVIGATION_CHECKPOINT_V1",
             // acc7cc16: every checkpoint URL passes the model-safe public URL gate.
             "crate::semantic_wire::model_safe_public_url(target)",
             ".map(provider_navigation_url)",
@@ -641,7 +641,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         .get("package")
         .and_then(Value::as_table)
         .ok_or_else(|| "controller package is missing".to_owned())?;
-    if package.get("name").and_then(Value::as_str) != Some("zephium-agent-controller")
+    if package.get("name").and_then(Value::as_str) != Some("drift-agent-controller")
         || package.get("publish").and_then(Value::as_bool) != Some(false)
         || package.get("build").and_then(Value::as_bool) != Some(false)
     {
@@ -679,7 +679,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         return Err("controller dependency inventory drifted".to_owned());
     }
     let transport = dependencies
-        .get("zephium-agent-provider-transport")
+        .get("drift-agent-provider-transport")
         .and_then(Value::as_table)
         .ok_or_else(|| "controller provider façade dependency is malformed".to_owned())?;
     if transport.get("workspace").and_then(Value::as_bool) != Some(true)
@@ -690,7 +690,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
     }
     // The typed-decision layer rides the provider façade: optional, workspace-only.
     let decision = dependencies
-        .get("zephium-decision")
+        .get("drift-decision")
         .and_then(Value::as_table)
         .ok_or_else(|| "controller decision dependency is malformed".to_owned())?;
     if decision.get("workspace").and_then(Value::as_bool) != Some(true)
@@ -708,9 +708,9 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         features,
         "provider-transport",
         &[
-            "dep:zephium-agent-provider-transport",
-            "dep:zephium-decision",
-            "zephium-agent-provider-transport/provider-transport",
+            "dep:drift-agent-provider-transport",
+            "dep:drift-decision",
+            "drift-agent-provider-transport/provider-transport",
         ],
     )?;
     require_array(
@@ -718,7 +718,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         "probe-harness",
         &[
             "provider-transport",
-            "zephium-agent-provider-transport/probe-harness",
+            "drift-agent-provider-transport/probe-harness",
         ],
     )?;
     if features.len() != 3 {
@@ -854,8 +854,8 @@ fn validate_terra(source: &str) -> Result<(), String> {
         "!unsuccessful || refusal.human_review().is_none()",
         "AgentBrowserSessionFinishRefusal",
         "self.policy.accounting().reserved_model_tokens() != 0",
-        "action_executions: zephium_agentic::SemanticActionExecutionCoordinator::new()",
-        "action_settlements: zephium_agentic::SemanticActionSettlementCoordinator::new()",
+        "action_executions: drift_agentic::SemanticActionExecutionCoordinator::new()",
+        "action_settlements: drift_agentic::SemanticActionSettlementCoordinator::new()",
         "self.action_executions.seal()",
         "self.action_settlements.seal()",
         "continue_after_verified_action",
@@ -1337,7 +1337,7 @@ const TYPED_FILL_READ: &str = r#"let typed = (proposal.action().kind() == Semant
 
 const TYPED_FILL_USE: &str = r#"if let Some(choice) = typed
                 .as_deref()
-                .and_then(|typed| zephium_agentic::semantic_sole_choice(&current, typed))
+                .and_then(|typed| drift_agentic::semantic_sole_choice(&current, typed))
                 .filter(|_| state.progressive_observation)
             {
                 let next = Box::pin(Self::commit_suggestion("#;
@@ -1481,8 +1481,8 @@ fn validate_work_actor_qualifier(source: &str) -> Result<(), String> {
         "AgentWorkController::try_new_for_probe(",
         "PendingAgentRuntime::spawn_suspended_with_controller(",
         "pending.bind_browser_port(port)",
-        "zephium_engine::run_macos_agentic_work_actor_probe(",
-        "zephium_store::SqliteStore::open(",
+        "drift_engine::run_macos_agentic_work_actor_probe(",
+        "drift_store::SqliteStore::open(",
         "AgentBrowserRetention::InspectablePublicData",
         "AgentWorkOutcome::Succeeded(settlement)",
         "AgentBrowserShutdownOutcome::Clean(_)",
@@ -1533,38 +1533,38 @@ mod tests {
         LOOK_DIGEST_USE,
     };
 
-    const MANIFEST: &str = include_str!("../../crates/zephium-agent-controller/Cargo.toml");
-    const ROOT: &str = include_str!("../../crates/zephium-agent-controller/src/lib.rs");
-    const PROBE: &str = include_str!("../../crates/zephium-agent-controller/src/probe.rs");
-    const TERRA: &str = include_str!("../../crates/zephium-agent-controller/src/terra.rs");
-    const ACTION: &str = include_str!("../../crates/zephium-agent-controller/src/action.rs");
+    const MANIFEST: &str = include_str!("../../crates/drift-agent-controller/Cargo.toml");
+    const ROOT: &str = include_str!("../../crates/drift-agent-controller/src/lib.rs");
+    const PROBE: &str = include_str!("../../crates/drift-agent-controller/src/probe.rs");
+    const TERRA: &str = include_str!("../../crates/drift-agent-controller/src/terra.rs");
+    const ACTION: &str = include_str!("../../crates/drift-agent-controller/src/action.rs");
     const ACTION_REFUSAL: &str =
-        include_str!("../../crates/zephium-agentic/src/agent_provider/action_refusal.rs");
-    const WORK: &str = include_str!("../../crates/zephium-agent-controller/src/work.rs");
+        include_str!("../../crates/drift-agentic/src/agent_provider/action_refusal.rs");
+    const WORK: &str = include_str!("../../crates/drift-agent-controller/src/work.rs");
     const WORK_DECISION: &str =
-        include_str!("../../crates/zephium-agent-controller/src/work_decision.rs");
-    const READ: &str = include_str!("../../crates/zephium-agentic/src/semantic_read.rs");
+        include_str!("../../crates/drift-agent-controller/src/work_decision.rs");
+    const READ: &str = include_str!("../../crates/drift-agentic/src/semantic_read.rs");
     const CONTINUATION: &str =
-        include_str!("../../crates/zephium-agentic/src/agent_provider/continuation.rs");
+        include_str!("../../crates/drift-agentic/src/agent_provider/continuation.rs");
     const PROVIDER_REQUEST: &str =
-        include_str!("../../crates/zephium-agentic/src/agent_provider/request.rs");
-    const POLICY: &str = include_str!("../../crates/zephium-agentic/src/agent_policy.rs");
-    const RUN_MANIFEST: &str = include_str!("../../crates/zephium-agentic/src/agent_manifest.rs");
-    const QUALIFIER: &str = include_str!("../../crates/zephium-terra-macos-probe/src/main.rs");
+        include_str!("../../crates/drift-agentic/src/agent_provider/request.rs");
+    const POLICY: &str = include_str!("../../crates/drift-agentic/src/agent_policy.rs");
+    const RUN_MANIFEST: &str = include_str!("../../crates/drift-agentic/src/agent_manifest.rs");
+    const QUALIFIER: &str = include_str!("../../crates/drift-terra-macos-probe/src/main.rs");
     const WORK_QUALIFIER: &str =
-        include_str!("../../crates/zephium-terra-macos-probe/src/work_actor.rs");
-    const FORM: &str = include_str!("../../crates/zephium-agent-controller/src/work_form.rs");
+        include_str!("../../crates/drift-terra-macos-probe/src/work_actor.rs");
+    const FORM: &str = include_str!("../../crates/drift-agent-controller/src/work_form.rs");
     const NAVIGATION: &str =
-        include_str!("../../crates/zephium-agent-controller/src/work_navigation.rs");
+        include_str!("../../crates/drift-agent-controller/src/work_navigation.rs");
     const NAVIGATION_POLICY: &str =
-        include_str!("../../crates/zephium-agentic/src/agent_policy/navigation.rs");
+        include_str!("../../crates/drift-agentic/src/agent_policy/navigation.rs");
 
     #[test]
     fn progressive_observation_cannot_bypass_the_original_delivery_or_native_owners() {
         let inspection =
-            include_str!("../../crates/zephium-agent-controller/src/work_inspection.rs");
+            include_str!("../../crates/drift-agent-controller/src/work_inspection.rs");
         let checkpoint = include_str!(
-            "../../crates/zephium-agentic/src/agent_provider/observation_checkpoint.rs"
+            "../../crates/drift-agentic/src/agent_provider/observation_checkpoint.rs"
         );
         super::validate_progressive_observation(inspection, checkpoint).unwrap();
         for boundary in [
@@ -1663,7 +1663,7 @@ mod tests {
             "destinations.is_empty() || destinations.len() > MAX_AGENT_NAVIGATION_ROUTE_HOPS",
             "target == &departure || destinations[..index - 1].contains(target)",
             "std::iter::once(route.departure()).chain(route.destinations())",
-            "ZEPHIUM-AGENT-NAVIGATION-ROUTES-1",
+            "DRIFT-AGENT-NAVIGATION-ROUTES-1",
         ] {
             assert!(
                 validate_navigation_route_contract(&RUN_MANIFEST.replace(removed, "removed"))
@@ -1858,7 +1858,7 @@ mod tests {
             "if &exact != request",
             "frame.generation() <= anchor.snapshot_generation()",
             "root.key() != anchor.capability().node_key()",
-            "ZEPHIUM-SEMANTIC-SUBTREE-READ-GUARD-1",
+            "DRIFT-SEMANTIC-SUBTREE-READ-GUARD-1",
         ] {
             assert!(validate_scoped_extraction(
                 &READ.replace(boundary, "removed_boundary"),
@@ -1896,7 +1896,7 @@ mod tests {
     fn actor_qualification_requires_actual_runtime_native_and_durable_closure() {
         for boundary in [
             "pending.bind_browser_port(port)",
-            "zephium_store::SqliteStore::open(",
+            "drift_store::SqliteStore::open(",
             "AgentBrowserShutdownOutcome::Clean(_)",
             "AgentWorkOutcome::Succeeded(settlement)",
             "impl AgentWorkTask for PublicPreparedResultTask",
@@ -1947,8 +1947,8 @@ mod tests {
     #[test]
     fn work_children_cannot_acquire_forbidden_authority() {
         for child in [
-            include_str!("../../crates/zephium-agent-controller/src/work_listing.rs"),
-            include_str!("../../crates/zephium-agent-controller/src/work_compound_form.rs"),
+            include_str!("../../crates/drift-agent-controller/src/work_listing.rs"),
+            include_str!("../../crates/drift-agent-controller/src/work_compound_form.rs"),
         ] {
             super::validate_work_child(child).expect("reviewed Work actor child");
             for forbidden in [
@@ -1980,7 +1980,7 @@ mod tests {
             assert!(validate_work(&WORK.replacen(from, to, 1), WORK_DECISION).is_err());
         }
         assert!(validate_work(
-            &format!("{WORK}\nfn f(t: &str) {{ zephium_agentic::semantic_sole_choice(&l, t); }}"),
+            &format!("{WORK}\nfn f(t: &str) {{ drift_agentic::semantic_sole_choice(&l, t); }}"),
             WORK_DECISION
         )
         .is_err());
@@ -2024,7 +2024,7 @@ mod tests {
         )
         .is_err());
         assert!(validate_work(&format!("{WORK}\nlet _ = page.as_str();"), WORK_DECISION).is_err());
-        let decision = include_str!("../../crates/zephium-agent-controller/src/decision.rs");
+        let decision = include_str!("../../crates/drift-agent-controller/src/decision.rs");
         validate_decision_routing(decision).expect("decision routing");
         assert!(validate_decision_routing(&format!("{decision}\nstd::thread::spawn(f);")).is_err());
         let vocabulary = super::NAVIGATION_VOCABULARY;
@@ -2201,7 +2201,7 @@ mod tests {
 
     #[test]
     fn reinspection_cannot_restore_execution_or_relax_independent_evidence() {
-        let source = include_str!("../../crates/zephium-agent-controller/src/work_reinspection.rs");
+        let source = include_str!("../../crates/drift-agent-controller/src/work_reinspection.rs");
         validate_reinspection(source).unwrap();
         for guard in [
             "binding.document() != &target.document",

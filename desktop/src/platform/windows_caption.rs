@@ -302,7 +302,7 @@ unsafe fn layout(p: *mut State) {
     }
     let progress = f64::from((*p).opacity) / 255.0;
     let displacement = (height as f64 * progress).round() as i32;
-    zephium_engine::set_window_caption_offset(
+    drift_engine::set_window_caption_offset(
         owner.0 as isize,
         if (*p).page_left.is_some() {
             displacement as f64 / scale
@@ -420,7 +420,7 @@ unsafe fn prepare_state_change(p: *mut State) {
     (*p).pressed_button = HWND::default();
     (*p).drag_start = None;
     (*p).motion_paused = None;
-    zephium_engine::set_window_caption_offset((*p).owner.0 as isize, 0.0, false);
+    drift_engine::set_window_caption_offset((*p).owner.0 as isize, 0.0, false);
     let _ = KillTimer(Some((*p).strip), FADE);
     let _ = KillTimer(Some((*p).strip), HIDE);
 }
@@ -715,7 +715,7 @@ unsafe extern "system" fn owner_proc(
     let p = data as *mut State;
     if msg == WM_NCDESTROY {
         let _ = RemoveWindowSubclass(hwnd, Some(owner_proc), ID);
-        zephium_engine::forget_window_caption_offset(hwnd.0 as isize);
+        drift_engine::forget_window_caption_offset(hwnd.0 as isize);
         // Owned popups are explicitly torn down before freeing subclass state.
         if IsWindow(Some((*p).strip)).as_bool() {
             let _ = DestroyWindow((*p).strip);

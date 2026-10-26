@@ -32,7 +32,7 @@ jobs:
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           shared-key: blocker-fuzz
-          workspaces: crates/zephium-blocker/fuzz
+          workspaces: crates/drift-blocker/fuzz
       - uses: taiki-e/install-action@e407f7bafb71fd004bc5c2da3032e5470cbb6ef0 # v2.87.24
         with:
           tool: cargo-deny@0.20.2
@@ -42,10 +42,10 @@ jobs:
       - run: cargo install --locked --version 0.13.2 cargo-fuzz
       - name: Audit the fuzz harness graph
         run: >-
-          cargo deny --manifest-path crates/zephium-blocker/fuzz/Cargo.toml
-          --config crates/zephium-blocker/fuzz/deny.toml --locked check
+          cargo deny --manifest-path crates/drift-blocker/fuzz/Cargo.toml
+          --config crates/drift-blocker/fuzz/deny.toml --locked check
       - name: Run bounded sanitizer replays
-        working-directory: crates/zephium-blocker
+        working-directory: crates/drift-blocker
         run: |
           set -euo pipefail
           corpus="${RUNNER_TEMP}/blocker-fuzz-corpus"
@@ -131,30 +131,30 @@ jobs:
       - name: Agentic probe harness
         if: runner.os == 'macOS'
         run: |
-          cargo test --locked -p zephium-agentic --features probe-harness
-          cargo clippy --locked -p zephium-agentic --all-targets --features probe-harness -- -D warnings
+          cargo test --locked -p drift-agentic --features probe-harness
+          cargo clippy --locked -p drift-agentic --all-targets --features probe-harness -- -D warnings
 
       - name: macOS native probe graphs
         if: runner.os == 'macOS'
         timeout-minutes: 15
         run: |
-          cargo clippy --locked -p zephium-engine --features native-isolation-probes \
+          cargo clippy --locked -p drift-engine --features native-isolation-probes \
             --bin macos-principal-isolation-probe -- -D warnings
-          cargo clippy --locked -p zephium-engine --features native-agentic-input-probe \
+          cargo clippy --locked -p drift-engine --features native-agentic-input-probe \
             --bin macos-agentic-input-probe -- -D warnings
-          cargo run --locked -p zephium-engine --features native-agentic-input-probe \
+          cargo run --locked -p drift-engine --features native-agentic-input-probe \
             --bin macos-agentic-input-probe -- --ci-hidden-fixed-dom
 
       - name: Windows feature graphs
         if: runner.os == 'Windows'
         run: |
-          cargo clippy --locked -p zephium-engine --lib --features windows-cdp-spike -- -D warnings
-          cargo clippy --locked -p zephium-private-fs --all-targets --features windows-namespace-validation -- -D warnings
-          cargo nextest run --locked -p zephium-app --features work-runtime,work-execution
-          cargo nextest run --locked -p zephium-agentic --features provider-transport,probe-harness
-          cargo nextest run --locked -p zephium-work-composition --features durable-runtime
-          cargo clippy --locked -p zephium-terra-macos-probe --features durable-runtime --bin windows-work-probe -- -D warnings
-          cargo build --locked -p zephium-terra-macos-probe --features durable-runtime --bin windows-work-probe
+          cargo clippy --locked -p drift-engine --lib --features windows-cdp-spike -- -D warnings
+          cargo clippy --locked -p drift-private-fs --all-targets --features windows-namespace-validation -- -D warnings
+          cargo nextest run --locked -p drift-app --features work-runtime,work-execution
+          cargo nextest run --locked -p drift-agentic --features provider-transport,probe-harness
+          cargo nextest run --locked -p drift-work-composition --features durable-runtime
+          cargo clippy --locked -p drift-terra-macos-probe --features durable-runtime --bin windows-work-probe -- -D warnings
+          cargo build --locked -p drift-terra-macos-probe --features durable-runtime --bin windows-work-probe
 
       # `cargo xtask check-agentic-probe-boundary` requires these two steps.
       - name: Parse the Windows agentic qualification workflow
@@ -177,16 +177,16 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          cargo clippy --locked -p zephium-engine \
+          cargo clippy --locked -p drift-engine \
             --features native-agentic-input-probe \
             --bin windows-agentic-input-probe
-          cargo build --locked -p zephium-engine \
+          cargo build --locked -p drift-engine \
             --features native-agentic-input-probe \
             --bin windows-agentic-input-probe
-          cargo clippy --locked -p zephium-engine \
+          cargo clippy --locked -p drift-engine \
             --features native-agentic-semantic-probe \
             --bin windows-agentic-semantic-probe
-          cargo build --locked -p zephium-engine \
+          cargo build --locked -p drift-engine \
             --features native-agentic-semantic-probe \
             --bin windows-agentic-semantic-probe
 

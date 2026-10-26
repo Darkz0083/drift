@@ -1,6 +1,6 @@
 # Bounded semantic browser session
 
-`zephium-agent-controller::AgentBrowserSession` is available on the normal
+`drift-agent-controller::AgentBrowserSession` is available on the normal
 `provider-transport` feature path. The production-path
 [`AgentWorkController`](agent-work-execution.md) now drives this session on the
 existing runtime worker, with the real browser-context, supervisor, audit and

@@ -30,7 +30,7 @@ async function capture(
   );
   frame.srcdoc = `<style>body{margin:8px}main{display:flex;gap:16px}article{width:200px}img,video,canvas,.photo{display:block;width:160px;height:110px}h2{font:16px sans-serif}</style>${body}<script>${source}
   addEventListener("load", () => {
-    const api=globalThis.__zephiumSemanticRuntimeV1;
+    const api=globalThis.__driftSemanticRuntimeV1;
     const b={n:${nodes},t:${nodes > 128 ? 32768 : 16384},w:${nodes > 128 ? 131072 : 65536},x:${nodes > 128 ? 16384 : 4096},geo:true};
     const first=JSON.parse(api.invoke(JSON.stringify({v:1,i:1,g:1,s:{k:"initial"},b})));
     const result=api.invoke(JSON.stringify({v:1,i:2,g:2,s:{k:"subtree",a:first.n[0].k},b}));
@@ -110,7 +110,7 @@ test("a larger observed image is sanitized before crossing the bounded native re
         ctx.putImageData(data,0,0);
         const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",0.9));
         const image=document.querySelector("img"),url=URL.createObjectURL(blob);image.setAttribute("data-src",url);
-        const api=globalThis.__zephiumSemanticRuntimeV1,b={n:128,t:16384,w:65536,x:4096,geo:true};
+        const api=globalThis.__driftSemanticRuntimeV1,b={n:128,t:16384,w:65536,x:4096,geo:true};
         const first=JSON.parse(api.invoke(JSON.stringify({v:1,i:1,g:1,s:{k:"initial"},b})));
         const snapshot=JSON.parse(api.invoke(JSON.stringify({v:1,i:2,g:2,s:{k:"subtree",a:first.n[0].k},b})));
         const heading=snapshot.n.find(node=>node.r==="heading"),media=snapshot.m.find(item=>item.r.includes(heading.k));
@@ -220,7 +220,7 @@ test("record labels stop child iteration at the existing stack bound", async () 
     frame.addEventListener("load", () => done(), { once: true }),
   );
   frame.srcdoc = `<script>${fixed}
-    const label=globalThis.__zephiumRecordMediaV1.testLabel;
+    const label=globalThis.__driftRecordMediaV1.testLabel;
     let iterated=0,refused=false,threw=false;
     const node=count=>({nodeType:1,getAttribute:()=>"",childNodes:new Proxy({},{get:(_,key)=>{if(key==="length")return count;if(++iterated>1000)throw new Error();return {nodeType:3,nodeValue:"x"};}})});
     const accepted=label(node(63))==="x".repeat(63)+"|";

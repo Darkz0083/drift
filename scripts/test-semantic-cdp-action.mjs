@@ -7,8 +7,8 @@ const eslintRequire = createRequire(frameRequire.resolve("eslint"));
 const espreeRequire = createRequire(eslintRequire.resolve("espree"));
 const { parse } = espreeRequire("acorn");
 
-const source=readFileSync(new URL("../crates/zephium-agentic/assets/semantic-runtime-v1.js",import.meta.url),"utf8");
-const runtimeContract = readFileSync(new URL("../crates/zephium-agentic/src/semantic_runtime.rs", import.meta.url), "utf8");
+const source=readFileSync(new URL("../crates/drift-agentic/assets/semantic-runtime-v1.js",import.meta.url),"utf8");
+const runtimeContract = readFileSync(new URL("../crates/drift-agentic/src/semantic_runtime.rs", import.meta.url), "utf8");
 const sourceLimit = runtimeContract.match(/pub const MAX_SEMANTIC_RUNTIME_SOURCE_BYTES: usize = (\d+) \* 1024;/);
 assert.ok(sourceLimit, "native install budget is declared in Rust");
 assert.ok(Buffer.byteLength(source) <= Number(sourceLimit[1]) * 1024, "fixed source respects its declared native install budget");

@@ -1,0 +1,27 @@
+[package]
+name = "drift-blocker-service"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = []
+official-https = ["drift-blocker-update/official-https"]
+tuf = ["drift-blocker-update/tuf"]
+
+[dependencies]
+flate2 = "=1.1.9"
+serde.workspace = true
+serde_json.workspace = true
+sha2 = "=0.10.9"
+thiserror.workspace = true
+drift-blocker.workspace = true
+drift-blocker-update.workspace = true
+drift-core.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[[example]]
+name = "official_update_probe"
+required-features = ["official-https"]

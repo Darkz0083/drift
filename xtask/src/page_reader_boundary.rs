@@ -5,24 +5,24 @@
 
 use std::path::Path;
 
-const BOOTSTRAP: &str = "crates/zephium-engine/src/platform/page_reader_bootstrap.js";
-const RECIPES: &str = "crates/zephium-engine/src/platform/page_reader_recipes.js";
-const KIT: &str = "crates/zephium-engine/src/host/picker_kit.js";
-const SERVE: &str = "crates/zephium-engine/src/platform/macos/page_reader_serve.js";
-const RECIPE: &str = "crates/zephium-engine/src/platform/page_recipe.rs";
-const MACOS_READER: &str = "crates/zephium-engine/src/platform/macos/browse_reader.rs";
-const WINDOWS_READER: &str = "crates/zephium-engine/src/platform/windows/browse_reader.rs";
-const PROTOCOL: &str = "crates/zephium-engine/src/platform/agent_semantic_cdp_protocol.rs";
-const HOST: &str = "crates/zephium-engine/src/host/page_reader.rs";
-const CONSTRUCTION: &str = "crates/zephium-engine/src/host/construction.rs";
-const PUBLIC: &str = "crates/zephium-engine/src/page_reader.rs";
-const RUNTIME: &str = "crates/zephium-engine/src/platform/macos/semantic_runtime.rs";
-const ENGINE_MANIFEST: &str = "crates/zephium-engine/Cargo.toml";
-const PERSON: &str = "crates/zephium-agentic/src/semantic_person.rs";
-const EFFECT: &str = "crates/zephium-agentic/src/agent_policy/effect.rs";
+const BOOTSTRAP: &str = "crates/drift-engine/src/platform/page_reader_bootstrap.js";
+const RECIPES: &str = "crates/drift-engine/src/platform/page_reader_recipes.js";
+const KIT: &str = "crates/drift-engine/src/host/picker_kit.js";
+const SERVE: &str = "crates/drift-engine/src/platform/macos/page_reader_serve.js";
+const RECIPE: &str = "crates/drift-engine/src/platform/page_recipe.rs";
+const MACOS_READER: &str = "crates/drift-engine/src/platform/macos/browse_reader.rs";
+const WINDOWS_READER: &str = "crates/drift-engine/src/platform/windows/browse_reader.rs";
+const PROTOCOL: &str = "crates/drift-engine/src/platform/agent_semantic_cdp_protocol.rs";
+const HOST: &str = "crates/drift-engine/src/host/page_reader.rs";
+const CONSTRUCTION: &str = "crates/drift-engine/src/host/construction.rs";
+const PUBLIC: &str = "crates/drift-engine/src/page_reader.rs";
+const RUNTIME: &str = "crates/drift-engine/src/platform/macos/semantic_runtime.rs";
+const ENGINE_MANIFEST: &str = "crates/drift-engine/Cargo.toml";
+const PERSON: &str = "crates/drift-agentic/src/semantic_person.rs";
+const EFFECT: &str = "crates/drift-agentic/src/agent_policy/effect.rs";
 /// The only places a person-directed step may be prepared.
-const PERSON_USERS: [&str; 1] = ["crates/zephium-engine/src/page_reader.rs"];
-const SHIPPING_MANIFESTS: [&str; 2] = ["desktop/Cargo.toml", "crates/zephium-app/Cargo.toml"];
+const PERSON_USERS: [&str; 1] = ["crates/drift-engine/src/page_reader.rs"];
+const SHIPPING_MANIFESTS: [&str; 2] = ["desktop/Cargo.toml", "crates/drift-app/Cargo.toml"];
 const MAX_BOOTSTRAP_BYTES: usize = 1_024;
 
 const NATIVE_HEADER: [&str; 4] = [
@@ -108,7 +108,7 @@ fn check_bootstrap(source: &str) -> Result<(), String> {
     }
     let compact = compact(source);
     for required in [
-        "messageHandlers.zephiumPageAssistBootV1",
+        "messageHandlers.driftPageAssistBootV1",
         "run=Function",
         "serve=run(a.slice(i+1))()",
         "[serve===null?\"B1\":\"B2:\"+token]",
@@ -139,7 +139,7 @@ fn check_bootstrap(source: &str) -> Result<(), String> {
 fn check_recipes(source: &str) -> Result<(), String> {
     let compact = compact(source);
     for required in [
-        "constNAME=\"__zephiumPageAssistV1\";if(Object.hasOwn(globalThis,NAME))return;",
+        "constNAME=\"__driftPageAssistV1\";if(Object.hasOwn(globalThis,NAME))return;",
         "writable:false,configurable:false,enumerable:false",
         "if(encoded===\"Q1:selection\")returnselection();",
         "if(encoded===\"Q1:outline\")returnoutline();",
@@ -217,10 +217,10 @@ fn check_kit(source: &str) -> Result<(), String> {
 fn check_serve(source: &str) -> Result<(), String> {
     let compact = compact(source);
     for required in [
-        "handlers.zephiumPageAssistV1",
+        "handlers.driftPageAssistV1",
         "[\"P1\"]",
         "request===\"S1\")return;",
-        "request.startsWith(\"Q1:\")?zephiumAssist.recipe(request):awaitzephiumRuntime.invoke(request)",
+        "request.startsWith(\"Q1:\")?driftAssist.recipe(request):awaitdriftRuntime.invoke(request)",
         "[\"R1:\"+result]",
         "if(acknowledgement!==\"A1\")return;",
     ] {
@@ -292,7 +292,7 @@ fn check_macos_reader(source: &str) -> Result<(), String> {
         "program.push_str(KIT);",
         "program.push_str(RECIPES);",
         "program.push_str(SERVE);",
-        "letinstallation=zephium_agentic::SEMANTIC_RUNTIME_PROGRAM.installation_source();",
+        "letinstallation=drift_agentic::SEMANTIC_RUNTIME_PROGRAM.installation_source();",
         "message.world()",
         "message.name()",
         "message.webView()",
@@ -424,7 +424,7 @@ fn check_windows_reader(source: &str, protocol: &str) -> Result<(), String> {
     let protocol = compact(protocol);
     for required in [
         "constPAGE_RECIPES_SOURCE:&str=concat!(include_str!(\"../host/picker_kit.js\"),\"\\n\",include_str!(\"page_reader_recipes.js\"));",
-        "constPAGE_RECIPE_FUNCTION:&str=\"function(encoded){returnglobalThis.__zephiumPageAssistV1.recipe(encoded);}\";",
+        "constPAGE_RECIPE_FUNCTION:&str=\"function(encoded){returnglobalThis.__driftPageAssistV1.recipe(encoded);}\";",
         "\"arguments\":[{\"value\":recipe.as_str()}],",
         ".and_then(|value|recipe.decode(value.as_bytes()))",
         "pub(crate)fninvoke_action_recipe_command(",

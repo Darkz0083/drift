@@ -3,7 +3,7 @@ import presetData from "$shared/ipc/theme-presets.json";
 export type Seeds = { bg: string; fg: string; accent: string };
 export type Mode = "light" | "dark";
 /** A theme's seeds as stored in `ui.theme-custom`. Mirrors
- *  `zephium_core::theme`, which validates every write. Contrast is its own
+ *  `drift_core::theme`, which validates every write. Contrast is its own
  *  setting, `ui.theme-contrast`, and travels with a theme only when shared. */
 export type ThemeSpec = { light: Seeds; dark: Seeds; from?: string };
 export type SharedTheme = { spec: ThemeSpec; contrast: number };
@@ -15,11 +15,11 @@ export type Preset = {
   ground: Record<Mode, string>;
 };
 
-export const DEFAULT_THEME = "zephium";
+export const DEFAULT_THEME = "drift";
 export const CUSTOM_THEME = "custom";
 export const DEFAULT_CONTRAST = 50;
 const MAX_CUSTOM_BYTES = 320;
-const SHARE_PREFIX = "zephium-theme:v1:";
+const SHARE_PREFIX = "drift-theme:v1:";
 const HEX = /^#[0-9a-f]{6}$/;
 
 export const presets: readonly Preset[] = presetData;
@@ -117,7 +117,7 @@ export function decodeShare(text: string): SharedTheme | null {
 
 export type Resolved = { id: string; spec: ThemeSpec; custom: boolean };
 
-/** The theme the stored pair names. An unknown or broken one is Zephium. */
+/** The theme the stored pair names. An unknown or broken one is Drift. */
 export function resolveTheme(id: string, custom: string): Resolved {
   if (id === CUSTOM_THEME) {
     const spec = parseTheme(custom);

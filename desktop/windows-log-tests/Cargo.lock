@@ -149,7 +149,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zephium-windows-log-tests"
+name = "drift-windows-log-tests"
 version = "0.0.0"
 dependencies = [
  "windows",

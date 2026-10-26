@@ -112,7 +112,7 @@ test("a new tab opened from settings shows the new tab", async () => {
   emitNativeEvent("uiCommand", "browser.return");
   await settle();
   await shot("settings-then-new-tab");
-  expect(document.querySelector("[data-zephium-new-tab]")).not.toBeNull();
+  expect(document.querySelector("[data-drift-new-tab]")).not.toBeNull();
 });
 
 test("a private window names itself at the foot of the column", async () => {

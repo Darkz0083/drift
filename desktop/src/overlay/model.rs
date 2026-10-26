@@ -1,4 +1,4 @@
-use zephium_ipc::{PanelState, SearchContext};
+use drift_ipc::{PanelState, SearchContext};
 /// The launcher's corner. Windows draws its own window corners and rim at
 /// the system radius, and the card has to agree with them.
 pub const RADIUS: u16 = if cfg!(target_os = "windows") { 8 } else { 20 };
@@ -104,7 +104,7 @@ impl Model {
     }
     /// A launcher is transient: it goes away when focus moves to the browser
     /// or to another application. An owned native surface, such as a menu or
-    /// dialog, keeps Zephium active and does not count as leaving.
+    /// dialog, keeps Drift active and does not count as leaving.
     pub fn focus(&mut self, panel_focused: bool, main_focused: bool, app_active: bool) {
         if self.presented && !panel_focused && (main_focused || !app_active) {
             self.hide();
@@ -197,7 +197,7 @@ mod tests {
     fn owned_native_surface_does_not_dismiss_search() {
         let mut m = Model::default();
         m.search();
-        // A menu/dialog owns focus, but Zephium is still the active application.
+        // A menu/dialog owns focus, but Drift is still the active application.
         m.focus(false, false, true);
         assert!(m.snapshot().visible);
         m.focus(false, false, false);

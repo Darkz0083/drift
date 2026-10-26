@@ -32,7 +32,7 @@
 
 <div class="settings-callout" data-setting="general.default">
   <span class="settings-callout-icon" data-brand
-    ><img src="/zephium-icon.png" alt="" />{#if status?.is_default}<span
+    ><img src="/drift-icon.png" alt="" />{#if status?.is_default}<span
         class="settings-callout-badge"><Icon icon={Tick02Icon} size={12} /></span
       >{/if}</span
   >

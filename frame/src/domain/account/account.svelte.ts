@@ -1,5 +1,5 @@
 /**
- * The optional Zephium account, one per install. Rust owns the session, the
+ * The optional Drift account, one per install. Rust owns the session, the
  * vault and every outcome; this mirrors its last answer. Codes and addresses
  * pass through once and are not kept here.
  */

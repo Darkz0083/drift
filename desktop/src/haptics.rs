@@ -16,8 +16,8 @@ pub(crate) fn haptic(caller: WebviewWindow, kind: HapticKind) {
     if !authorize(&caller, CallerPolicy::Main, "haptic") {
         return;
     }
-    zephium_engine::haptic(match kind {
-        HapticKind::Align => zephium_engine::Haptic::Align,
-        HapticKind::Level => zephium_engine::Haptic::Level,
+    drift_engine::haptic(match kind {
+        HapticKind::Align => drift_engine::Haptic::Align,
+        HapticKind::Level => drift_engine::Haptic::Level,
     });
 }

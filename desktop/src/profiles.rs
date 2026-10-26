@@ -8,10 +8,10 @@ use std::time::Duration;
 
 use tauri::{AppHandle, Manager, State, WebviewWindow};
 use tauri_plugin_dialog::DialogExt;
-use zephium_app::{Command, Handle};
-use zephium_core::ids::ProfileId;
-use zephium_core::profiles::{ProfileAvatar, ProfileAvatarStyle};
-use zephium_ipc::{OperationAdmission, ProfileAvatarStyleView, ProfilesView};
+use drift_app::{Command, Handle};
+use drift_core::ids::ProfileId;
+use drift_core::profiles::{ProfileAvatar, ProfileAvatarStyle};
+use drift_ipc::{OperationAdmission, ProfileAvatarStyleView, ProfilesView};
 
 const MAX_PICKED_BYTES: u64 = 32 * 1024 * 1024;
 
@@ -217,7 +217,7 @@ pub(crate) async fn profile_avatar_pick(
         if !metadata.is_file() || metadata.len() > MAX_PICKED_BYTES {
             return None;
         }
-        zephium_store::prepare_avatar_photo(&std::fs::read(&path).ok()?).ok()
+        drift_store::prepare_avatar_photo(&std::fs::read(&path).ok()?).ok()
     })
     .await
     .map_err(|_| ())?;

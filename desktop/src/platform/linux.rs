@@ -10,14 +10,14 @@ use gtk::prelude::*;
 use gtk::subclass::prelude::*;
 use tauri::WebviewWindow;
 
-use zephium_app::{
+use drift_app::{
     ChromePresentation, ChromePresentationCallback, ChromePresentationDispatch, PresentationChrome,
     SharedChrome,
 };
-use zephium_core::geometry::Size;
-use zephium_core::ports::chrome::{Chrome, ChromeFrame};
-use zephium_core::ports::engine::Shortcut;
-use zephium_engine::MainThreadDispatch;
+use drift_core::geometry::Size;
+use drift_core::ports::chrome::{Chrome, ChromeFrame};
+use drift_core::ports::engine::Shortcut;
+use drift_engine::MainThreadDispatch;
 
 mod zero_fixed {
     use super::*;
@@ -30,7 +30,7 @@ mod zero_fixed {
 
         #[glib::object_subclass]
         impl ObjectSubclass for ZeroFixed {
-            const NAME: &'static str = "ZephiumFixed";
+            const NAME: &'static str = "DriftFixed";
             type Type = super::ZeroFixed;
             type ParentType = gtk::Fixed;
         }
@@ -128,10 +128,10 @@ impl fmt::Display for LinuxInitError {
                 "Tauri's composition box is not a direct child of its GTK window",
             ),
             Self::ChromeReparentPostcondition => formatter.write_str(
-                "privileged WebKitGTK view did not enter the Zephium composition container",
+                "privileged WebKitGTK view did not enter the Drift composition container",
             ),
             Self::FixedParentPostcondition => formatter.write_str(
-                "Zephium composition container did not become the GTK window's direct child",
+                "Drift composition container did not become the GTK window's direct child",
             ),
             Self::TopLevelAlreadyExposed => formatter.write_str(
                 "privileged GTK window was visible before native hardening completed",
@@ -175,7 +175,7 @@ pub fn init(window: &WebviewWindow) -> Result<(), LinuxInitError> {
         &gtk_window,
         &vbox,
         &chrome,
-        zephium_engine::install_container,
+        drift_engine::install_container,
     )
 }
 
@@ -307,7 +307,7 @@ fn harden_privileged_webview(chrome: &webkit2gtk::WebView) -> Result<(), LinuxIn
         return Err(LinuxInitError::ProcessSwapDisabled);
     }
 
-    const DOWNLOAD_DENY_MARKER: &str = "zephium-privileged-download-deny-installed";
+    const DOWNLOAD_DENY_MARKER: &str = "drift-privileged-download-deny-installed";
     // SAFETY: this private key is used only as a bool in this module and is
     // destroyed with the GLib WebContext.
     let download_deny = unsafe { context.data::<bool>(DOWNLOAD_DENY_MARKER).is_some() };
@@ -426,7 +426,7 @@ mod native_composition_tests {
     fn linux_composition_transaction_preserves_hidden_state_and_rolls_back_exactly() {
         gtk::init().expect("GTK display");
         let application = gtk::Application::new(
-            Some("dev.zephium.native-composition-test"),
+            Some("dev.drift.native-composition-test"),
             gtk::gio::ApplicationFlags::NON_UNIQUE,
         );
         application
@@ -537,8 +537,8 @@ pub fn install_shortcuts(
     });
 
     // A release can be delivered to another application after focus leaves
-    // Zephium. Clear only after the compositor has had time to transfer focus
-    // between Zephium's main and panel windows; clearing synchronously on the
+    // Drift. Clear only after the compositor has had time to transfer focus
+    // between Drift's main and panel windows; clearing synchronously on the
     // main window's focus-out would let the same held key repeat into the
     // newly-focused launcher and immediately close it again.
     let focus_presses = presses;
@@ -787,7 +787,7 @@ impl PresentationChrome for ChromeAdapter {
     fn restore_browser_chrome(
         &self,
         revision: u64,
-        items: zephium_ipc::ItemsState,
+        items: drift_ipc::ItemsState,
         done: ChromePresentationCallback,
     ) -> ChromePresentationDispatch {
         crate::restore_browser_chrome(&self.window, revision, items, done)

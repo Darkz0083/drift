@@ -17,20 +17,20 @@ using the normal repository setup, then run in PowerShell:
 
 The script runs native library/desktop tests, Chromium component tests, frontend
 checks/build/CSS gate, then builds a debug executable without an installer. It
-uses `app.zephium.files-integration-qa` and the explicit Windows QA configuration.
-The default output is `target/debug/zephium-desktop.exe`; respect
+uses `app.drift.files-integration-qa` and the explicit Windows QA configuration.
+The default output is `target/debug/drift-desktop.exe`; respect
 `CARGO_TARGET_DIR` if configured. The script does not launch it. The QA feature
 cannot be used in release builds or combined with another QA identity. 
 
 Start the generated-only fixture in a separate terminal:
 
 ```powershell
-python scripts/qualification/file_workflows.py --files "$env:TEMP/zephium-files-qa/uploads"
+python scripts/qualification/file_workflows.py --files "$env:TEMP/drift-files-qa/uploads"
 ```
 
 Keep that terminal running. Use the newly printed token URL, never one copied
 from an older test report. Select a new disposable download directory under
-`$env:TEMP/zephium-files-qa/`. Do not select personal upload files.
+`$env:TEMP/drift-files-qa/`. Do not select personal upload files.
 
 ## Native acceptance matrix
 
@@ -61,8 +61,8 @@ WebView2 version, filesystem type, test result and any failure for each row.
 For a completed fixture file, inspect Windows provenance:
 
 ```powershell
-Get-FileHash -Algorithm SHA256 -LiteralPath 'C:\path\zephium-download.txt'
-Get-Content -LiteralPath 'C:\path\zephium-download.txt' -Stream Zone.Identifier
+Get-FileHash -Algorithm SHA256 -LiteralPath 'C:\path\drift-download.txt'
+Get-Content -LiteralPath 'C:\path\drift-download.txt' -Stream Zone.Identifier
 ```
 
 The attachment hash is
@@ -80,7 +80,7 @@ Never weaken security policy or disable Defender to make a check pass.
   frame activation/navigation ID, so this does not claim initiating-frame consent;
   WebView2's multiple-automatic-download permission remains denied.
 - Upload selection is WebView2-owned. The pinned stable API has no equivalent
-  to Zephium's macOS initiating-frame upload broker; do not claim parity for that
+  to Drift's macOS initiating-frame upload broker; do not claim parity for that
   interception boundary.
 - Automatic resume/replay is not implemented. Interrupted POST/blob downloads
   must be retried from their website; replaying a saved URL would lose semantics.

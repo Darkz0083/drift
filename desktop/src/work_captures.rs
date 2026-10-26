@@ -14,11 +14,11 @@ pub(crate) fn install(app: &tauri::AppHandle) {
         return;
     };
     if DIRECTORY.set(directory.join("captures")).is_ok() {
-        zephium_agentic::capture_app_views(capture);
+        drift_agentic::capture_app_views(capture);
     }
 }
 
-fn capture(app: zephium_agentic::DailyApp, page: &str, snapshot: serde_json::Value) {
+fn capture(app: drift_agentic::DailyApp, page: &str, snapshot: serde_json::Value) {
     let Some(directory) = DIRECTORY.get() else {
         return;
     };
@@ -98,8 +98,8 @@ fn prune(directory: &Path) -> std::io::Result<()> {
 
 /// The view's own word: Slack's channel, DM or rail view, Linear's inbox or
 /// my issues, Gmail's label; "home" when the address names none.
-fn view_of(app: zephium_agentic::DailyApp, page: &str) -> String {
-    use zephium_agentic::DailyApp;
+fn view_of(app: drift_agentic::DailyApp, page: &str) -> String {
+    use drift_agentic::DailyApp;
     let word = |segment: &str| {
         (!segment.is_empty()
             && segment.len() <= 24
@@ -142,7 +142,7 @@ fn view_of(app: zephium_agentic::DailyApp, page: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zephium_agentic::DailyApp;
+    use drift_agentic::DailyApp;
 
     #[test]
     fn views_are_named_by_the_apps_own_words() {

@@ -13,8 +13,8 @@ use std::sync::Mutex;
 
 use serde::{Deserialize, Serialize};
 use tauri::{Manager, State, WebviewWindow};
-use zephium_app::Handle;
-use zephium_core::ids::ProfileId;
+use drift_app::Handle;
+use drift_core::ids::ProfileId;
 
 use crate::{authorize, shutdown_started, CallerPolicy};
 
@@ -157,7 +157,7 @@ fn remove_previous_repository(data_dir: &Path) {
         return;
     }
     let spawned = std::thread::Builder::new()
-        .name("zephium-legacy-extension-cleanup".into())
+        .name("drift-legacy-extension-cleanup".into())
         .spawn(move || {
             unseal(&path);
             if let Err(error) = std::fs::remove_dir_all(&path) {
@@ -323,7 +323,7 @@ pub(crate) fn web_extension_answer_access(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     extensions: State<'_, WebExtensions>,
-    request: zephium_ipc::WebExtensionAccessRequestView,
+    request: drift_ipc::WebExtensionAccessRequestView,
     allowed: bool,
 ) -> Result<(), String> {
     if !authorize(&caller, CallerPolicy::Main, "web_extension_answer_access") {

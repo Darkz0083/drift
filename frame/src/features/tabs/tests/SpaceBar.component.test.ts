@@ -313,7 +313,7 @@ test("a neighbour the window has shown is drawn as it was, its own tab lit", asy
   expect(next.textContent).toContain("Moodboard");
   expect(next.querySelector('[data-selected="true"]')?.textContent).toContain("Palette");
   // A drawn copy is never a tab to native: it carries none of its markers.
-  expect(next.querySelector("[data-zephium-tab-id]")).toBeNull();
+  expect(next.querySelector("[data-drift-tab-id]")).toBeNull();
   expect(next.inert).toBe(true);
 });
 

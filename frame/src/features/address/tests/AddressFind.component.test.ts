@@ -38,7 +38,7 @@ async function field() {
     split_group: null,
   });
   const screen = await render(AddressField);
-  const address = screen.container.querySelector<HTMLInputElement>("[data-zephium-address]")!;
+  const address = screen.container.querySelector<HTMLInputElement>("[data-drift-address]")!;
   return { screen, address, tab };
 }
 

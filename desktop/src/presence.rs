@@ -6,7 +6,7 @@
 use std::sync::atomic::{AtomicU8, Ordering};
 
 use tauri::Manager;
-use zephium_app::{Command, Handle};
+use drift_app::{Command, Handle};
 
 const ASLEEP: u8 = 1;
 const DISPLAY_OFF: u8 = 2;
@@ -34,7 +34,7 @@ fn mark(app: &tauri::AppHandle, reason: u8, away: bool) {
     }
 }
 
-/// Time counts only while a Zephium window is the one in use.
+/// Time counts only while a Drift window is the one in use.
 pub fn report_app_active(app: &tauri::AppHandle) {
     let focused = |label: &str| {
         app.get_webview_window(label)

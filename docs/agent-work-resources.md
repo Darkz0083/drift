@@ -28,7 +28,7 @@ independently RAF-qualified.
 ## Production selected-profile attachment
 
 The shipping `macos-work` Rust entry is now
-`zephium_desktop::admit_retained_trusted_work(app, request)`, delegating through
+`drift_desktop::admit_retained_trusted_work(app, request)`, delegating through
 the installed `MacosWorkComposition::launch_retained` and the original Shell.
 The trusted request must include the existing actor-selected Ready profile
 binding, approved manifest/context/objective/model/deadline, credential and
@@ -290,7 +290,7 @@ key/main windows must remain the captured human owners. The original responder
 is required at admission; later responder churn does not transfer the retained
 page. Execution still requires its exact noninteractive surface attachment and
 excludes routing the human window's responder into the retained page subtree.
-Zephium never activates the application, injects input, selects a responder or
+Drift never activates the application, injects input, selects a responder or
 restores focus after a human changes it. Missing foreground/geometry yields an
 explicit read refusal, not a fabricated observation.
 
@@ -732,7 +732,7 @@ This is provider-free deterministic evidence; no GUI or native app rerun occurre
 
 ## Private application ownership cut (deterministic only)
 
-`zephium-app::work_resources` now contains a private, dormant Work owner above
+`drift-app::work_resources` now contains a private, dormant Work owner above
 actor leases. It creates the native port once with an immutable Work-lifetime
 sink, retains the exact functional registry and resource observers, and never
 captures or rebinds an actor/runtime mailbox. Resource failures remain sticky

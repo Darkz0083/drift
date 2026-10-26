@@ -7,30 +7,30 @@ pub(crate) fn check(root: &Path) -> Result<(), String> {
         std::fs::read_to_string(root.join(path))
             .map_err(|e| format!("foreground rendering boundary: {e}"))
     };
-    let native = read("crates/zephium-engine/src/platform/macos/agentic_foreground_probe.rs")?;
-    let host = read("crates/zephium-engine/src/host/agent_foreground_probe.rs")?;
-    let port = read("crates/zephium-engine/src/agent_foreground_probe_port.rs")?;
+    let native = read("crates/drift-engine/src/platform/macos/agentic_foreground_probe.rs")?;
+    let host = read("crates/drift-engine/src/host/agent_foreground_probe.rs")?;
+    let port = read("crates/drift-engine/src/agent_foreground_probe_port.rs")?;
     validate(&native, &host, &port)?;
     validate_document_readiness(&read(
-        "crates/zephium-engine/src/platform/agent_navigation.rs",
+        "crates/drift-engine/src/platform/agent_navigation.rs",
     )?)?;
     validate_driver(
-        &read("crates/zephium-engine/src/platform/macos/agentic_foreground_driver.rs")?,
+        &read("crates/drift-engine/src/platform/macos/agentic_foreground_driver.rs")?,
         &read("desktop/src/foreground_rendering_probe.rs")?,
     )?;
     validate_admission(
         &read("desktop/foreground_probe_admission.rs")?,
         &read("desktop/src/foreground_rendering_probe.rs")?,
-        &read("crates/zephium-engine/src/platform/macos/agentic_foreground_driver.rs")?,
+        &read("crates/drift-engine/src/platform/macos/agentic_foreground_driver.rs")?,
     )?;
     for (path, needle) in [
-        ("crates/zephium-engine/Cargo.toml", "native-agentic-foreground-probe=[\"native-agentic-semantic-probe\"]"),
-        ("crates/zephium-engine/src/platform/macos/mod.rs", "#[cfg(feature=\"native-agentic-foreground-probe\")]modagentic_foreground_probe;"),
-        ("crates/zephium-engine/src/agent_context_port.rs", "#[cfg(all(target_os=\"macos\",feature=\"native-agentic-foreground-probe\"))]fnprobe_foreground_rendering("),
-        ("crates/zephium-agentic/src/context_port.rs", "#[cfg(feature=\"probe-harness\")]fnprobe_foreground_rendering("),
-        ("crates/zephium-agentic/src/lib.rs", "#[cfg(feature=\"probe-harness\")]modforeground_rendering_probe;"),
+        ("crates/drift-engine/Cargo.toml", "native-agentic-foreground-probe=[\"native-agentic-semantic-probe\"]"),
+        ("crates/drift-engine/src/platform/macos/mod.rs", "#[cfg(feature=\"native-agentic-foreground-probe\")]modagentic_foreground_probe;"),
+        ("crates/drift-engine/src/agent_context_port.rs", "#[cfg(all(target_os=\"macos\",feature=\"native-agentic-foreground-probe\"))]fnprobe_foreground_rendering("),
+        ("crates/drift-agentic/src/context_port.rs", "#[cfg(feature=\"probe-harness\")]fnprobe_foreground_rendering("),
+        ("crates/drift-agentic/src/lib.rs", "#[cfg(feature=\"probe-harness\")]modforeground_rendering_probe;"),
         ("desktop/src/lib.rs", "#[cfg(all(feature=\"macos-work-rendering-probe\",target_os=\"macos\"))]modforeground_rendering_probe;"),
-        ("desktop/Cargo.toml", "macos-work-rendering-probe=[\"zephium-engine/native-agentic-foreground-probe\",\"tauri/custom-protocol\",]"),
+        ("desktop/Cargo.toml", "macos-work-rendering-probe=[\"drift-engine/native-agentic-foreground-probe\",\"tauri/custom-protocol\",]"),
     ] { require(&compact(&read(path)?), needle)?; }
     Ok(())
 }
@@ -237,7 +237,7 @@ fn validate(native: &str, host: &str, port: &str) -> Result<(), String> {
         "!expected.is_null()&&expected==observed&&facts.admitted()",
         "ifcontext.into()!=self.context",
         "(self.context==context.into()).then_some(self.failures)",
-        "enumForegroundOwner{Legacy(ContextJoin),#[cfg(feature=\"native-agentic-work-resource-probe\")]Resource(zephium_agentic::WorkBrowserResourceJoin),}",
+        "enumForegroundOwner{Legacy(ContextJoin),#[cfg(feature=\"native-agentic-work-resource-probe\")]Resource(drift_agentic::WorkBrowserResourceJoin),}",
         "ifslot.is_none()",
         "iftrace.is_none()",
         "&mutself.failures.cleanup",
@@ -354,7 +354,7 @@ fn validate_geometry(native: &str) -> Result<(), String> {
 mod tests {
     use super::*;
     const DRIVER: &str =
-        include_str!("../../crates/zephium-engine/src/platform/macos/agentic_foreground_driver.rs");
+        include_str!("../../crates/drift-engine/src/platform/macos/agentic_foreground_driver.rs");
     const DESKTOP: &str = include_str!("../../desktop/src/foreground_rendering_probe.rs");
     const ADMISSION: &str = include_str!("../../desktop/foreground_probe_admission.rs");
 
@@ -419,11 +419,11 @@ mod tests {
         }
     }
     const NATIVE: &str =
-        include_str!("../../crates/zephium-engine/src/platform/macos/agentic_foreground_probe.rs");
+        include_str!("../../crates/drift-engine/src/platform/macos/agentic_foreground_probe.rs");
     const HOST: &str =
-        include_str!("../../crates/zephium-engine/src/host/agent_foreground_probe.rs");
+        include_str!("../../crates/drift-engine/src/host/agent_foreground_probe.rs");
     const PORT: &str =
-        include_str!("../../crates/zephium-engine/src/agent_foreground_probe_port.rs");
+        include_str!("../../crates/drift-engine/src/agent_foreground_probe_port.rs");
 
     #[test]
     fn foreground_geometry_rejects_fractional_placement_resize_and_native_plan_substitution() {
@@ -457,7 +457,7 @@ mod tests {
     #[test]
     fn foreground_document_wait_keeps_exact_identity_original_budget_and_cleanup_owner() {
         const NAVIGATION: &str =
-            include_str!("../../crates/zephium-engine/src/platform/agent_navigation.rs");
+            include_str!("../../crates/drift-engine/src/platform/agent_navigation.rs");
         validate_document_readiness(NAVIGATION).unwrap();
         for changed in [
             NAVIGATION.replace("committed.operation.context() == context", "true"),

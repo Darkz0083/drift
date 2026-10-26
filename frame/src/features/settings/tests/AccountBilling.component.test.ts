@@ -320,7 +320,7 @@ test("under billing review there are no purchase buttons, but the portal and a d
   await expect
     .element(screen.getByRole("heading", { name: "Your account is under billing review" }))
     .toBeVisible();
-  await expect.element(screen.getByText("support@zephium.app")).toBeVisible();
+  await expect.element(screen.getByText("support@drift.app")).toBeVisible();
   expect(screen.getByRole("button", { name: "Upgrade" }).elements()).toHaveLength(0);
   expect(screen.getByRole("button", { name: "Buy credits" }).elements()).toHaveLength(0);
   await expect.element(screen.getByRole("button", { name: "Manage subscription" })).toBeVisible();
@@ -414,7 +414,7 @@ const stagingPacks: AccountV1["offers"] = [
 ].map(([id, units, cents]) => ({
   kind: "top_up" as const,
   id: id as string,
-  name: `Zephium ${id}`,
+  name: `Drift ${id}`,
   units: units as string,
   price: { amount_minor: cents as number, currency: "USD" },
   expires_days: 365,

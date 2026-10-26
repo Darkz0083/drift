@@ -1,0 +1,1 @@
+var e=/[/\\]/u,t=/^(?:\/Users\/[^/]+|\/home\/[^/]+|[A-Za-z]:\\Users\\[^\\]+)(?=[/\\]|$)/u;function n(t){return t.split(e).filter(Boolean).at(-1)??t}function r(t){let n=t.split(e);return n.pop(),i(n.join(`/`))}function i(e){return e.replace(t,`~`)}export{n,i as r,r as t};

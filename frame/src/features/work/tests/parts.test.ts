@@ -21,7 +21,7 @@ const ids = (stage: "done" | "working" | "handoff", part: string) =>
 describe("a computer part's view", () => {
   test("changes, commands, tests and what it read", () => {
     const view = computerView(projection("done"), ids("done", "code"));
-    expect(view.folder).toBe("zephium");
+    expect(view.folder).toBe("drift");
     expect(view.files.map((f) => [f.name, f.folder, f.added, f.removed, f.state])).toEqual([
       ["duration.rs", "…/src/work", 1, 1, "done"],
       ["tests.rs", "…/src/work", 5, 0, "done"],
@@ -38,7 +38,7 @@ describe("a computer part's view", () => {
     // Looking for a folder that isn't there is a quiet fact, said in the command's own words.
     expect([view.commands[0]!.inspection, view.commands[0]!.said]).toEqual([
       true,
-      "ls: crates/zephium-core/src/time: No such file or directory",
+      "ls: crates/drift-core/src/time: No such file or directory",
     ]);
     expect(computerRows(view)).toBe(9);
   });
@@ -48,7 +48,7 @@ describe("a computer part's view", () => {
     expect(view.files[0]!.state).toBe("waiting");
     const running = view.commands.at(-1)!;
     expect(running.state).toBe("running");
-    expect(running.live).toContain("Compiling zephium-store");
+    expect(running.live).toContain("Compiling drift-store");
     expect(view.working).toBe(true);
   });
 

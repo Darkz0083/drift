@@ -66,7 +66,7 @@ async function list(section: "today" | "pinned" = "today") {
     onSelect: () => {},
   });
   const row = (id: string) =>
-    screen.container.querySelector<HTMLElement>(`.browse-tab[data-zephium-tab-id="${id}"]`)!;
+    screen.container.querySelector<HTMLElement>(`.browse-tab[data-drift-tab-id="${id}"]`)!;
   // The sidebar's scroller, whose room past the last row is still the list's.
   screen.container.setAttribute("data-tabs-drop", "");
   screen.container.style.height = "380px";

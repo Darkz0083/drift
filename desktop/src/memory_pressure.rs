@@ -4,7 +4,7 @@ use tauri::Manager;
 
 pub(crate) fn install(app: &tauri::AppHandle) {
     #[cfg(any(target_os = "macos", target_os = "windows"))]
-    if let Some(shell) = app.try_state::<zephium_app::Handle>() {
+    if let Some(shell) = app.try_state::<drift_app::Handle>() {
         if let Some(monitor) = native::Monitor::new(shell.inner().clone()) {
             app.manage(monitor);
         }
@@ -16,8 +16,8 @@ pub(crate) fn install(app: &tauri::AppHandle) {
 #[cfg(target_os = "macos")]
 mod native {
     use dispatch2::{DispatchObject, DispatchRetained, DispatchSource};
-    use zephium_app::{Command, Handle};
-    use zephium_core::ports::engine::MemoryPressure;
+    use drift_app::{Command, Handle};
+    use drift_core::ports::engine::MemoryPressure;
 
     pub(super) struct Monitor(DispatchRetained<DispatchSource>);
 
@@ -119,8 +119,8 @@ mod native {
     use windows::Win32::System::Threading::{
         CreateEventW, SetEvent, WaitForMultipleObjects, INFINITE,
     };
-    use zephium_app::{Command, Handle};
-    use zephium_core::ports::engine::MemoryPressure;
+    use drift_app::{Command, Handle};
+    use drift_core::ports::engine::MemoryPressure;
 
     struct Event(HANDLE);
     impl Event {

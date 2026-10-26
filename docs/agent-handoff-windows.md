@@ -12,14 +12,14 @@ From PowerShell in the reviewed checkout:
 
 ```powershell
 $env:CARGO_INCREMENTAL = "0"
-$env:CARGO_TARGET_DIR = Join-Path $env:TEMP "zephium-handoff-target"
-cargo test -p zephium-agentic --lib work_browser_human
-cargo test -p zephium-engine --features agentic-browser wall_proof_tests
-cargo test -p zephium-app --features work-runtime,work-execution --lib work_
-cargo test -p zephium-work-composition --features durable-runtime --lib
-cargo build -p zephium-terra-macos-probe --features durable-runtime --bin windows-work-probe
+$env:CARGO_TARGET_DIR = Join-Path $env:TEMP "drift-handoff-target"
+cargo test -p drift-agentic --lib work_browser_human
+cargo test -p drift-engine --features agentic-browser wall_proof_tests
+cargo test -p drift-app --features work-runtime,work-execution --lib work_
+cargo test -p drift-work-composition --features durable-runtime --lib
+cargo build -p drift-terra-macos-probe --features durable-runtime --bin windows-work-probe
 
-$handoffEvidence = Join-Path $env:TEMP "zephium-handoff-evidence"
+$handoffEvidence = Join-Path $env:TEMP "drift-handoff-evidence"
 New-Item -ItemType Directory -Force $handoffEvidence | Out-Null
 $handoffProbe = Join-Path $handoffEvidence "windows-work-probe.exe"
 Copy-Item (Join-Path $env:CARGO_TARGET_DIR "debug/windows-work-probe.exe") $handoffProbe
@@ -69,7 +69,7 @@ on their original Work and operation, including refused and uncertain admission.
 The generated bindings carry the Rust contracts; object kinds are unchanged.
 
 Fix Windows-specific findings in the Windows worktree, regenerate bindings with
-`cargo test -p zephium-desktop export_typescript_bindings` when contracts change,
+`cargo test -p drift-desktop export_typescript_bindings` when contracts change,
 and report the exact validation evidence with the follow-up commits. The person
 has reserved final Windows verification and any required adaptations for that
 Windows session.

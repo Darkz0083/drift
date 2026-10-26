@@ -4,7 +4,7 @@ import { mockBindings } from "$shared/testing/bindings";
 vi.mock("$shared/ipc/bindings", () => mockBindings({ workReleaseMemory: vi.fn(async () => true) }));
 
 const frame = (generation: number) =>
-  `http://zephium-media.localhost/frame/attempt/step/${generation}`;
+  `http://drift-media.localhost/frame/attempt/step/${generation}`;
 const pending = new Map<string, Promise<void>>();
 let bitmaps: Array<{ width: number; height: number; close: ReturnType<typeof vi.fn> }>;
 let images: string[];
@@ -65,12 +65,12 @@ afterEach(() => {
 
 test("only ordinary media pictures request a width; native frames retain their PNG address", async () => {
   const { thumbSrc } = await import("../lib/frame-thumbs");
-  const media = "zephium-media://localhost/01M3CTWDG20GFZPACD7905RSRJ/" + "b".repeat(64);
+  const media = "drift-media://localhost/01M3CTWDG20GFZPACD7905RSRJ/" + "b".repeat(64);
   expect(thumbSrc(media, 224)).toBe(`${media}?w=224`);
   expect(thumbSrc(`${media}?v=2`, 224)).toBe(`${media}?v=2&w=224`);
   expect(thumbSrc(frame(1), 288)).toBe(frame(1));
-  expect(thumbSrc("zephium-media://localhost/frame/a/b/1", 288)).toBe(
-    "zephium-media://localhost/frame/a/b/1",
+  expect(thumbSrc("drift-media://localhost/frame/a/b/1", 288)).toBe(
+    "drift-media://localhost/frame/a/b/1",
   );
   expect(thumbSrc("data:image/png;base64,AAAA", 224)).toBe("data:image/png;base64,AAAA");
   expect(thumbSrc("https://example.com/a.png", 224)).toBe("https://example.com/a.png");
@@ -97,7 +97,7 @@ test("a native generation decodes once across display widths, without scratch or
   await settle();
   expect(sharp.width).toBe(640);
   expect(bitmaps).toHaveLength(1);
-  expect(thumbSrc("http://zephium-media.localhost/photo", 360)).toMatch(/\?w=720$/u);
+  expect(thumbSrc("http://drift-media.localhost/photo", 360)).toMatch(/\?w=720$/u);
 });
 
 test("a late older generation cannot draw over the newest page pixels", async () => {

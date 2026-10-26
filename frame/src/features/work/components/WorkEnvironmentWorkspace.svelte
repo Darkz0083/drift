@@ -814,8 +814,8 @@
     if ((event as CustomEvent<string>).detail === "tasks") openPanel("tasks", true);
   }
   $effect(() => {
-    window.addEventListener("zephium:work-tool", toolAsked);
-    return () => window.removeEventListener("zephium:work-tool", toolAsked);
+    window.addEventListener("drift:work-tool", toolAsked);
+    return () => window.removeEventListener("drift:work-tool", toolAsked);
   });
   let attachKind = $state<AttachKind>("tabs");
   let objectivePending = $state(false);

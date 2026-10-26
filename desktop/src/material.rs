@@ -97,7 +97,7 @@ pub fn themed_ground(light: bool) -> Option<[u8; 3]> {
         .map(|(id, _)| id.clone())
         .or_else(|| theme.id.clone())
         .or_else(|| crate::app_setting("ui.theme"))
-        .unwrap_or_else(|| zephium_core::theme::DEFAULT.into());
+        .unwrap_or_else(|| drift_core::theme::DEFAULT.into());
     let custom = match space {
         Some((_, custom)) => custom,
         None => theme
@@ -108,12 +108,12 @@ pub fn themed_ground(light: bool) -> Option<[u8; 3]> {
     let level = theme
         .level
         .or_else(|| crate::app_setting("ui.theme-contrast").and_then(|value| value.parse().ok()))
-        .unwrap_or(zephium_core::theme::DEFAULT_CONTRAST);
+        .unwrap_or(drift_core::theme::DEFAULT_CONTRAST);
     let contrast = theme
         .contrast
         .unwrap_or_else(|| crate::app_setting("ui.contrast").as_deref() == Some("true"));
-    (!zephium_core::theme::is_default(&id, custom.as_deref(), level, contrast))
-        .then(|| zephium_core::theme::chrome(&id, custom.as_deref(), level, contrast, light))
+    (!drift_core::theme::is_default(&id, custom.as_deref(), level, contrast))
+        .then(|| drift_core::theme::chrome(&id, custom.as_deref(), level, contrast, light))
 }
 
 #[cfg_attr(not(any(target_os = "macos", test)), allow(dead_code))]
@@ -381,7 +381,7 @@ mod macos {
     pub fn publish(window: &WebviewWindow, material: Material) {
         // Serialization is a closed enum, never page or model input.
         if let Ok(value) = serde_json::to_string(&material) {
-            let _ = window.eval(format!("window.dispatchEvent(new CustomEvent('zephium:ui-command',{{detail:'material.'+{value}}}))"));
+            let _ = window.eval(format!("window.dispatchEvent(new CustomEvent('drift:ui-command',{{detail:'material.'+{value}}}))"));
         }
     }
 }
@@ -393,7 +393,7 @@ mod tests {
     use super::*;
     #[test]
     fn a_projected_theme_shadows_the_store_and_tints_only_when_asked() {
-        assert!(theme_changed("ui.theme", "zephium"));
+        assert!(theme_changed("ui.theme", "drift"));
         assert!(theme_changed("ui.contrast", "false"));
         assert!(theme_changed("ui.window-tint", "0"));
         assert!(theme_changed("ui.theme-contrast", "50"));
@@ -405,7 +405,7 @@ mod tests {
         let [r, g, b] = ground(false);
         assert_eq!(tint(false), Some((r, g, b, 217)));
         assert_eq!(tint_alpha(40), 87);
-        assert!(theme_changed("ui.theme", "zephium"));
+        assert!(theme_changed("ui.theme", "drift"));
         assert!(theme_changed("ui.window-tint", "0"));
     }
 

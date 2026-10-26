@@ -107,7 +107,7 @@ test("the bar is tools and a field at rest, the field alone in use, the agent's 
   for (const name of ["Blocks", "Add to canvas"])
     await expect.element(tools.getByRole("button", { name, exact: true })).toBeVisible();
   expect(bar().dataset.mode).toBe("rest");
-  expect(screen.container.querySelector("[data-zephium-work-chrome]")).toBeNull();
+  expect(screen.container.querySelector("[data-drift-work-chrome]")).toBeNull();
   await expect
     .poll(() => screen.container.querySelector("[data-work-zoom-slot] [role='group']"))
     .not.toBeNull();

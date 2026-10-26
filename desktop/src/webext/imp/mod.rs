@@ -12,11 +12,11 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use zephium_app::{Handle, WebExtensionStatus};
-use zephium_core::ids::{ExtensionInstallId, ItemId, ProfileId};
-use zephium_core::ports::engine::WebExtensionLoad;
-use zephium_webext::manifest::Manifest;
-use zephium_webext::{archive, crx, permissions, ExtensionId};
+use drift_app::{Handle, WebExtensionStatus};
+use drift_core::ids::{ExtensionInstallId, ItemId, ProfileId};
+use drift_core::ports::engine::WebExtensionLoad;
+use drift_webext::manifest::Manifest;
+use drift_webext::{archive, crx, permissions, ExtensionId};
 
 use super::{Access, Entry, Registry, WebExtensionView, WebExtensions};
 
@@ -136,7 +136,7 @@ impl WebExtensions {
         if changed {
             let _ = self.save(profile, registry);
         }
-        shell.dispatch(zephium_app::Command::SetWebExtensions {
+        shell.dispatch(drift_app::Command::SetWebExtensions {
             profile,
             extensions: loads,
         });
@@ -147,7 +147,7 @@ impl WebExtensions {
         let package = format!("{}-{revision}", entry.version);
         let target = packages.join(&package);
         #[cfg(target_os = "windows")]
-        if zephium_webext::windows::is_prepared(&target, revision) {
+        if drift_webext::windows::is_prepared(&target, revision) {
             entry.package = package;
             entry.compat = revision.to_owned();
             return Ok(());
@@ -279,7 +279,7 @@ pub(in crate::webext) fn restore(extensions: &WebExtensions, shell: &Handle) {
 async fn target(
     shell: &Handle,
     tab: Option<ItemId>,
-) -> Result<zephium_app::WebExtensionTarget, String> {
+) -> Result<drift_app::WebExtensionTarget, String> {
     let receiver = shell.web_extension_target(tab);
     tauri::async_runtime::spawn_blocking(move || receiver.recv_timeout(Duration::from_secs(2)))
         .await
@@ -411,7 +411,7 @@ pub(in crate::webext) async fn set_access(
 
 pub(in crate::webext) async fn open_options(shell: &Handle, id: &str) -> Result<(), String> {
     let profile = target(shell, None).await?.profile;
-    shell.dispatch(zephium_app::Command::OpenWebExtensionOptions {
+    shell.dispatch(drift_app::Command::OpenWebExtensionOptions {
         profile,
         extension_id: id.to_owned(),
     });
@@ -421,7 +421,7 @@ pub(in crate::webext) async fn open_options(shell: &Handle, id: &str) -> Result<
 pub(in crate::webext) fn answer_access(
     shell: &Handle,
     extensions: &WebExtensions,
-    request: zephium_ipc::WebExtensionAccessRequestView,
+    request: drift_ipc::WebExtensionAccessRequestView,
     allowed: bool,
 ) -> Result<(), String> {
     let profile = ProfileId::parse(&request.profile_id).ok_or("Invalid profile.")?;
@@ -446,7 +446,7 @@ pub(in crate::webext) fn answer_access(
             extensions.save(profile, &registry)?;
         }
     }
-    shell.dispatch(zephium_app::Command::AnswerWebExtensionAccess {
+    shell.dispatch(drift_app::Command::AnswerWebExtensionAccess {
         profile,
         request: number,
         allowed,
@@ -469,7 +469,7 @@ pub(in crate::webext) async fn uninstall(
     // Its package files stay until the next launch: the browser may need
     // them to load the extension once more to erase its data.
     if let Some(install) = ExtensionInstallId::parse(&entry.install) {
-        shell.dispatch(zephium_app::Command::RemoveWebExtension {
+        shell.dispatch(drift_app::Command::RemoveWebExtension {
             profile,
             extension: Box::new(extensions.load(&entry, install, false)),
         });

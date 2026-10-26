@@ -1,0 +1,31 @@
+[package]
+name = "drift-agent-controller"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+build = false
+
+[features]
+default = []
+provider-transport = [
+    "dep:drift-agent-provider-transport",
+    "dep:drift-decision",
+    "drift-agent-provider-transport/provider-transport",
+]
+probe-harness = [
+    "provider-transport",
+    "drift-agent-provider-transport/probe-harness",
+]
+
+[dependencies]
+thiserror.workspace = true
+tokio = { workspace = true, features = ["time"] }
+drift-agentic.workspace = true
+drift-decision = { workspace = true, optional = true }
+drift-agent-model-catalog.workspace = true
+drift-agent-provider-transport = { workspace = true, optional = true }
+drift-agent-runtime.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

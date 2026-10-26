@@ -1,5 +1,5 @@
 name: Bug report
-description: Something in Zephium is broken or behaves unexpectedly
+description: Something in Drift is broken or behaves unexpectedly
 labels: ["bug"]
 body:
   - type: markdown
@@ -7,12 +7,12 @@ body:
       value: |
         Thanks for taking the time to report this. A precise report is the fastest way to a fix.
 
-        Security problems must not be filed here. Use [private vulnerability reporting](https://github.com/zephium-browser/Zephium/security/advisories/new) instead.
+        Security problems must not be filed here. Use [private vulnerability reporting](https://github.com/drift-browser/Drift/security/advisories/new) instead.
 
   - type: input
     id: version
     attributes:
-      label: Zephium version
+      label: Drift version
       description: Shown in Settings, About.
       placeholder: "1.0.3"
     validations:

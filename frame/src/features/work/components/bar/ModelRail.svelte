@@ -12,7 +12,7 @@
   import { untrack } from "svelte";
   import { providerName } from "$domain/ai";
   import ProviderMark from "$shared/ui/ProviderMark";
-  import ZephiumTile from "$shared/ui/ZephiumTile";
+  import DriftTile from "$shared/ui/DriftTile";
   import * as m from "$shared/i18n/messages";
 
   let {
@@ -64,7 +64,7 @@
 
   /** The favourites are shown while none of the seats is the place. */
   const at = $derived(seats.findIndex((seat) => seat.provider === current));
-  /** Zephium's own seat stands apart from the providers by a hairline. */
+  /** Drift's own seat stands apart from the providers by a hairline. */
   const lead = $derived(seats[0]?.provider === "cloud" ? 1 : 0);
 
   let list = $state<HTMLElement>();
@@ -134,7 +134,7 @@
       onclick={() => onpick(seat.provider)}
     >
       <span class="mark" aria-hidden="true"
-        >{#if seat.provider === "cloud"}<ZephiumTile size={24} />{:else}<ProviderMark
+        >{#if seat.provider === "cloud"}<DriftTile size={24} />{:else}<ProviderMark
             provider={seat.provider}
             size={18}
           />{/if}</span

@@ -40,7 +40,7 @@ test("an image card previews through the media route and a file card shows its s
   };
   const screen = await render(MediaCard, { item, selected: false });
   const img = screen.container.querySelector("img")!;
-  expect(img.getAttribute("src")).toMatch(/zephium-media(:\/\/localhost|\.localhost)\//);
+  expect(img.getAttribute("src")).toMatch(/drift-media(:\/\/localhost|\.localhost)\//);
   expect(img.getAttribute("src")).toContain(`${profile}/${digest}`);
   expect(img.getAttribute("alt")).toBe("keyboard.png");
   await expect.element(screen.getByText("2 KB")).toBeVisible();

@@ -145,9 +145,9 @@
             data-cascade
             style:--cascade={index + 1}
             data-motion-key={`tab:${tab.id}`}
-            data-zephium-tab-id={tab.id}
-            data-zephium-tab-url={tab.url ?? ""}
-            data-zephium-projection-revision={tab.projection_revision}
+            data-drift-tab-id={tab.id}
+            data-drift-tab-url={tab.url ?? ""}
+            data-drift-projection-revision={tab.projection_revision}
           >
             <button
               type="button"
@@ -174,7 +174,7 @@
                   ? PuzzleIcon
                   : Globe02Icon}
               />
-              <span data-zephium-tab-label class="sr-only">{tab.title}</span>
+              <span data-drift-tab-label class="sr-only">{tab.title}</span>
             </button>
             <!-- A rail has no row to put a close control in, so it rides the
              mark's corner, the way a notification's does. -->

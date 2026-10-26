@@ -59,7 +59,7 @@ export function planIcs(
     if (!end) return;
     events.push(
       "BEGIN:VEVENT",
-      `UID:${plan.id}-${index}@zephium.work`,
+      `UID:${plan.id}-${index}@drift.work`,
       `DTSTAMP:${dtstamp}`,
       `DTSTART;VALUE=DATE:${step.date.replaceAll("-", "")}`,
       `DTEND;VALUE=DATE:${end}`,
@@ -73,7 +73,7 @@ export function planIcs(
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    `PRODID:-//${options.product ?? "Zephium"}//Work//EN`,
+    `PRODID:-//${options.product ?? "Drift"}//Work//EN`,
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     ...(plan.title ? [`X-WR-CALNAME:${escapeText(plan.title)}`] : []),

@@ -4,7 +4,7 @@ set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 probe="${root}/scripts/ci/probe_macos_blocker_seed.swift"
 workflow="${root}/.github/workflows/ci.yml"
-engine_policy="${root}/crates/zephium-engine/src/host/content_rules.rs"
+engine_policy="${root}/crates/drift-engine/src/host/content_rules.rs"
 
 test -f "${probe}"
 test ! -L "${probe}"
@@ -17,8 +17,8 @@ for invariant in \
   '(before.st_mode & S_IFMT) == S_IFREG' \
   'before.st_nlink == 1' \
   'blocker artifact changed while it was being admitted' \
-  'private let identifierPrefix = "app.zephium.rules.v1."' \
-  'private let artifactDigestDomain = Data("zephium-webkit-content-rules".utf8)' \
+  'private let identifierPrefix = "app.drift.rules.v1."' \
+  'private let artifactDigestDomain = Data("drift-webkit-content-rules".utf8)' \
   'private let artifactFormatVersion: UInt32 = 4' \
   '"b0e7d8af3782731f328a97ea4a5b77034bd32f200c3e1632f5d85c316f6d5621"' \
   'guard digest == expectedReleaseArtifactDigest else' \

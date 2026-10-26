@@ -8,7 +8,7 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
 import { alias } from "../../aliases";
 
-const HOST = `http://zephium-media.localhost:${process.env.WORK_MEMORY_PORT ?? 4719}`;
+const HOST = `http://drift-media.localhost:${process.env.WORK_MEMORY_PORT ?? 4719}`;
 
 /** What the native media route does with `?w=`: a copy scaled down to that width, made once. */
 const scaled: Plugin = {

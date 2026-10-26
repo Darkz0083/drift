@@ -1,0 +1,67 @@
+name: Build Windows
+
+# Tauri cannot cross-compile to Windows from macOS — it needs WebView2, MSVC
+# and the Windows SDK. So the Windows build runs on a Windows runner and you
+# download the installer as an artifact.
+#
+# Push this to GitHub, then: Actions → Build Windows → Run workflow.
+# The .exe/.msi appears under the run's "Artifacts" section in ~15 minutes.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          # Matches rust-toolchain.toml so the pinned toolchain doesn't fight us.
+          toolchain: "1.95.0"
+
+      - name: Cache cargo
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "desktop -> target"
+
+      - name: Install frontend deps
+        working-directory: frame
+        run: npm install --no-audit --no-fund
+
+      - name: Install desktop deps
+        working-directory: desktop
+        run: npm install --no-audit --no-fund
+
+      - name: Build frontend
+        working-directory: frame
+        run: npm run build
+
+      - name: Build the app
+        working-directory: desktop
+        run: npx tauri build
+        env:
+          # Windows builds aren't code-signed yet, so SmartScreen will warn.
+          # Add the two secrets below to sign, and delete this line.
+          TAURI_SIGNING_PRIVATE_KEY: ""
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-windows
+          if-no-files-found: error
+          path: |
+            desktop/target/release/bundle/nsis/*.exe
+            desktop/target/release/bundle/msi/*.msi

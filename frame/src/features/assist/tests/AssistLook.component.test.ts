@@ -104,7 +104,7 @@ async function open(next: PageAssistStatusV1, height = 760) {
   native.status = next;
   await page.viewport(400, height + 40);
   const screen = await render(PanelStage, { profile: PROFILE, height });
-  await expect.element(screen.getByRole("textbox", { name: "Ask Zephium…" })).toBeVisible();
+  await expect.element(screen.getByRole("textbox", { name: "Ask Drift…" })).toBeVisible();
   return screen;
 }
 
@@ -157,7 +157,7 @@ test("empty, typing: Send takes the mic's place", async () => {
 
 test("empty on a page it does not read: says what it can still do", async () => {
   const screen = await open(status([], { availability: "sensitive", page: null }));
-  await expect.element(screen.getByText("Zephium stays out of this site")).toBeVisible();
+  await expect.element(screen.getByText("Drift stays out of this site")).toBeVisible();
   await expect.element(screen.getByText(/You can still ask anything/u)).toBeVisible();
   await capture(screen.container, "away");
 });
@@ -390,7 +390,7 @@ test("faults: a rate limit counts down, credits lead to the account", async () =
     ),
   );
   await expect.element(screen.getByRole("button", { name: "Buy credits" })).toBeVisible();
-  await expect.element(screen.getByText("Zephium AI needs a short breather.")).toBeVisible();
+  await expect.element(screen.getByText("Drift AI needs a short breather.")).toBeVisible();
   await capture(screen.container, "faults");
 });
 
@@ -398,7 +398,7 @@ test("composer: page and selection chips; + holds the page, the picker and other
   setTabs({
     tabs: [
       tab(TAB, "https://news.ycombinator.com/", "Hacker News"),
-      tab("tab-2", "https://github.com/zephium/zephium", "zephium/zephium · GitHub"),
+      tab("tab-2", "https://github.com/drift/drift", "drift/drift · GitHub"),
       tab("tab-3", "https://developer.mozilla.org/", "MDN Web Docs"),
     ],
   });

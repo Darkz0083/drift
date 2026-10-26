@@ -277,11 +277,11 @@
   <div
     class="sentinel"
     aria-hidden="true"
-    data-zephium-tab-id={tab.id}
-    data-zephium-tab-url={tab.url ?? ""}
-    data-zephium-projection-revision={tab.projection_revision}
+    data-drift-tab-id={tab.id}
+    data-drift-tab-url={tab.url ?? ""}
+    data-drift-projection-revision={tab.projection_revision}
   >
-    <span data-zephium-tab-label>{tab.title}</span>
+    <span data-drift-tab-label>{tab.title}</span>
   </div>
 {/if}
 <section
@@ -341,7 +341,7 @@
       </span>
       <input
         bind:this={address}
-        data-zephium-address
+        data-drift-address
         type="text"
         aria-label={m.work_pane_address()}
         autocomplete="off"

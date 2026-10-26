@@ -1,7 +1,7 @@
 #!/bin/sh
 # Cargo's runner on macOS. An ad-hoc signed debug build is a new app to the
 # Keychain after every rebuild, so each one asks for the login password again.
-# Zephium's own dev executables are re-signed with one identifier and the
+# Drift's own dev executables are re-signed with one identifier and the
 # developer's certificate, which the Keychain keeps trusting across rebuilds
 # after one "Always Allow". Without a certificate they run unchanged.
 set -eu
@@ -10,11 +10,11 @@ bin=$1
 shift
 
 case $(basename -- "$bin") in
-    zephium-desktop | macos-terra-agentic-probe | macos-agentic-liveness-probe) ;;
+    drift-desktop | macos-terra-agentic-probe | macos-agentic-liveness-probe) ;;
     *) exec "$bin" "$@" ;;
 esac
 
-identifier=app.zephium.dev
+identifier=app.drift.dev
 if ! /usr/bin/codesign -dv "$bin" 2>&1 | grep -qx "Identifier=$identifier"; then
     identity=${APPLE_SIGNING_IDENTITY:-}
     if [ -z "$identity" ]; then

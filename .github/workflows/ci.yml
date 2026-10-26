@@ -123,7 +123,7 @@ jobs:
       - run: pnpm --dir frame run build
       - run: pnpm --dir frame run check:styles
 
-  # Zephium ships on macOS and Windows only, so Linux builds no app code; it
+  # Drift ships on macOS and Windows only, so Linux builds no app code; it
   # runs the platform-neutral policy gates.
   policy:
     name: Rust policy
@@ -235,9 +235,9 @@ jobs:
       # elevated runner creates directories owned by Administrators. Both run on
       # the Windows QA machine instead.
       - run: >-
-          cargo nextest run --workspace --exclude zephium-desktop --locked --profile ci --retries 2 --no-fail-fast
+          cargo nextest run --workspace --exclude drift-desktop --locked --profile ci --retries 2 --no-fail-fast
           -E 'not (test(/^platform::windows::native_storage::work::tests::/)
-          or (package(zephium-store) and test(/^(hub::agent_work|actor::tests::work_journal_|hub::work_document::runtime_store::tests::approved_deadline_)/)))'
+          or (package(drift-store) and test(/^(hub::agent_work|actor::tests::work_journal_|hub::work_document::runtime_store::tests::approved_deadline_)/)))'
       - name: Report flaky tests
         if: ${{ !cancelled() }}
         shell: bash

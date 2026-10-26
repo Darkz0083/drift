@@ -50,7 +50,7 @@
       if (work && tool !== null) {
         tools.close();
         if (settledInWork)
-          window.dispatchEvent(new CustomEvent("zephium:work-tool", { detail: tool }));
+          window.dispatchEvent(new CustomEvent("drift:work-tool", { detail: tool }));
       }
       settledInWork = work;
     });

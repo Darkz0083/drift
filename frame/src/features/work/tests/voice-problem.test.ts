@@ -20,25 +20,25 @@ test("the daily limit resets at the next 00:00 UTC on the person's clock", () =>
 
 test("every hosted refusal has its own message and one clear action", () => {
   const cases: [VoiceFaultV1, string, string | null][] = [
-    ["plan_required", "Dictation needs a different Zephium plan.", "plans"],
-    ["billing_review", "Your Zephium account is under billing review.", "account"],
-    ["free_usage_paused", "Free Zephium AI usage is paused right now.", "plans"],
-    ["hosted_paused", "Zephium AI is paused for now.", "settings"],
+    ["plan_required", "Dictation needs a different Drift plan.", "plans"],
+    ["billing_review", "Your Drift account is under billing review.", "account"],
+    ["free_usage_paused", "Free Drift AI usage is paused right now.", "plans"],
+    ["hosted_paused", "Drift AI is paused for now.", "settings"],
     ["invalid_audio", "Couldn’t read that recording. Try again.", "retry"],
     ["unsupported_audio", "That recording’s format isn’t supported.", "retry"],
     ["audio_too_long", "Recordings can be up to 4 minutes.", "retry"],
   ];
   for (const [fault, message, remedy] of cases) {
-    const problem = voiceProblem(fault, "zephium");
+    const problem = voiceProblem(fault, "drift");
     expect(problem.message, fault).toContain(message);
     expect(problem.remedy, fault).toBe(remedy);
   }
-  const daily = voiceProblem("daily_limit", "zephium");
+  const daily = voiceProblem("daily_limit", "drift");
   expect(daily.message).toContain(`resets at ${dailyResetTime()}`);
   expect(daily.remedy).toBe("limit");
 });
 
-test("running out of Zephium credit points at plans, and a key's credit at settings", () => {
-  expect(voiceProblem("out_of_credit", "zephium").remedy).toBe("plans");
+test("running out of Drift credit points at plans, and a key's credit at settings", () => {
+  expect(voiceProblem("out_of_credit", "drift").remedy).toBe("plans");
   expect(voiceProblem("out_of_credit", "open_ai").remedy).toBe("settings");
 });

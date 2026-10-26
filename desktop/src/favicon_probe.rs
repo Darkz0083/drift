@@ -10,9 +10,9 @@ use std::io::Cursor;
 use std::time::Duration;
 
 use reqwest::{redirect::Policy, Client, Url};
-use zephium_app::{CallbackHandle, Command};
-use zephium_core::icon::{ICON_SIDE, RGBA32_BYTES};
-use zephium_core::ids::ProfileId;
+use drift_app::{CallbackHandle, Command};
+use drift_core::icon::{ICON_SIDE, RGBA32_BYTES};
+use drift_core::ids::ProfileId;
 
 pub(crate) const PROBE_TIMEOUT: Duration = Duration::from_secs(5);
 pub(crate) const MAX_ICON_BYTES: usize = 256 * 1024;
@@ -25,7 +25,7 @@ const MAX_LINKS: usize = 64;
 const MAX_DECODED_SIDE: u32 = 1024;
 const MAX_DECODE_ALLOC: u64 = 16 * 1024 * 1024;
 /// The agent browser's product user agent.
-const WORK_USER_AGENT: &str = "Zephium-Agent-Browser/0.1";
+const WORK_USER_AGENT: &str = "Drift-Agent-Browser/0.1";
 const REPLY_ATTEMPTS: usize = 20;
 const REPLY_RETRY: Duration = Duration::from_millis(250);
 
@@ -50,7 +50,7 @@ impl ProbePolicy {
 
     fn admits(self, url: &Url) -> bool {
         if self.public_https {
-            zephium_agentic::public_asset::public_https(url)
+            drift_agentic::public_asset::public_https(url)
         } else {
             matches!(url.scheme(), "http" | "https")
         }
@@ -78,13 +78,13 @@ fn client(policy: ProbePolicy) -> Option<Client> {
 }
 
 /// Attaches the prober to the shell. Each request answers exactly once.
-pub(crate) fn install(shell: &zephium_app::Handle) {
+pub(crate) fn install(shell: &drift_app::Handle) {
     let Some(client) = client(ProbePolicy::PRODUCT) else {
         crate::write_diagnostic(format_args!("favicon: probe client did not build"));
         return;
     };
     let reply = shell.callback_handle();
-    let prober: zephium_app::FaviconProber = std::sync::Arc::new(move |profile, origin| {
+    let prober: drift_app::FaviconProber = std::sync::Arc::new(move |profile, origin| {
         let client = client.clone();
         let reply = reply.clone();
         tauri::async_runtime::spawn(async move {
@@ -96,7 +96,7 @@ pub(crate) fn install(shell: &zephium_app::Handle) {
         });
     });
     if !shell.dispatch(Command::AttachFaviconProber(
-        zephium_app::FaviconProberAttachment(prober),
+        drift_app::FaviconProberAttachment(prober),
     )) {
         crate::write_diagnostic(format_args!("favicon: the shell refused its prober"));
     }

@@ -17,18 +17,18 @@
     if (!editing) customUrl = value;
   });
 
-  /** Feedback only, mirroring `zephium_core::search::valid_template`. Native
+  /** Feedback only, mirroring `drift_core::search::valid_template`. Native
    *  remains the authority and rejects anything this misses. */
   let invalid = $derived.by(() => {
     const value = customUrl.trim();
     if (!value) return false;
     if (value.length > 2048 || value.split("{searchTerms}").length !== 2) return true;
     try {
-      const url = new URL(value.replace("{searchTerms}", "zephium-query"));
+      const url = new URL(value.replace("{searchTerms}", "drift-query"));
       return (
         url.protocol !== "https:" ||
-        !url.search.includes("zephium-query") ||
-        url.hostname.includes("zephium-query")
+        !url.search.includes("drift-query") ||
+        url.hostname.includes("drift-query")
       );
     } catch {
       return true;

@@ -1,10 +1,10 @@
 # Trusted macOS Work composition
 
-`zephium-work-composition/macos-work` connects the actual desktop engine and
+`drift-work-composition/macos-work` connects the actual desktop engine and
 Store to the existing durable application coordinator. It does not implement
 another controller, browser port, policy authority or task interpreter.
 
-The optional `zephium-desktop/macos-work` root installs a dormant, move-only
+The optional `drift-desktop/macos-work` root installs a dormant, move-only
 `MacosWorkComposition` containing the same `Arc<WebviewEngine>` and
 `Arc<SqliteStore>` already passed to the ordinary shell. Installation claims no
 Work namespace and starts no worker, timer, provider request or native page.

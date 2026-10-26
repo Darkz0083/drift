@@ -35,7 +35,7 @@ async function numberFixture(options: Options = {}) {
   frame.srcdoc = `<label>Quantity<input type="number" aria-label="Quantity" ${options.attributes ?? ""}></label><script>${inject("semanticMediaRuntime")}
     addEventListener("load", async () => {
       try {
-        const api=globalThis.__zephiumSemanticRuntimeV1;
+        const api=globalThis.__driftSemanticRuntimeV1;
         const target=document.querySelector("input");
         const options=${JSON.stringify(options)};
         const events=[];
@@ -231,11 +231,11 @@ test("CDP preparation delegates exactly one native key pair without a second fix
     expect(down.p).toMatchObject({ type: "keyDown", key: "ArrowUp" });
     const api = (
       frame.contentWindow as unknown as {
-        __zephiumSemanticRuntimeV1: {
+        __driftSemanticRuntimeV1: {
           nextCdpAction(attempt: number, index: number, abort: boolean): string | Promise<string>;
         };
       }
-    ).__zephiumSemanticRuntimeV1;
+    ).__driftSemanticRuntimeV1;
     await userEvent.keyboard("{ArrowUp>}");
     expect(target.value).toBe("18");
     const up = await api.nextCdpAction(down.a, 1, false);

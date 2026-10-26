@@ -22,13 +22,13 @@ use objc2_web_kit::{
 };
 use tauri::{Manager as _, WebviewWindow};
 
-use zephium_app::{
+use drift_app::{
     ChromePresentation, ChromePresentationCallback, ChromePresentationDispatch, PresentationChrome,
     SharedChrome,
 };
-use zephium_core::geometry::Size;
-use zephium_core::ports::chrome::{Chrome, ChromeFrame};
-use zephium_engine::MainThreadDispatch;
+use drift_core::geometry::Size;
+use drift_core::ports::chrome::{Chrome, ChromeFrame};
+use drift_engine::MainThreadDispatch;
 
 static CHROME_GENERATION: AtomicU64 = AtomicU64::new(0);
 static NEXT_CHROME_GENERATION: AtomicU64 = AtomicU64::new(1);
@@ -119,7 +119,7 @@ thread_local! {
 /// same canonical build. On Sonoma and Sequoia that binds Apple's Safari
 /// security release to the embedder; Tahoe's WebKit comes from the OS update.
 pub fn enforce_runtime_security_floor(
-) -> Result<zephium_core::runtime_security::RuntimeSecurityAdvisories, String> {
+) -> Result<drift_core::runtime_security::RuntimeSecurityAdvisories, String> {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_or(0, |elapsed| elapsed.as_secs());
@@ -150,7 +150,7 @@ pub fn enforce_runtime_security_floor(
     require_bundle_identifier(&webkit, "com.apple.WebKit", "WKWebView")?;
     let webkit_build = bundle_string(&webkit, ns_string!("CFBundleVersion"))?;
 
-    zephium_core::macos::assess_runtime(
+    drift_core::macos::assess_runtime(
         &operating_system,
         &safari_version,
         &safari_build,
@@ -159,7 +159,7 @@ pub fn enforce_runtime_security_floor(
     )
     .map_err(|error| {
         format!(
-            "Zephium needs macOS Sonoma 14 or later with Safari 26 or later. This Mac has macOS {operating_system} with Safari {safari_version}.\n\nOpen System Settings > General > Software Update, install the available updates, then open Zephium again.\n\nDetails: {error}"
+            "Drift needs macOS Sonoma 14 or later with Safari 26 or later. This Mac has macOS {operating_system} with Safari {safari_version}.\n\nOpen System Settings > General > Software Update, install the available updates, then open Drift again.\n\nDetails: {error}"
         )
     })
 }
@@ -196,7 +196,7 @@ fn bundle_string(bundle: &NSBundle, key: &NSString) -> Result<String, String> {
 define_class!(
     #[unsafe(super(NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "ZephiumPrivilegedUIDelegate"]
+    #[name = "DriftPrivilegedUIDelegate"]
     #[ivars = ()]
     struct PrivilegedUIDelegate;
 
@@ -479,7 +479,7 @@ impl PresentationChrome for ChromeAdapter {
     fn restore_browser_chrome(
         &self,
         revision: u64,
-        items: zephium_ipc::ItemsState,
+        items: drift_ipc::ItemsState,
         done: ChromePresentationCallback,
     ) -> ChromePresentationDispatch {
         crate::restore_browser_chrome(&self.window, revision, items, done)
@@ -605,7 +605,7 @@ pub async fn configure_sidebar_resize(
     width: f64,
     enabled: bool,
     revision: u64,
-    shell: zephium_app::Handle,
+    shell: drift_app::Handle,
 ) -> bool {
     // An older revision may still switch the guide off; only turning it on
     // has to be current.
@@ -631,11 +631,11 @@ pub async fn configure_sidebar_resize(
                 }
                 // A guide release is a snap to a new shape: the content
                 // travels there, which also covers the chrome's repaint.
-                if shell.dispatch(zephium_app::Command::SetSidebarWidth(width, true)) {
+                if shell.dispatch(drift_app::Command::SetSidebarWidth(width, true)) {
                     crate::emit_to_privileged(
                         sender.app_handle(),
                         crate::MAIN_LABEL,
-                        "zephium:sidebar-width-selected",
+                        "drift:sidebar-width-selected",
                         &serde_json::json!({"width": width, "revision": revision}),
                     );
                 }
@@ -809,7 +809,7 @@ mod tests {
             true
         });
         let frame = ChromeFrame {
-            rect: zephium_core::geometry::Rect::new(8.0, 8.0, 240.0, 700.0),
+            rect: drift_core::geometry::Rect::new(8.0, 8.0, 240.0, 700.0),
             fill_width: false,
             travel: false,
         };
@@ -886,7 +886,7 @@ thread_local! {
 /// launcher panel keeps its own.
 pub fn install_key_monitor(
     window: &WebviewWindow,
-    table: Arc<std::sync::RwLock<Vec<(zephium_core::accelerator::Accelerator, &'static str)>>>,
+    table: Arc<std::sync::RwLock<Vec<(drift_core::accelerator::Accelerator, &'static str)>>>,
     on: impl Fn(&str) + 'static,
 ) {
     use block2::RcBlock;
@@ -946,8 +946,8 @@ pub fn install_key_monitor(
 
 /// Printable keys compare by the character they type unmodified, so the
 /// layout decides; the rest compare by macOS virtual key code.
-fn key_matches(key: zephium_core::accelerator::Key, character: Option<&str>, code: u16) -> bool {
-    use zephium_core::accelerator::Key;
+fn key_matches(key: drift_core::accelerator::Key, character: Option<&str>, code: u16) -> bool {
+    use drift_core::accelerator::Key;
     if let Some(expected) = key.character() {
         return character.is_some_and(|typed| typed.chars().eq(std::iter::once(expected)));
     }

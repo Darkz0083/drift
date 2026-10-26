@@ -214,7 +214,7 @@ afterEach(() => {
   surface.dispose();
   tabs.dispose();
   preferences.dispose();
-  themed("zephium");
+  themed("drift");
   document.getElementById("wallpaper")?.remove();
 });
 
@@ -262,7 +262,7 @@ for (const theme of ["light", "dark"] as const) {
     await crop(`${theme}-themed-switcher`);
     away();
 
-    themed("zephium");
+    themed("drift");
     spaced("side", true);
     await settle();
     await crop(`${theme}-empty`);
@@ -326,7 +326,7 @@ for (const theme of ["light", "dark"] as const) {
 
   test(`a tab carried across the column, ${theme}`, async () => {
     await stage(theme);
-    const row = document.querySelector<HTMLElement>(`[data-zephium-tab-id="spotify"] .tab-open`)!;
+    const row = document.querySelector<HTMLElement>(`[data-drift-tab-id="spotify"] .tab-open`)!;
     const from = row.getBoundingClientRect();
     const init = { bubbles: true, pointerId: 1, button: 0, isPrimary: true };
     const at = (x: number, y: number) => ({ ...init, clientX: x, clientY: y });

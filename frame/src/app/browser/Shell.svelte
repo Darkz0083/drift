@@ -301,8 +301,8 @@
   data-tauri-drag-region
   class:pb-0={inWork}
   data-caption={IS_WINDOWS || undefined}
-  data-zephium-active-tab={tabs.activeId() ?? ""}
-  data-zephium-surface={browserPage.currentPage() ?? "browse"}
+  data-drift-active-tab={tabs.activeId() ?? ""}
+  data-drift-surface={browserPage.currentPage() ?? "browse"}
   data-private={incognito || undefined}
 >
   <Sidebar
@@ -487,7 +487,7 @@
       page and the new tab never changes the window's shape. The inline start
       inset matches the core layout gap between chrome and content.
     -->
-      <main class="min-w-0 flex-1 ps-2" data-zephium-new-tab>
+      <main class="min-w-0 flex-1 ps-2" data-drift-new-tab>
         <!-- New Tab paints its own ground, so its dock can open onto the frame. -->
         <div class="content-pane h-full w-full overflow-hidden" data-ground="own">
           <LazyView

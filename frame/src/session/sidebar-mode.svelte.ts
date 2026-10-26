@@ -131,7 +131,7 @@ let resizeListenerInstalled = false;
 function installResizeListener() {
   if (resizeListenerInstalled) return;
   resizeListenerInstalled = true;
-  window.addEventListener("zephium:sidebar-width-selected", (event) => {
+  window.addEventListener("drift:sidebar-width-selected", (event) => {
     if (!(event instanceof CustomEvent) || !event.detail || typeof event.detail !== "object")
       return;
     const { width, revision } = event.detail;

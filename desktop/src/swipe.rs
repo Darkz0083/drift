@@ -17,7 +17,7 @@ pub(crate) enum SwipePhase {
 /// Fingers' travel since the last event, positive to the right and down, in
 /// points; `time` is the event's own clock in milliseconds.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, specta::Type, tauri_specta::Event)]
-#[tauri_specta(event_name = "zephium:swipe")]
+#[tauri_specta(event_name = "drift:swipe")]
 #[allow(dead_code)]
 pub(crate) struct SwipeScroll {
     pub(crate) phase: SwipePhase,

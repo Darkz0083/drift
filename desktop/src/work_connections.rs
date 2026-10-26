@@ -2,9 +2,9 @@
 //! servers the person added. Secrets go straight to the Keychain and never
 //! come back; responses say only which ones are held.
 use super::*;
-use zephium_core::ids::ProfileId;
-use zephium_core::work::WorkError;
-use zephium_ipc::work::{
+use drift_core::ids::ProfileId;
+use drift_core::work::WorkError;
+use drift_ipc::work::{
     WorkCliRowV1, WorkConnectionsResponseV1, WorkServerCheckV1, WorkServerDraftV1,
     WorkServerOutcomeV1,
 };
@@ -32,9 +32,9 @@ fn admitted(
 #[cfg(feature = "work-product")]
 mod live {
     use super::*;
-    use zephium_app::work_connections::client::keychain;
-    use zephium_app::work_connections::{cli, store};
-    use zephium_ipc::work::{
+    use drift_app::work_connections::client::keychain;
+    use drift_app::work_connections::{cli, store};
+    use drift_ipc::work::{
         WorkCliStatusV1, WorkServerAuthV1, WorkServerRowV1, WorkServerTransportV1, WorkServerV1,
     };
 
@@ -145,7 +145,7 @@ async fn listing(
     app: &tauri::AppHandle,
     profile: ProfileId,
     with_clis: bool,
-) -> Result<(Vec<WorkCliRowV1>, Vec<zephium_ipc::work::WorkServerRowV1>), WorkError> {
+) -> Result<(Vec<WorkCliRowV1>, Vec<drift_ipc::work::WorkServerRowV1>), WorkError> {
     #[cfg(feature = "work-product")]
     {
         let store = live::store(app)?;
@@ -170,7 +170,7 @@ async fn listing(
 
 fn response(
     expected: String,
-    result: Result<(Vec<WorkCliRowV1>, Vec<zephium_ipc::work::WorkServerRowV1>), WorkError>,
+    result: Result<(Vec<WorkCliRowV1>, Vec<drift_ipc::work::WorkServerRowV1>), WorkError>,
 ) -> WorkConnectionsResponseV1 {
     match result {
         Ok((clis, servers)) => WorkConnectionsResponseV1 {
@@ -218,7 +218,7 @@ fn connection_mutations() -> &'static tokio::sync::Mutex<()> {
 struct CheckedDraft {
     draft: WorkServerDraftV1,
     secrets: std::collections::HashMap<String, String>,
-    tools: Vec<zephium_app::work_connections::client::McpTool>,
+    tools: Vec<drift_app::work_connections::client::McpTool>,
     checked: std::time::Instant,
 }
 #[cfg(feature = "work-product")]
@@ -246,7 +246,7 @@ pub(crate) async fn work_preview_connection(
         #[cfg(feature = "work-product")]
         {
             let _guard = connection_mutations().lock().await;
-            use zephium_app::work_connections::{
+            use drift_app::work_connections::{
                 client::{
                     keychain,
                     oauth::{MemoryTokens, TokenStore},
@@ -301,9 +301,9 @@ pub(crate) async fn work_preview_connection(
             let (mut check, mut tools) =
                 mcp::check_endpoint(&owner, &draft.server, endpoint()).await;
             if check.outcome == WorkServerOutcomeV1::SignIn {
-                if let zephium_ipc::work::WorkServerTransportV1::Http {
+                if let drift_ipc::work::WorkServerTransportV1::Http {
                     url,
-                    auth: zephium_ipc::work::WorkServerAuthV1::OAuth,
+                    auth: drift_ipc::work::WorkServerAuthV1::OAuth,
                 } = &draft.server.transport
                 {
                     match sign_in_flow(&app, &owner, &id, url, tokens.clone()).await {
@@ -395,7 +395,7 @@ pub(crate) async fn work_save_connection(
         #[cfg(feature = "work-product")]
         {
             let _guard = connection_mutations().lock().await;
-            use zephium_app::work_connections::client::keychain;
+            use drift_app::work_connections::client::keychain;
             let store = live::store(&app)?;
             let id = profile.to_string();
             if !valid_draft(&draft) {
@@ -503,7 +503,7 @@ pub(crate) async fn work_remove_connection(
                 .lock()
                 .unwrap_or_else(|p| p.into_inner())
                 .remove(&(expected_profile.clone(), id.clone()));
-            use zephium_app::work_connections::client::keychain;
+            use drift_app::work_connections::client::keychain;
             let store = live::store(&app)?;
             let owner = profile.to_string();
             tokio::task::spawn_blocking(move || {
@@ -563,7 +563,7 @@ pub(crate) async fn work_check_connection(
                 .into_iter()
                 .find(|s| s.id == id)
                 .ok_or(WorkError::NotFound)?;
-            Ok(zephium_app::work_connections::mcp::check(&owner, &server).await)
+            Ok(drift_app::work_connections::mcp::check(&owner, &server).await)
         }
         #[cfg(not(feature = "work-product"))]
         {
@@ -634,7 +634,7 @@ impl Drop for SignInLease {
         emit_to_privileged(
             &self.app,
             MAIN_LABEL,
-            "zephium:connection-sign-in",
+            "drift:connection-sign-in",
             &serde_json::json!({
                 "version": 1, "phase": "finished", "profile": self.key.0, "id": self.key.1, "request_id": self.request_id,
             }),
@@ -648,8 +648,8 @@ async fn sign_in_flow(
     owner: &str,
     id: &str,
     url: &str,
-    tokens: std::sync::Arc<dyn zephium_app::work_connections::client::oauth::TokenStore>,
-) -> Result<(), zephium_app::work_connections::client::McpError> {
+    tokens: std::sync::Arc<dyn drift_app::work_connections::client::oauth::TokenStore>,
+) -> Result<(), drift_app::work_connections::client::McpError> {
     static NEXT_SIGN_IN: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
     let request_id = NEXT_SIGN_IN
         .fetch_add(1, std::sync::atomic::Ordering::Relaxed)
@@ -672,7 +672,7 @@ async fn sign_in_flow(
     emit_to_privileged(
         app,
         MAIN_LABEL,
-        "zephium:connection-sign-in",
+        "drift:connection-sign-in",
         &serde_json::json!({
             "version": 1, "phase": "started", "profile": owner, "id": id, "request_id": request_id,
         }),
@@ -680,11 +680,11 @@ async fn sign_in_flow(
     let opener = app.clone();
     let (flow, flow_profile, flow_server) =
         (request_id.to_owned(), owner.to_owned(), id.to_owned());
-    let signed = zephium_app::work_connections::client::oauth::sign_in_cancellable(
+    let signed = drift_app::work_connections::client::oauth::sign_in_cancellable(
         url,
         tokens,
         move |page| {
-            if zephium_core::navigation::is_allowed_str(&page) {
+            if drift_core::navigation::is_allowed_str(&page) {
                 let shell = opener.state::<Handle>();
                 let admission = dispatch_operation(
                     &opener,
@@ -698,7 +698,7 @@ async fn sign_in_flow(
                 emit_to_privileged(
                     &opener,
                     MAIN_LABEL,
-                    "zephium:connection-sign-in",
+                    "drift:connection-sign-in",
                     &serde_json::json!({
                         "version": 1, "phase": "open_requested", "profile": flow_profile, "id": flow_server,
                         "request_id": flow, "operation_id": admission.operation_id,
@@ -729,7 +729,7 @@ pub(crate) async fn work_sign_in_connection(
         #[cfg(feature = "work-product")]
         {
             let _guard = connection_mutations().lock().await;
-            use zephium_ipc::work::WorkServerTransportV1;
+            use drift_ipc::work::WorkServerTransportV1;
             let store = live::store(&app)?;
             let owner = profile.to_string();
             let server = store
@@ -740,17 +740,17 @@ pub(crate) async fn work_sign_in_connection(
                 .ok_or(WorkError::NotFound)?;
             let WorkServerTransportV1::Http {
                 url,
-                auth: zephium_ipc::work::WorkServerAuthV1::OAuth,
+                auth: drift_ipc::work::WorkServerAuthV1::OAuth,
             } = &server.transport
             else {
                 return Err(WorkError::Invalid);
             };
             let tokens =
-                zephium_app::work_connections::client::keychain::oauth_store(&owner, &server.id);
+                drift_app::work_connections::client::keychain::oauth_store(&owner, &server.id);
             let signed = sign_in_flow(&app, &owner, &id, url, tokens).await;
-            use zephium_app::work_connections::client::McpError;
+            use drift_app::work_connections::client::McpError;
             let check = match signed {
-                Ok(()) => zephium_app::work_connections::mcp::check(&owner, &server).await,
+                Ok(()) => drift_app::work_connections::mcp::check(&owner, &server).await,
                 Err(error) => WorkServerCheckV1 {
                     version: 1,
                     profile: owner,

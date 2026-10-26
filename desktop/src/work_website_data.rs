@@ -19,7 +19,7 @@ pub(crate) async fn work_clear_website_data(
     {
         return false;
     }
-    let Some(profile) = zephium_core::ids::ProfileId::parse(&expected_profile)
+    let Some(profile) = drift_core::ids::ProfileId::parse(&expected_profile)
         .filter(|id| id.to_string() == expected_profile)
     else {
         return false;
@@ -31,7 +31,7 @@ pub(crate) async fn work_clear_website_data(
     feature = "work-product",
     any(target_os = "macos", target_os = "windows")
 ))]
-async fn clear(app: &tauri::AppHandle, profile: zephium_core::ids::ProfileId) -> bool {
+async fn clear(app: &tauri::AppHandle, profile: drift_core::ids::ProfileId) -> bool {
     use tauri::Manager;
     let Some(state) = app.try_state::<super::work_product::WorkProductState>() else {
         return false;
@@ -50,6 +50,6 @@ async fn clear(app: &tauri::AppHandle, profile: zephium_core::ids::ProfileId) ->
     feature = "work-product",
     any(target_os = "macos", target_os = "windows")
 )))]
-async fn clear(_app: &tauri::AppHandle, _profile: zephium_core::ids::ProfileId) -> bool {
+async fn clear(_app: &tauri::AppHandle, _profile: drift_core::ids::ProfileId) -> bool {
     false
 }

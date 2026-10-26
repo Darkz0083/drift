@@ -3,9 +3,9 @@
 use std::path::Path;
 use std::time::Duration;
 
-use zephium_app::Handle;
-use zephium_core::ids::ProfileId;
-use zephium_webext::{store, ExtensionId};
+use drift_app::Handle;
+use drift_core::ids::ProfileId;
+use drift_webext::{store, ExtensionId};
 
 use super::install::{download, keep_original, stage, store_client, Source};
 use crate::webext::{Entry, WebExtensions};

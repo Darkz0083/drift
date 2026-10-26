@@ -376,7 +376,7 @@ once rather than on every search. A private run's results page opens in a
 fresh ephemeral store of its own. Typed decisions are off, and the results policy takes the
 page's whole first look, presses nothing and ends there, so no model sees it
 and nothing is charged but the step. The reader
-(`zephium_agentic::read_search_page`) keeps up to eight results in the
+(`drift_agentic::read_search_page`) keeps up to eight results in the
 engine's order, each a title link's destination with Google's `/url?q=`,
 Bing's `/ck/a?u=a1…` and DuckDuckGo's `/l/?uddg=` redirects unwrapped, its
 title and the engine's own snippet. Ads, the engine's own links, non-web

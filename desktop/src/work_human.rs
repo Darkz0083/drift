@@ -1,5 +1,5 @@
 use super::*;
-use zephium_ipc::work::*;
+use drift_ipc::work::*;
 
 #[cfg_attr(
     not(all(

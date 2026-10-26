@@ -1,5 +1,5 @@
 {
-  "name": "@zephium/desktop",
+  "name": "@drift/desktop",
   "private": true,
   "scripts": {
     "dev": "node ../scripts/require-supported-platform.mjs && tauri dev --config tauri.dev.conf.json",

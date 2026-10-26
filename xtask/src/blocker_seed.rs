@@ -852,7 +852,7 @@ fn deterministic_gzip(raw: &[u8]) -> Result<Vec<u8>, String> {
         .finish()
         .map_err(|error| format!("cannot finish blocker seed compression: {error}"))?;
     if compressed.get(..GZIP_HEADER.len()) != Some(GZIP_HEADER.as_slice()) {
-        return Err("gzip encoder did not produce Zephium's canonical header".into());
+        return Err("gzip encoder did not produce Drift's canonical header".into());
     }
     Ok(compressed)
 }
@@ -906,9 +906,9 @@ fn validate_license(bytes: &[u8]) -> Result<(), String> {
 
 fn build_notice(sources: &[SourceInput]) -> String {
     let mut notice = String::from(
-        "Zephium bundled blocker seed v1\n\n\
+        "Drift bundled blocker seed v1\n\n\
          This directory contains unmodified EasyList and EasyPrivacy subscription text.\n\
-         Zephium changes only the storage representation by applying deterministic gzip\n\
+         Drift changes only the storage representation by applying deterministic gzip\n\
          compression; the decompressed source bytes are unchanged.\n\n\
          Attribution: The EasyList authors (https://easylist.to/)\n\
          Selected license: CC BY-SA 3.0 Unported (CC-BY-SA-3.0)\n\
@@ -926,7 +926,7 @@ fn build_notice(sources: &[SourceInput]) -> String {
         ));
     }
     notice.push_str(
-        "The upstream authors do not endorse Zephium. Release engineering must regenerate\n\
+        "The upstream authors do not endorse Drift. Release engineering must regenerate\n\
          and verify this record with `cargo xtask update-blocker-seed` whenever either\n\
          subscription changes.\n",
     );
@@ -1025,7 +1025,7 @@ fn publish_verified_webkit_artifact(
         .ok_or_else(|| "verified blocker seed has no valid WebKit artifact identity".to_owned())?;
     let bytes = read_regular_file(
         staged,
-        zephium_core::blocker::MAX_DECLARATIVE_RULE_BYTES as u64,
+        drift_core::blocker::MAX_DECLARATIVE_RULE_BYTES as u64,
     )?;
     if bytes.len() != coverage.json_bytes
         || bytes.first() != Some(&b'[')
@@ -1035,7 +1035,7 @@ fn publish_verified_webkit_artifact(
         return Err("materialized WebKit blocker artifact is structurally invalid".into());
     }
     let mut digest = Sha256::new();
-    digest.update(b"zephium-webkit-content-rules");
+    digest.update(b"drift-webkit-content-rules");
     digest.update(compiler.webkit_artifact_format_version.to_be_bytes());
     digest.update(&bytes);
     if lower_hex(&digest.finalize()) != expected_digest {
@@ -1342,7 +1342,7 @@ pub(crate) fn compile_hidden(
     easyprivacy: &Path,
     artifact_output: Option<&Path>,
 ) -> Result<(), String> {
-    use zephium_blocker::{Compiler, FilterSource, SourceFormat, SourceId};
+    use drift_blocker::{Compiler, FilterSource, SourceFormat, SourceId};
 
     let expected_target =
         if cfg!(feature = "blocker-seed-runtime") && !cfg!(feature = "blocker-seed-webkit") {
@@ -1375,8 +1375,8 @@ pub(crate) fn compile_hidden(
         })
         .collect::<Result<Vec<_>, String>>()?;
     let native_target = match expected_target {
-        CompileTarget::Runtime => zephium_blocker::CompileTarget::Runtime,
-        CompileTarget::Webkit => zephium_blocker::CompileTarget::WebKit,
+        CompileTarget::Runtime => drift_blocker::CompileTarget::Runtime,
+        CompileTarget::Webkit => drift_blocker::CompileTarget::WebKit,
     };
     let compiled = Compiler::default()
         .compile(native_target, sources)
@@ -1468,9 +1468,9 @@ pub(crate) fn compile_hidden(
     let golden = CompileGolden {
         target: expected_target,
         feature_graph: expected_target.argument().into(),
-        policy_format_version: zephium_blocker::POLICY_FORMAT_VERSION,
-        webkit_artifact_format_version: zephium_blocker::WEBKIT_ARTIFACT_FORMAT_VERSION,
-        adblock_engine_version: zephium_blocker::ADBLOCK_ENGINE_VERSION.into(),
+        policy_format_version: drift_blocker::POLICY_FORMAT_VERSION,
+        webkit_artifact_format_version: drift_blocker::WEBKIT_ARTIFACT_FORMAT_VERSION,
+        adblock_engine_version: drift_blocker::ADBLOCK_ENGINE_VERSION.into(),
         limits: CompileBudgets {
             max_sources: limits.max_sources(),
             max_source_bytes: limits.max_source_bytes(),
@@ -1510,9 +1510,9 @@ pub(crate) fn compile_hidden(
 
 #[cfg(feature = "blocker-seed-runtime")]
 fn verify_runtime_release_seed_smoke(
-    compiled: &zephium_blocker::CompiledRules,
+    compiled: &drift_blocker::CompiledRules,
 ) -> Result<(), String> {
-    use zephium_blocker::{NetworkAction, NetworkRequest, RequestMethod, ResourceType};
+    use drift_blocker::{NetworkAction, NetworkRequest, RequestMethod, ResourceType};
 
     for (url, expected) in [
         (
@@ -1520,7 +1520,7 @@ fn verify_runtime_release_seed_smoke(
             NetworkAction::Block,
         ),
         (
-            "https://www.googletagmanager.com/zephium-blocker-smoke.js",
+            "https://www.googletagmanager.com/drift-blocker-smoke.js",
             NetworkAction::Block,
         ),
         ("https://example.com/app.js", NetworkAction::Allow),
@@ -1543,8 +1543,8 @@ fn verify_runtime_release_seed_smoke(
 }
 
 #[cfg(any(feature = "blocker-seed-runtime", feature = "blocker-seed-webkit"))]
-const fn input_drop_name(reason: zephium_blocker::InputDropReason) -> &'static str {
-    use zephium_blocker::InputDropReason;
+const fn input_drop_name(reason: drift_blocker::InputDropReason) -> &'static str {
+    use drift_blocker::InputDropReason;
     match reason {
         InputDropReason::InvalidNetworkRule => "invalid_network_rule",
         InputDropReason::InvalidCosmeticRule => "invalid_cosmetic_rule",
@@ -1561,8 +1561,8 @@ const fn input_drop_name(reason: zephium_blocker::InputDropReason) -> &'static s
 }
 
 #[cfg(any(feature = "blocker-seed-runtime", feature = "blocker-seed-webkit"))]
-const fn webkit_drop_name(reason: zephium_blocker::WebKitDropReason) -> &'static str {
-    use zephium_blocker::WebKitDropReason;
+const fn webkit_drop_name(reason: drift_blocker::WebKitDropReason) -> &'static str {
+    use drift_blocker::WebKitDropReason;
     match reason {
         WebKitDropReason::MixedDomainConditions => "mixed_domain_conditions",
         WebKitDropReason::UnsupportedResourceTypes => "unsupported_resource_types",

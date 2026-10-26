@@ -29,19 +29,19 @@ type Options = {
  *  when the pointer is past its middle, so the end of a row or a list can be
  *  chosen by dropping on the last tab's far half. */
 function placeBefore(over: Element | null, x: number, y: number, dragged: string): string | null {
-  const row = over?.closest<HTMLElement>("[data-zephium-tab-id]");
+  const row = over?.closest<HTMLElement>("[data-drift-tab-id]");
   if (!row) return null;
   const rect = row.getBoundingClientRect();
   const sideways = !!over?.closest("[data-essentials-drop]");
   const after = sideways ? x > rect.left + rect.width / 2 : y > rect.top + rect.height / 2;
-  if (!after && row.dataset.zephiumTabId !== dragged) return row.dataset.zephiumTabId ?? null;
+  if (!after && row.dataset.driftTabId !== dragged) return row.dataset.driftTabId ?? null;
   const rows = [
-    ...(row.closest("ul")?.querySelectorAll<HTMLElement>("[data-zephium-tab-id]") ?? []),
+    ...(row.closest("ul")?.querySelectorAll<HTMLElement>("[data-drift-tab-id]") ?? []),
   ];
   const next = rows
     .slice(rows.indexOf(row) + 1)
-    .find((candidate) => candidate.dataset.zephiumTabId !== dragged);
-  return next?.dataset.zephiumTabId ?? null;
+    .find((candidate) => candidate.dataset.driftTabId !== dragged);
+  return next?.dataset.driftTabId ?? null;
 }
 
 /**

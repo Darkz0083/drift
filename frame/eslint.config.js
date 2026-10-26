@@ -25,8 +25,8 @@ export default tseslint.config(
   architecture,
   {
     files: ["src/features/**/*.{ts,svelte}"],
-    plugins: { "zephium-modules": moduleRoles },
-    rules: { "zephium-modules/structure": "error" },
+    plugins: { "drift-modules": moduleRoles },
+    rules: { "drift-modules/structure": "error" },
   },
   primitiveArchitecture,
   ipcArchitecture,

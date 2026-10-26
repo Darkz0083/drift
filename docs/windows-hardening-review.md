@@ -155,7 +155,7 @@ $env:CARGO_PROFILE_DEV_DEBUG='0'
 $env:CARGO_PROFILE_TEST_DEBUG='0'
 $env:CARGO_INCREMENTAL='0'
 cargo test --workspace --locked -j 2 --no-run
-# Use the zephium_engine test executable printed above; run alone:
+# Use the drift_engine test executable printed above; run alone:
 & <engine-test-executable> native_windows_runtime_recovery --ignored --nocapture --test-threads=1
 ```
 
@@ -164,8 +164,8 @@ installed extension or the owner's browsing profile. Its passing branches also
 verify sleeping-tab style refresh, popup crash closure, one failed native popup
 close, disabled-extension removal at capacity, and restoration in a fresh
 process. Stable queue order and retry on a freed slot are implemented in
-`crates/zephium-app/src/shell/webext.rs`; native admission/removal ownership is in
-`crates/zephium-engine/src/host/webext_windows.rs`.
+`crates/drift-app/src/shell/webext.rs`; native admission/removal ownership is in
+`crates/drift-engine/src/host/webext_windows.rs`.
 
 ## Validation record
 
@@ -229,7 +229,7 @@ These are debug correctness checks, not release performance measurements.
 The native chrome test is opt-in under
 `platform::windows::renderer::tests::privileged_renderer_recovers_twice_through_native_process_failed`.
 The engine's `native_protection_qualification` test uses
-`ZEPHIUM_PROTECTION_SITE=fixture` or `csp`, `ZEPHIUM_PROTECTION_MODE=on`,
+`DRIFT_PROTECTION_SITE=fixture` or `csp`, `DRIFT_PROTECTION_MODE=on`,
 and `--ignored --nocapture --test-threads=1`. All reported native checks here
 use debug binaries for correctness. Their incidental timing output must not
 be presented as release performance evidence.
@@ -340,7 +340,7 @@ The earlier Windows branch remains available independently at `f937e2db`.
 | Native Work lifecycle, first preview, action guard | Passed |
 | Native Work `webmail-inbox`, `writes`, `human` | Initial runs failed; fresh narrow reruns and limits are detailed below |
 | Workspace source-contract tests (`xtask`) | 159 passed, 14 failed; the first workspace run stopped here |
-| Remaining workspace targets (`--exclude xtask --no-fail-fast`) | Completed; only `zephium-app --lib` failed (the default AppData temporary-directory run described above) |
+| Remaining workspace targets (`--exclude xtask --no-fail-fast`) | Completed; only `drift-app --lib` failed (the default AppData temporary-directory run described above) |
 | Strict workspace Clippy | Failed: oversized variants, boolean-expression lints, argument count and an `unreachable!` in the integrated Work code |
 | Frame emitted-style check | Failed on the integrated Work input glow (`0 -10px 40px -20px var(--glow)`); the checker still requires at most a 3px contact-shadow blur |
 
@@ -390,9 +390,9 @@ to obtain a passing gate. Full details are retained in
 `target/review-qa/integrated-workspace-tests.log` and
 `target/review-qa/integrated-clippy-4.log`.
 
-The final QA executable is `target/review-qa/Zephium Review QA.exe`, built with
+The final QA executable is `target/review-qa/Drift Review QA.exe`, built with
 `--debug --no-bundle --config ../target/review-qa/tauri.review-qa.conf.json`.
-Its identifier is `app.zephium.review-qa`; its security configuration matches
+Its identifier is `app.drift.review-qa`; its security configuration matches
 the integrated product configuration. Direct launch from the packaged development
 host redirects newly created Roaming descendants into that host's MSIX cache,
 which correctly fails the runtime canonical-parent check. Launching through

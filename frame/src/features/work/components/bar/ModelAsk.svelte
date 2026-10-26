@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { WorkModelProvider } from "$shared/ipc/bindings";
   import ProviderMark from "$shared/ui/ProviderMark";
-  import ZephiumTile from "$shared/ui/ZephiumTile";
+  import DriftTile from "$shared/ui/DriftTile";
   import Button from "$shared/ui/Button";
   import Icon from "$shared/ui/Icon";
   import "$shared/ui/Shine/shine.css";
@@ -41,7 +41,7 @@
 
 <div class="ask">
   <span class="tile ui-shine" aria-hidden="true"
-    >{#if provider === "cloud"}<ZephiumTile size={30} />{:else}<ProviderMark
+    >{#if provider === "cloud"}<DriftTile size={30} />{:else}<ProviderMark
         {provider}
         size={26}
       />{/if}</span

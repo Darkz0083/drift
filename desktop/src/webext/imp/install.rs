@@ -4,10 +4,10 @@
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use zephium_app::Handle;
-use zephium_core::ids::{ExtensionInstallId, ItemId, ProfileId};
-use zephium_webext::manifest::Manifest;
-use zephium_webext::{archive, crx, permissions, store, ExtensionId};
+use drift_app::Handle;
+use drift_core::ids::{ExtensionInstallId, ItemId, ProfileId};
+use drift_webext::manifest::Manifest;
+use drift_webext::{archive, crx, permissions, store, ExtensionId};
 
 use super::{compat_revision, prepare_package, target, MAX_PACKAGE_BYTES};
 use crate::webext::{Entry, Original, Pending, WebExtensionReview, WebExtensions};
@@ -175,7 +175,7 @@ async fn review(
     #[cfg(target_os = "windows")]
     let review = {
         let mut review = review;
-        if enabled >= zephium_core::extensions::MAX_EXTENSION_INSTALLS_PER_PROFILE
+        if enabled >= drift_core::extensions::MAX_EXTENSION_INSTALLS_PER_PROFILE
             && !enabled_ids.contains(&review.id)
         {
             review.warnings.push("Windows can run eight extensions at once across all profiles. This extension will wait until you disable or remove another running extension.".into());

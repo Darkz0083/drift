@@ -78,7 +78,7 @@ test.skipIf(!counts.length).each(counts.length ? counts : [100])(
       "shell-scale",
       JSON.stringify({
         count,
-        rows: document.querySelectorAll("[data-zephium-tab-id]").length,
+        rows: document.querySelectorAll("[data-drift-tab-id]").length,
         dom: document.querySelectorAll("*").length,
         switchMs: switched,
         titleMs: titled,

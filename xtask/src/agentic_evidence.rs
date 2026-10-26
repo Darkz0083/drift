@@ -88,7 +88,7 @@ fn validate_macos_semantic_runtime(evidence: MacOsSemanticRuntimeEvidence) -> Re
         || evidence.reviewed_on != "2026-09-03"
         || evidence.scope != "authorized_hidden_fixed_semantic_runtime_v3"
         || evidence.command
-            != "cargo run --locked -p zephium-engine --features native-agentic-semantic-probe --bin macos-agentic-semantic-probe -- --ci-hidden-fixed-dom"
+            != "cargo run --locked -p drift-engine --features native-agentic-semantic-probe --bin macos-agentic-semantic-probe -- --ci-hidden-fixed-dom"
         || evidence.platform != "macos"
         || evidence.os_version != "27.0.0"
         || evidence.os_build != "26A5425a"
@@ -557,7 +557,7 @@ fn validate_native_results(results: &[NativeResult], reviewed_on: &str) -> Resul
     if result.reviewed_on != reviewed_on
         || result.scope != "authorized_hidden_fixed_dom_safety_gate"
         || result.command
-            != "cargo run --locked -p zephium-engine --features native-agentic-input-probe --bin macos-agentic-input-probe -- --ci-hidden-fixed-dom"
+            != "cargo run --locked -p drift-engine --features native-agentic-input-probe --bin macos-agentic-input-probe -- --ci-hidden-fixed-dom"
         || result.platform != "macos"
         || result.os_version.is_empty()
         || result.engine != "WebKit"
@@ -636,7 +636,7 @@ fn validate_public_fill(result: &RealSiteRun) -> Result<(), String> {
         || result.site != "Wikipedia"
         || result.task != "fill_search_input_without_submission"
         || result.command
-            != "cargo run --quiet --locked -p zephium-terra-macos-probe --features live-probe -- --live-public-wikipedia-fill"
+            != "cargo run --quiet --locked -p drift-terra-macos-probe --features live-probe -- --live-public-wikipedia-fill"
         || result.platform != "macos"
         || result.os_version != "27.0"
         || result.os_build != "26A5425a"
@@ -693,7 +693,7 @@ fn validate_public_two_action(result: &RealSiteRun) -> Result<(), String> {
         || result.site != "Wikipedia"
         || result.task != "fill_search_then_select_language_without_submission"
         || result.command
-            != "cargo run --quiet --locked -p zephium-terra-macos-probe --features live-probe -- --live-public-wikipedia-form"
+            != "cargo run --quiet --locked -p drift-terra-macos-probe --features live-probe -- --live-public-wikipedia-form"
         || result.platform != "macos"
         || result.os_version != "27.0"
         || result.os_build != "26A5425a"
@@ -751,7 +751,7 @@ fn validate_public_locate_continuation(result: &RealSiteRun) -> Result<(), Strin
         || result.site != "Wikipedia"
         || result.task != "fill_search_locate_language_then_select_without_submission"
         || result.command
-            != "cargo run --quiet --locked -p zephium-terra-macos-probe --features live-probe -- --live-public-wikipedia-form-locate"
+            != "cargo run --quiet --locked -p drift-terra-macos-probe --features live-probe -- --live-public-wikipedia-form-locate"
         || result.platform != "macos"
         || result.os_version != "27.0"
         || result.os_build != "26A5425a"
@@ -809,7 +809,7 @@ fn validate_public_luna_compact(result: &RealSiteRun) -> Result<(), String> {
         || result.site != "Wikipedia"
         || result.task != "fill_search_locate_latent_language_then_select_without_submission"
         || result.command
-            != "cargo run --locked -p zephium-terra-macos-probe --features live-probe -- --live-public-luna-suite-inspectable"
+            != "cargo run --locked -p drift-terra-macos-probe --features live-probe -- --live-public-luna-suite-inspectable"
         || result.platform != "macos"
         || result.os_version != "27.0"
         || result.os_build != "26A5425a"
@@ -854,7 +854,7 @@ fn validate_public_luna_forced_locate(result: &RealSiteRun) -> Result<(), String
         || result.task
             != "fill_search_force_locate_latent_language_then_select_without_submission"
         || result.command
-            != "cargo run --locked -p zephium-terra-macos-probe --features live-probe -- --live-public-luna-suite-inspectable"
+            != "cargo run --locked -p drift-terra-macos-probe --features live-probe -- --live-public-luna-suite-inspectable"
         || result.platform != "macos"
         || result.os_version != "27.0"
         || result.os_build != "26A5425a"

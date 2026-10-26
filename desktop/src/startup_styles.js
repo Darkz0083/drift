@@ -9,7 +9,7 @@
   document.addEventListener('error', (event) => {
     if (stylesheet(event.target)) failed = Math.min(failed + 1, 255);
   }, true);
-  Object.defineProperty(window, '__zephiumStartupStyles', { value: () => {
+  Object.defineProperty(window, '__driftStartupStyles', { value: () => {
     const links = [...document.querySelectorAll('link[rel~="stylesheet"]')];
     const body = document.body;
     const shell = document.querySelector('.shell');

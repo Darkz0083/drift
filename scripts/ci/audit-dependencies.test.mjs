@@ -37,7 +37,7 @@ test("incomplete or failed registry results cannot produce a passing audit", () 
 });
 
 test("altered patch bytes are rejected before package code executes", () => {
-  const directory = mkdtempSync(join(tmpdir(), "zephium-braces-test-"));
+  const directory = mkdtempSync(join(tmpdir(), "drift-braces-test-"));
   try {
     mkdirSync(join(directory, "lib"));
     writeFileSync(join(directory, "package.json"), JSON.stringify({ version: "3.0.3" }));

@@ -51,7 +51,7 @@ mod navigation_probe;
 compile_error!("profile enrollment and authenticated execution are separate application builds");
 
 #[cfg(feature = "macos-work")]
-pub use zephium_work_composition::{
+pub use drift_work_composition::{
     MacosWorkComposition, PublicReadWorkAccount, PublicReadWorkInvocation, PublicReadWorkObjective,
     PublicReadWorkSettings, TrustedWorkRequest,
 };
@@ -150,29 +150,29 @@ use serde::{Deserialize, Serialize};
 use tauri::{LogicalPosition, Manager, State, WebviewWindow};
 use tauri_specta::{collect_commands, collect_events, Event};
 
-use zephium_app::{
+use drift_app::{
     ChromePresentation, ChromePresentationCallback, ChromePresentationDispatch, Command, EmitFn,
     Handle, PagePermissionPromptDecision, SharedChrome, ShellTerminalFailureCallback,
     ShutdownOutcome, TabAction,
 };
-use zephium_blocker_service::ManagedBlocker;
-use zephium_core::extensions::{
+use drift_blocker_service::ManagedBlocker;
+use drift_core::extensions::{
     ExtensionActionRevision, ExtensionPopupAnchor, ExtensionRuntimeGeneration,
     ExtensionRuntimeInstance,
 };
-use zephium_core::geometry::{Rect, Size};
-use zephium_core::ids::ScriptId;
-use zephium_core::ids::{ExtensionInstallId, ItemId, ProfileId};
-use zephium_core::injection::MatchSet;
-use zephium_core::ports::blocker::{BlockerCompiler as _, BlockerShutdownOutcome};
-use zephium_core::ports::engine::{
+use drift_core::geometry::{Rect, Size};
+use drift_core::ids::ScriptId;
+use drift_core::ids::{ExtensionInstallId, ItemId, ProfileId};
+use drift_core::injection::MatchSet;
+use drift_core::ports::blocker::{BlockerCompiler as _, BlockerShutdownOutcome};
+use drift_core::ports::engine::{
     Engine as _, ScriptOwner, UserContent, UserContentGeneration, UserStyle,
 };
-use zephium_core::ports::store::{Store as _, StoreShutdownOutcome};
-use zephium_core::split::Axis;
-use zephium_engine::{InitialUserContent, MainThreadDispatch, WebviewEngine};
-use zephium_ipc::Projection;
-use zephium_store::SqliteStore;
+use drift_core::ports::store::{Store as _, StoreShutdownOutcome};
+use drift_core::split::Axis;
+use drift_engine::{InitialUserContent, MainThreadDispatch, WebviewEngine};
+use drift_ipc::Projection;
+use drift_store::SqliteStore;
 
 macro_rules! diagnostic {
     ($($argument:tt)*) => {{
@@ -226,23 +226,23 @@ const APPEARANCE_SYSTEM: u8 = 0;
 const APPEARANCE_LIGHT: u8 = 1;
 const APPEARANCE_DARK: u8 = 2;
 
-const EVENT_ITEMS: &str = "zephium:items";
-const EVENT_TAB: &str = "zephium:tab";
-const EVENT_FAVICONS: &str = "zephium:favicons";
-const EVENT_EXTENSION_ACTIONS: &str = "zephium:extension-actions";
-const EVENT_EXTENSION_ACTION_FAILED: &str = "zephium:extension-action-failed";
-const EVENT_WEB_EXTENSION_ACCESS: &str = "zephium:web-extension-access";
-const EVENT_WEB_EXTENSION_DROPPED: &str = "zephium:web-extension-dropped";
-const EVENT_EXTENSION_ACTION_SHORTCUT: &str = "zephium:extension-action-shortcut";
-const EVENT_PAGE_PERMISSION_PROMPT: &str = "zephium:page-permission-prompt";
-const EVENT_PRESENTATION_TAB: &str = "zephium:presentation-tab";
-const EVENT_UI: &str = "zephium:ui-command";
-const EVENT_SEARCH: &str = "zephium:search";
-const EVENT_LAYOUT: &str = "zephium:layout";
-const EVENT_RUNTIME_STATUS: &str = "zephium:runtime-status";
-const EVENT_BLOCKER_STATUS: &str = "zephium:blocker-status";
-const EVENT_FOCUS: &str = "zephium:focus";
-const EVENT_OPERATION_PROCESSED: &str = "zephium:operation-processed";
+const EVENT_ITEMS: &str = "drift:items";
+const EVENT_TAB: &str = "drift:tab";
+const EVENT_FAVICONS: &str = "drift:favicons";
+const EVENT_EXTENSION_ACTIONS: &str = "drift:extension-actions";
+const EVENT_EXTENSION_ACTION_FAILED: &str = "drift:extension-action-failed";
+const EVENT_WEB_EXTENSION_ACCESS: &str = "drift:web-extension-access";
+const EVENT_WEB_EXTENSION_DROPPED: &str = "drift:web-extension-dropped";
+const EVENT_EXTENSION_ACTION_SHORTCUT: &str = "drift:extension-action-shortcut";
+const EVENT_PAGE_PERMISSION_PROMPT: &str = "drift:page-permission-prompt";
+const EVENT_PRESENTATION_TAB: &str = "drift:presentation-tab";
+const EVENT_UI: &str = "drift:ui-command";
+const EVENT_SEARCH: &str = "drift:search";
+const EVENT_LAYOUT: &str = "drift:layout";
+const EVENT_RUNTIME_STATUS: &str = "drift:runtime-status";
+const EVENT_BLOCKER_STATUS: &str = "drift:blocker-status";
+const EVENT_FOCUS: &str = "drift:focus";
+const EVENT_OPERATION_PROCESSED: &str = "drift:operation-processed";
 // Accepted operations are never evicted before privileged chrome explicitly
 // acknowledges the actor's disposition. Refuse new admission at the bound
 // rather than lose the public record of how accepted work was processed.
@@ -582,7 +582,7 @@ impl UiStartupGate {
         let gate = self.clone();
         let app = window.app_handle().clone();
         let spawned = std::thread::Builder::new()
-            .name("zephium-handover-watchdog".into())
+            .name("drift-handover-watchdog".into())
             .spawn(move || {
                 std::thread::sleep(UI_INITIALIZATION_TIMEOUT);
                 if gate.browser_revealed.load(Ordering::Acquire) {
@@ -805,7 +805,7 @@ impl HardExitWatchdog {
 
         let watchdog = self.clone();
         let spawned = std::thread::Builder::new()
-            .name("zephium-hard-exit".into())
+            .name("drift-hard-exit".into())
             .spawn(move || {
                 let mut deadline = watchdog
                     .deadline
@@ -1189,7 +1189,7 @@ fn request_classified_startup_failure(
     detail: &str,
 ) {
     write_diagnostic(format_args!(
-        "startup: failed to initialize Zephium: {cause}"
+        "startup: failed to initialize Drift: {cause}"
     ));
     startup_alert::show_then(app, problem, detail, request_orderly_terminal_failure);
 }
@@ -1294,7 +1294,7 @@ fn request_pre_shell_startup_failure_with_store(
     store: Arc<SqliteStore>,
 ) {
     write_diagnostic(format_args!(
-        "startup: failed to initialize Zephium: {error}"
+        "startup: failed to initialize Drift: {error}"
     ));
     let store_owner = app
         .try_state::<StartupStore>()
@@ -1322,7 +1322,7 @@ fn request_pre_shell_startup_failure_with_blocker(
     blocker: Arc<ManagedBlocker>,
 ) {
     write_diagnostic(format_args!(
-        "startup: failed to initialize Zephium: {error}"
+        "startup: failed to initialize Drift: {error}"
     ));
     let engine_owner = app
         .try_state::<StartupEngine>()
@@ -1363,18 +1363,18 @@ fn request_unrecoverable_native_failure(app: &tauri::AppHandle, reason: &str) {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct WorkChanged(zephium_ipc::work::WorkChangedV1);
+struct WorkChanged(drift_ipc::work::WorkChangedV1);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-#[tauri_specta(event_name = "zephium:work-human-changed")]
-struct WorkHumanChanged(zephium_ipc::work::WorkHumanChangedV1);
+#[tauri_specta(event_name = "drift:work-human-changed")]
+struct WorkHumanChanged(drift_ipc::work::WorkHumanChangedV1);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-#[tauri_specta(event_name = "zephium:work-decision-preference-changed")]
-struct WorkDecisionPreferenceChanged(zephium_ipc::work::WorkDecisionPreferenceChangedV1);
+#[tauri_specta(event_name = "drift:work-decision-preference-changed")]
+struct WorkDecisionPreferenceChanged(drift_ipc::work::WorkDecisionPreferenceChangedV1);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct WorkEnvironmentChanged(zephium_ipc::work::WorkEnvironmentChangedV1);
+struct WorkEnvironmentChanged(drift_ipc::work::WorkEnvironmentChangedV1);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
 struct NoteOpenRequested {
@@ -1405,54 +1405,54 @@ struct ResourceChanged {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct ItemsChanged(zephium_ipc::ItemsState);
+struct ItemsChanged(drift_ipc::ItemsState);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct TabChanged(zephium_ipc::TabView);
+struct TabChanged(drift_ipc::TabView);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct FaviconsChanged(zephium_ipc::FaviconsView);
+struct FaviconsChanged(drift_ipc::FaviconsView);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct ExtensionActionsChanged(zephium_ipc::ExtensionActionsView);
+struct ExtensionActionsChanged(drift_ipc::ExtensionActionsView);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct ExtensionActionFailed(zephium_ipc::ExtensionActionFailedView);
+struct ExtensionActionFailed(drift_ipc::ExtensionActionFailedView);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct ExtensionActionShortcut(zephium_ipc::ExtensionActionShortcutView);
+struct ExtensionActionShortcut(drift_ipc::ExtensionActionShortcutView);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct WebExtensionAccessRequested(zephium_ipc::WebExtensionAccessRequestView);
+struct WebExtensionAccessRequested(drift_ipc::WebExtensionAccessRequestView);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct PagePermissionPromptChanged(zephium_ipc::PagePermissionPromptView);
+struct PagePermissionPromptChanged(drift_ipc::PagePermissionPromptView);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
 struct UiCommand(String);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct SearchChanged(zephium_ipc::SearchResults);
+struct SearchChanged(drift_ipc::SearchResults);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct FindChanged(zephium_ipc::FindResultView);
+struct FindChanged(drift_ipc::FindResultView);
 
-const EVENT_FIND: &str = "zephium:find";
-
-#[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct LayoutChanged(zephium_ipc::LayoutState);
+const EVENT_FIND: &str = "drift:find";
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct RuntimeStatusChanged(zephium_ipc::RuntimeStatus);
+struct LayoutChanged(drift_ipc::LayoutState);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct BlockerStatusChanged(zephium_ipc::BlockerStatusView);
+struct RuntimeStatusChanged(drift_ipc::RuntimeStatus);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct FocusChanged(zephium_ipc::FocusStatus);
+struct BlockerStatusChanged(drift_ipc::BlockerStatusView);
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
-struct OperationProcessed(zephium_ipc::OperationDisposition);
+struct FocusChanged(drift_ipc::FocusStatus);
+
+#[derive(Clone, Debug, Serialize, Deserialize, specta::Type, Event)]
+struct OperationProcessed(drift_ipc::OperationDisposition);
 
 #[derive(Clone, Default)]
 struct OperationLedger {
@@ -1467,7 +1467,7 @@ struct OperationLedgerInner {
 
 enum OperationRecord {
     Pending,
-    Processed(zephium_ipc::OperationDisposition),
+    Processed(drift_ipc::OperationDisposition),
 }
 
 impl OperationLedger {
@@ -1508,7 +1508,7 @@ impl OperationLedger {
     /// Records the terminal actor result before any fallible WebView delivery.
     /// Duplicate or unreserved disposition is rejected instead of overwriting
     /// the first authoritative value.
-    fn record_disposition(&self, disposition: zephium_ipc::OperationDisposition) -> bool {
+    fn record_disposition(&self, disposition: drift_ipc::OperationDisposition) -> bool {
         let mut inner = self
             .inner
             .lock()
@@ -1523,26 +1523,26 @@ impl OperationLedger {
         true
     }
 
-    fn status(&self, operation_id: &str) -> zephium_ipc::OperationStatus {
+    fn status(&self, operation_id: &str) -> drift_ipc::OperationStatus {
         if !valid_operation_id(operation_id) {
-            return zephium_ipc::OperationStatus::Unknown;
+            return drift_ipc::OperationStatus::Unknown;
         }
         let inner = self
             .inner
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner());
         match inner.entries.get(operation_id) {
-            Some(OperationRecord::Pending) => zephium_ipc::OperationStatus::Pending,
+            Some(OperationRecord::Pending) => drift_ipc::OperationStatus::Pending,
             Some(OperationRecord::Processed(disposition)) => {
-                zephium_ipc::OperationStatus::Processed {
+                drift_ipc::OperationStatus::Processed {
                     disposition: disposition.clone(),
                 }
             }
-            None => zephium_ipc::OperationStatus::Unknown,
+            None => drift_ipc::OperationStatus::Unknown,
         }
     }
 
-    fn processed(&self) -> Vec<zephium_ipc::OperationDisposition> {
+    fn processed(&self) -> Vec<drift_ipc::OperationDisposition> {
         let inner = self
             .inner
             .lock()
@@ -1579,8 +1579,8 @@ impl OperationLedger {
 
 fn record_and_deliver_operation(
     ledger: &OperationLedger,
-    disposition: zephium_ipc::OperationDisposition,
-    deliver: impl FnOnce(&zephium_ipc::OperationDisposition) -> bool,
+    disposition: drift_ipc::OperationDisposition,
+    deliver: impl FnOnce(&drift_ipc::OperationDisposition) -> bool,
 ) -> bool {
     if !ledger.record_disposition(disposition.clone()) {
         return false;
@@ -2055,7 +2055,7 @@ pub(crate) fn emit_media_changed(app: &tauri::AppHandle, profile: &str, id: &str
         revision: revision.to_owned(),
     };
     for label in [MAIN_LABEL, overlay::PANEL_LABEL] {
-        emit_to_privileged(app, label, "zephium:resource-changed", &event);
+        emit_to_privileged(app, label, "drift:resource-changed", &event);
     }
 }
 
@@ -2088,7 +2088,7 @@ pub(crate) fn apply_chrome_presentation(
         return ChromePresentationDispatch::Rejected;
     };
     let nonce = format!(
-        "zephium-presentation-v1:{}:{:032x}",
+        "drift-presentation-v1:{}:{:032x}",
         presentation.id,
         presentation.navigation.into_raw()
     );
@@ -2099,29 +2099,29 @@ pub(crate) fn apply_chrome_presentation(
     let script = format!(
         r#"(() => {{
   "use strict";
-  const rejected = "zephium-presentation-rejected";
+  const rejected = "drift-presentation-rejected";
   try {{
     const tab = {payload};
     const active = {active};
     window.dispatchEvent(new CustomEvent({event}, {{ detail: {{ tab, active }} }}));
     if ({settings_visible}) {{
-      const shell = document.querySelector("[data-zephium-active-tab]");
-      if (shell?.dataset.zephiumSurface !== "settings" || shell.dataset.zephiumActiveTab !== (active ?? "")) return rejected;
+      const shell = document.querySelector("[data-drift-active-tab]");
+      if (shell?.dataset.driftSurface !== "settings" || shell.dataset.driftActiveTab !== (active ?? "")) return rejected;
       return {serialized_nonce};
     }}
     let row = null;
-    for (const candidate of document.querySelectorAll("[data-zephium-tab-id]")) {{
-      if (candidate.dataset.zephiumTabId === tab.id) {{ row = candidate; break; }}
+    for (const candidate of document.querySelectorAll("[data-drift-tab-id]")) {{
+      if (candidate.dataset.driftTabId === tab.id) {{ row = candidate; break; }}
     }}
-    if (!row || row.dataset.zephiumTabUrl !== (tab.url ?? "") ||
-        row.dataset.zephiumProjectionRevision !== tab.projection_revision) return rejected;
-    const label = row.querySelector("[data-zephium-tab-label]");
+    if (!row || row.dataset.driftTabUrl !== (tab.url ?? "") ||
+        row.dataset.driftProjectionRevision !== tab.projection_revision) return rejected;
+    const label = row.querySelector("[data-drift-tab-label]");
     if (!label || label.textContent !== tab.title) return rejected;
-    const shell = document.querySelector("[data-zephium-active-tab]");
+    const shell = document.querySelector("[data-drift-active-tab]");
     if (!shell) return rejected;
-    if (shell.dataset.zephiumActiveTab !== (active ?? "")) return rejected;
+    if (shell.dataset.driftActiveTab !== (active ?? "")) return rejected;
     if (active === tab.id) {{
-      const address = document.querySelector("[data-zephium-address]");
+      const address = document.querySelector("[data-drift-address]");
       if (!(address instanceof HTMLInputElement)) return rejected;
       let expected = "";
       try {{ expected = new URL(tab.url).host; }} catch (_) {{ return rejected; }}
@@ -2131,7 +2131,7 @@ pub(crate) fn apply_chrome_presentation(
       }}
       if (address.value !== expected) return rejected;
     }}
-    if (active === tab.id && document.querySelector("[data-zephium-new-tab]")) return rejected;
+    if (active === tab.id && document.querySelector("[data-drift-new-tab]")) return rejected;
     void document.documentElement.getBoundingClientRect();
     return {serialized_nonce};
   }} catch (_) {{
@@ -2165,34 +2165,34 @@ pub(crate) fn apply_chrome_presentation(
 pub(crate) fn restore_browser_chrome(
     window: &WebviewWindow,
     revision: u64,
-    items: zephium_ipc::ItemsState,
+    items: drift_ipc::ItemsState,
     done: ChromePresentationCallback,
 ) -> ChromePresentationDispatch {
     let Ok(payload) = serde_json::to_string(&items) else {
         return ChromePresentationDispatch::Rejected;
     };
-    let nonce = format!("zephium-browser-return:{revision}");
+    let nonce = format!("drift-browser-return:{revision}");
     let Ok(expected) = serde_json::to_string(&nonce) else {
         return ChromePresentationDispatch::Rejected;
     };
     let script = format!(
         r#"(() => {{
       const items = {payload};
-      window.dispatchEvent(new CustomEvent('zephium:browser-return', {{ detail: items }}));
-      const shell = document.querySelector('[data-zephium-active-tab]');
-      if (!shell || shell.dataset.zephiumSurface !== 'browse' || shell.dataset.zephiumActiveTab !== (items.active ?? '')) return '';
+      window.dispatchEvent(new CustomEvent('drift:browser-return', {{ detail: items }}));
+      const shell = document.querySelector('[data-drift-active-tab]');
+      if (!shell || shell.dataset.driftSurface !== 'browse' || shell.dataset.driftActiveTab !== (items.active ?? '')) return '';
       const active = items.tabs.find(tab => tab.id === items.active);
       if (active) {{
-        const rows = [...document.querySelectorAll('[data-zephium-tab-id]')].filter(row => row.dataset.zephiumTabId === active.id);
+        const rows = [...document.querySelectorAll('[data-drift-tab-id]')].filter(row => row.dataset.driftTabId === active.id);
         if (rows.length !== 1) return '';
         const row = rows[0];
-        if (row.dataset.zephiumTabUrl !== (active.url ?? '') || row.dataset.zephiumProjectionRevision !== active.projection_revision || row.querySelector('[data-zephium-tab-label]')?.textContent !== active.title) return '';
-        const address = document.querySelector('[data-zephium-address]');
+        if (row.dataset.driftTabUrl !== (active.url ?? '') || row.dataset.driftProjectionRevision !== active.projection_revision || row.querySelector('[data-drift-tab-label]')?.textContent !== active.title) return '';
+        const address = document.querySelector('[data-drift-address]');
         if (!(address instanceof HTMLInputElement)) return '';
         const host = active.url ? new URL(active.url).host : '';
         if (address.value !== host) {{ address.value = host; address.dispatchEvent(new Event('input', {{ bubbles: true }})); }}
         if (address.value !== host) return '';
-        if (!!document.querySelector('[data-zephium-new-tab]') !== ((active.content ?? 'web') === 'web' && !active.url && !active.loading)) return '';
+        if (!!document.querySelector('[data-drift-new-tab]') !== ((active.content ?? 'web') === 'web' && !active.url && !active.loading)) return '';
       }}
       void document.documentElement.getBoundingClientRect();
       return {expected};
@@ -2300,7 +2300,7 @@ const MAX_COMMAND_ID_BYTES: usize = 128;
 const MAX_KEPT_SITE_ID_BYTES: usize = 32;
 const MAX_PROFILE_NAME_BYTES: usize = 256;
 const MAX_WINDOW_COORDINATE: f64 = 1_000_000.0;
-use zephium_core::layout::{MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH};
+use drift_core::layout::{MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH};
 
 /// The tab a native context menu was opened for.
 ///
@@ -2451,29 +2451,29 @@ fn sidebar_resize_revision(revision: f64) -> Option<u64> {
 }
 
 fn setting_value_allowed(key: &str, value: &str) -> bool {
-    zephium_core::preferences::value_allowed(key, value)
+    drift_core::preferences::value_allowed(key, value)
 }
 
-fn search_action_in_bounds(action: &zephium_ipc::SearchAction) -> bool {
-    use zephium_ipc::SearchAction;
+fn search_action_in_bounds(action: &drift_ipc::SearchAction) -> bool {
+    use drift_ipc::SearchAction;
 
     match action {
-        SearchAction::OpenNote { id } => zephium_core::resources::valid_id(id),
+        SearchAction::OpenNote { id } => drift_core::resources::valid_id(id),
         SearchAction::ActivateTab { id } => bounded(id, MAX_ITEM_ID_BYTES),
         SearchAction::OpenUrl { url } => bounded(url, MAX_NAVIGATION_INPUT_BYTES),
         // The launcher may only run registry commands. Context-menu actions
         // resolve against an armed target and are reachable from main chrome
         // alone; the panel must never be able to replay one.
         SearchAction::RunCommand { id } => {
-            bounded(id, MAX_COMMAND_ID_BYTES) && zephium_core::commands::get(id).is_some()
+            bounded(id, MAX_COMMAND_ID_BYTES) && drift_core::commands::get(id).is_some()
         }
     }
 }
 
 // Ids arrive as ULID strings from a semi-trusted webview; anything that does
 // not parse is dropped here, before it reaches the shell.
-fn rejected_operation() -> zephium_ipc::OperationAdmission {
-    zephium_ipc::OperationAdmission {
+fn rejected_operation() -> drift_ipc::OperationAdmission {
+    drift_ipc::OperationAdmission {
         operation_id: None,
         accepted: false,
     }
@@ -2483,9 +2483,9 @@ fn finish_operation_admission(
     ledger: &OperationLedger,
     operation_id: String,
     accepted: bool,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if accepted {
-        zephium_ipc::OperationAdmission {
+        drift_ipc::OperationAdmission {
             operation_id: Some(operation_id),
             accepted: true,
         }
@@ -2502,7 +2502,7 @@ fn dispatch_operation(
     app: &tauri::AppHandle,
     shell: &Handle,
     command: Command,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     let Ok(sequence) = NEXT_OPERATION_ID
         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
     else {
@@ -2524,7 +2524,7 @@ fn dispatch_with_id(
     shell: &Handle,
     id: &str,
     cmd: impl FnOnce(ItemId) -> Command,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !bounded(id, MAX_ITEM_ID_BYTES) {
         return rejected_operation();
     }
@@ -2551,11 +2551,11 @@ async fn blocker_stats(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     profile: String,
-) -> Result<zephium_ipc::BlockerStatsView, ()> {
+) -> Result<drift_ipc::BlockerStatsView, ()> {
     if !authorize(&caller, CallerPolicy::Main, "blocker_stats") {
         return Err(());
     }
-    let Some(profile) = zephium_core::ids::ProfileId::parse(&profile) else {
+    let Some(profile) = drift_core::ids::ProfileId::parse(&profile) else {
         return Err(());
     };
     if BLOCKER_STATS_QUERY_IN_FLIGHT
@@ -2583,15 +2583,15 @@ async fn blocker_stats(
 async fn blocker_status(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
-) -> Result<zephium_ipc::BlockerStatusView, ()> {
+) -> Result<drift_ipc::BlockerStatusView, ()> {
     if !authorize(&caller, CallerPolicy::Main, "blocker_status") {
-        return Ok(zephium_ipc::BlockerStatusView::unavailable());
+        return Ok(drift_ipc::BlockerStatusView::unavailable());
     }
     if BLOCKER_STATUS_QUERY_IN_FLIGHT
         .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
         .is_err()
     {
-        return Ok(zephium_ipc::BlockerStatusView::unavailable());
+        return Ok(drift_ipc::BlockerStatusView::unavailable());
     }
     let _query_guard = AtomicFlagReset(&BLOCKER_STATUS_QUERY_IN_FLIGHT);
     let request = shell.focused_content_policy_status();
@@ -2599,7 +2599,7 @@ async fn blocker_status(
         request.recv_timeout(BLOCKER_STATUS_QUERY_TIMEOUT)
     })
     .await
-    .unwrap_or_else(|_| zephium_ipc::BlockerStatusView::unavailable());
+    .unwrap_or_else(|_| drift_ipc::BlockerStatusView::unavailable());
     Ok(status)
 }
 
@@ -2609,7 +2609,7 @@ fn blocker_set_enabled(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     enabled: bool,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "blocker_set_enabled") {
         return rejected_operation();
     }
@@ -2627,19 +2627,19 @@ static BLOCKER_PICKER_QUERY_IN_FLIGHT: AtomicBool = AtomicBool::new(false);
 async fn blocker_picker(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
-    context: zephium_ipc::BlockerSiteContext,
-    action: zephium_ipc::BlockerPickerAction,
-) -> Result<Option<zephium_ipc::BlockerPickerView>, ()> {
+    context: drift_ipc::BlockerSiteContext,
+    action: drift_ipc::BlockerPickerAction,
+) -> Result<Option<drift_ipc::BlockerPickerView>, ()> {
     if !authorize(&caller, CallerPolicy::Main, "blocker_picker")
         || context.profile.len() > 64
         || context.tab.len() > 64
         || context.site.len() > 253
         || context.revision.len() != 16
         || match &action {
-            zephium_ipc::BlockerPickerAction::Start => false,
-            zephium_ipc::BlockerPickerAction::Read { session }
-            | zephium_ipc::BlockerPickerAction::Preview { session, .. }
-            | zephium_ipc::BlockerPickerAction::Stop { session } => session.len() != 16,
+            drift_ipc::BlockerPickerAction::Start => false,
+            drift_ipc::BlockerPickerAction::Read { session }
+            | drift_ipc::BlockerPickerAction::Preview { session, .. }
+            | drift_ipc::BlockerPickerAction::Stop { session } => session.len() != 16,
         }
         || BLOCKER_PICKER_QUERY_IN_FLIGHT
             .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
@@ -2665,22 +2665,22 @@ async fn blocker_picker(
 fn blocker_site_change(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
-    context: zephium_ipc::BlockerSiteContext,
-    action: zephium_ipc::BlockerSiteAction,
-) -> zephium_ipc::OperationAdmission {
+    context: drift_ipc::BlockerSiteContext,
+    action: drift_ipc::BlockerSiteAction,
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "blocker_site_change")
         || context.profile.len() > 64
         || context.tab.len() > 64
         || context.site.len() > 253
         || context.revision.len() != 16
         || match &action {
-            zephium_ipc::BlockerSiteAction::SaveSelection { session, selection } => {
+            drift_ipc::BlockerSiteAction::SaveSelection { session, selection } => {
                 session.len() != 16 || selection.len() != 64
             }
-            zephium_ipc::BlockerSiteAction::Pause { .. }
-            | zephium_ipc::BlockerSiteAction::Retry => false,
-            zephium_ipc::BlockerSiteAction::SetHideEnabled { id, .. }
-            | zephium_ipc::BlockerSiteAction::RemoveHide { id } => id.len() != 16,
+            drift_ipc::BlockerSiteAction::Pause { .. }
+            | drift_ipc::BlockerSiteAction::Retry => false,
+            drift_ipc::BlockerSiteAction::SetHideEnabled { id, .. }
+            | drift_ipc::BlockerSiteAction::RemoveHide { id } => id.len() != 16,
         }
     {
         return rejected_operation();
@@ -2701,7 +2701,7 @@ fn blocker_retry(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     failed_generation: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "blocker_retry")
         || failed_generation.len() != 16
         || !failed_generation
@@ -2712,7 +2712,7 @@ fn blocker_retry(
     }
     let Some(failed_generation) = u64::from_str_radix(&failed_generation, 16)
         .ok()
-        .and_then(zephium_core::blocker::ContentPolicyGeneration::new)
+        .and_then(drift_core::blocker::ContentPolicyGeneration::new)
     else {
         return rejected_operation();
     };
@@ -2728,7 +2728,7 @@ fn blocker_retry(
 fn blocker_refresh_sources(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "blocker_refresh_sources") {
         return rejected_operation();
     }
@@ -2741,7 +2741,7 @@ fn blocker_refresh_sources(
 
 #[tauri::command]
 #[specta::specta]
-fn tabs_open(caller: WebviewWindow, shell: State<'_, Handle>) -> zephium_ipc::OperationAdmission {
+fn tabs_open(caller: WebviewWindow, shell: State<'_, Handle>) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_open") {
         return rejected_operation();
     }
@@ -2754,7 +2754,7 @@ fn tabs_activate(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     id: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_activate") {
         return rejected_operation();
     }
@@ -2767,7 +2767,7 @@ fn tabs_close(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     id: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_close") {
         return rejected_operation();
     }
@@ -2782,7 +2782,7 @@ fn tabs_set_essential(
     id: String,
     essential: bool,
     before: Option<String>,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_set_essential")
         || !bounded(&id, MAX_ITEM_ID_BYTES)
     {
@@ -2818,7 +2818,7 @@ fn essentials_keep(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     site: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize_onboarding(&caller, "essentials_keep") || !bounded(&site, MAX_KEPT_SITE_ID_BYTES)
     {
         return rejected_operation();
@@ -2832,7 +2832,7 @@ fn essentials_release(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     site: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize_onboarding(&caller, "essentials_release")
         || !bounded(&site, MAX_KEPT_SITE_ID_BYTES)
     {
@@ -2847,7 +2847,7 @@ fn profile_rename(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     name: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize_onboarding(&caller, "profile_rename") || !bounded(&name, MAX_PROFILE_NAME_BYTES) {
         return rejected_operation();
     }
@@ -2865,7 +2865,7 @@ fn tabs_navigate(
     shell: State<'_, Handle>,
     id: String,
     input: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_navigate")
         || !bounded(&input, MAX_NAVIGATION_INPUT_BYTES)
     {
@@ -2877,7 +2877,7 @@ fn tabs_navigate(
     })
 }
 
-/// Shows the folder with Zephium's local log and crash report.
+/// Shows the folder with Drift's local log and crash report.
 #[tauri::command]
 #[specta::specta]
 fn diagnostics_show_logs(caller: WebviewWindow) -> bool {
@@ -2890,17 +2890,17 @@ fn tabs_answer_page_request(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     id: String,
-    answer: zephium_ipc::PageRequestAnswer,
-) -> zephium_ipc::OperationAdmission {
+    answer: drift_ipc::PageRequestAnswer,
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_answer_page_request") {
         return rejected_operation();
     }
     let decision = match answer {
-        zephium_ipc::PageRequestAnswer::Allow => zephium_app::PageRequestDecision::Allow,
-        zephium_ipc::PageRequestAnswer::AlwaysAllow => {
-            zephium_app::PageRequestDecision::AlwaysAllow
+        drift_ipc::PageRequestAnswer::Allow => drift_app::PageRequestDecision::Allow,
+        drift_ipc::PageRequestAnswer::AlwaysAllow => {
+            drift_app::PageRequestDecision::AlwaysAllow
         }
-        zephium_ipc::PageRequestAnswer::Dismiss => zephium_app::PageRequestDecision::Dismiss,
+        drift_ipc::PageRequestAnswer::Dismiss => drift_app::PageRequestDecision::Dismiss,
     };
     dispatch_with_id(caller.app_handle(), &shell, &id, |id| {
         Command::AnswerPageRequest { id, decision }
@@ -2913,7 +2913,7 @@ fn tabs_reload(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     id: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_reload") {
         return rejected_operation();
     }
@@ -2926,7 +2926,7 @@ fn tabs_back(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     id: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_back") {
         return rejected_operation();
     }
@@ -2939,14 +2939,14 @@ fn tabs_forward(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     id: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_forward") {
         return rejected_operation();
     }
     dispatch_with_id(caller.app_handle(), &shell, &id, Command::GoForward)
 }
 
-fn work_pane_rect(rect: zephium_ipc::WorkPaneRect) -> Option<zephium_core::geometry::Rect> {
+fn work_pane_rect(rect: drift_ipc::WorkPaneRect) -> Option<drift_core::geometry::Rect> {
     (point_in_bounds(rect.x, rect.y)
         && rect.width.is_finite()
         && rect.height.is_finite()
@@ -2954,7 +2954,7 @@ fn work_pane_rect(rect: zephium_ipc::WorkPaneRect) -> Option<zephium_core::geome
         && rect.height > 0.0
         && rect.width <= MAX_WINDOW_COORDINATE
         && rect.height <= MAX_WINDOW_COORDINATE)
-        .then(|| zephium_core::geometry::Rect::new(rect.x, rect.y, rect.width, rect.height))
+        .then(|| drift_core::geometry::Rect::new(rect.x, rect.y, rect.width, rect.height))
 }
 
 fn trusted_web_url(url: &str) -> bool {
@@ -2975,9 +2975,9 @@ fn trusted_web_url(url: &str) -> bool {
 fn work_pane_show(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
-    target: zephium_ipc::WorkPaneTarget,
-    rect: zephium_ipc::WorkPaneRect,
-) -> zephium_ipc::OperationAdmission {
+    target: drift_ipc::WorkPaneTarget,
+    rect: drift_ipc::WorkPaneRect,
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "work_pane_show") {
         return rejected_operation();
     }
@@ -2985,20 +2985,20 @@ fn work_pane_show(
         return rejected_operation();
     };
     let target = match target {
-        zephium_ipc::WorkPaneTarget::Tab { id } => {
+        drift_ipc::WorkPaneTarget::Tab { id } => {
             if !bounded(&id, MAX_ITEM_ID_BYTES) {
                 return rejected_operation();
             }
             match ItemId::parse(&id) {
-                Some(id) => zephium_app::WorkPaneTarget::Tab(id),
+                Some(id) => drift_app::WorkPaneTarget::Tab(id),
                 None => return rejected_operation(),
             }
         }
-        zephium_ipc::WorkPaneTarget::Url { url } => {
+        drift_ipc::WorkPaneTarget::Url { url } => {
             if !trusted_web_url(&url) {
                 return rejected_operation();
             }
-            zephium_app::WorkPaneTarget::Url(url)
+            drift_app::WorkPaneTarget::Url(url)
         }
     };
     dispatch_operation(
@@ -3013,7 +3013,7 @@ fn work_pane_show(
 fn work_pane_set_rect(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
-    rect: zephium_ipc::WorkPaneRect,
+    rect: drift_ipc::WorkPaneRect,
     generation: u32,
 ) {
     if !authorize(&caller, CallerPolicy::Main, "work_pane_set_rect") {
@@ -3030,7 +3030,7 @@ fn work_pane_set_rect(
 fn work_pane_hide(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "work_pane_hide") {
         return rejected_operation();
     }
@@ -3044,7 +3044,7 @@ fn tabs_split(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     other: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_split") {
         return rejected_operation();
     }
@@ -3061,7 +3061,7 @@ fn tabs_split(
 fn tabs_unsplit(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_unsplit") {
         return rejected_operation();
     }
@@ -3074,7 +3074,7 @@ fn tabs_leave_split(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     id: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tabs_leave_split")
         || !bounded(&id, MAX_ITEM_ID_BYTES)
     {
@@ -3100,7 +3100,7 @@ fn extension_action_invoke(
     anchor_y: f64,
     anchor_width: f64,
     anchor_height: f64,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "extension_action_invoke")
         || shutdown_started(caller.app_handle())
         || !bounded(&profile_id, MAX_ITEM_ID_BYTES)
@@ -3165,7 +3165,7 @@ fn extension_action_invoke(
     admission
 }
 
-fn rejected_extension_action(stage: &'static str) -> zephium_ipc::OperationAdmission {
+fn rejected_extension_action(stage: &'static str) -> drift_ipc::OperationAdmission {
     diagnostic!("extensions: toolbar action IPC rejected at {stage}");
     rejected_operation()
 }
@@ -3191,7 +3191,7 @@ fn page_permission_respond(
     item_id: String,
     request_id: String,
     decision: PagePermissionPromptDecisionInput,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "page_permission_respond")
         || shutdown_started(caller.app_handle())
         || !bounded(&profile_id, MAX_ITEM_ID_BYTES)
@@ -3208,7 +3208,7 @@ fn page_permission_respond(
         return rejected_operation();
     };
     let Some(request) = fixed_nonzero_hex(&request_id)
-        .and_then(zephium_core::permissions::PagePermissionRequestId::new)
+        .and_then(drift_core::permissions::PagePermissionRequestId::new)
     else {
         return rejected_operation();
     };
@@ -3237,7 +3237,7 @@ fn capture_stop(
     shell: State<'_, Handle>,
     item_id: String,
     navigation_id: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "capture_stop")
         || shutdown_started(caller.app_handle())
         || !bounded(&item_id, MAX_ITEM_ID_BYTES)
@@ -3248,7 +3248,7 @@ fn capture_stop(
         return rejected_operation();
     };
     let Some(navigation) = fixed_nonzero_hex(&navigation_id)
-        .map(zephium_core::ports::engine::NavigationPresentationId::from_raw)
+        .map(drift_core::ports::engine::NavigationPresentationId::from_raw)
     else {
         return rejected_operation();
     };
@@ -3265,7 +3265,7 @@ fn profiles_delete(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
     profile: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "profiles_delete")
         || !bounded(&profile, MAX_ITEM_ID_BYTES)
     {
@@ -3284,14 +3284,14 @@ fn operation_status(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     operation_id: String,
-) -> zephium_ipc::OperationStatus {
+) -> drift_ipc::OperationStatus {
     if !authorize(&caller, CallerPolicy::Main, "operation_status")
         || !valid_operation_id(&operation_id)
     {
-        return zephium_ipc::OperationStatus::Unknown;
+        return drift_ipc::OperationStatus::Unknown;
     }
     app.try_state::<OperationLedger>()
-        .map_or(zephium_ipc::OperationStatus::Unknown, |ledger| {
+        .map_or(drift_ipc::OperationStatus::Unknown, |ledger| {
             ledger.status(&operation_id)
         })
 }
@@ -3301,7 +3301,7 @@ fn operation_status(
 fn operations_reconcile(
     caller: WebviewWindow,
     app: tauri::AppHandle,
-) -> Vec<zephium_ipc::OperationDisposition> {
+) -> Vec<drift_ipc::OperationDisposition> {
     if !authorize(&caller, CallerPolicy::Main, "operations_reconcile") {
         return Vec::new();
     }
@@ -3326,7 +3326,7 @@ fn operation_acknowledge(
         .is_some_and(|ledger| ledger.acknowledge(&operation_id))
 }
 
-const SETTING_KEYS: &[&str] = zephium_core::preferences::KEYS;
+const SETTING_KEYS: &[&str] = drift_core::preferences::KEYS;
 
 /// The person's overrides, for menus built on demand.
 fn keymap_overrides(app: &tauri::AppHandle) -> std::collections::HashMap<String, String> {
@@ -3424,14 +3424,14 @@ fn apply_native_theme(app: &tauri::AppHandle, mode: &str) {
     reinstall_native_materials(app);
 }
 
-fn accepted_ui_operation() -> zephium_ipc::OperationAdmission {
-    zephium_ipc::OperationAdmission {
+fn accepted_ui_operation() -> drift_ipc::OperationAdmission {
+    drift_ipc::OperationAdmission {
         operation_id: None,
         accepted: true,
     }
 }
 
-fn execute_command(app: &tauri::AppHandle, id: &str) -> zephium_ipc::OperationAdmission {
+fn execute_command(app: &tauri::AppHandle, id: &str) -> drift_ipc::OperationAdmission {
     if id == "browser.quit" {
         app.exit(0);
         return accepted_ui_operation();
@@ -3462,7 +3462,7 @@ fn execute_command(app: &tauri::AppHandle, id: &str) -> zephium_ipc::OperationAd
         return execute_command(app, "browser.settings");
     }
     if id == help::MENU {
-        let resolved = zephium_core::commands::resolve(&keymap_overrides(app));
+        let resolved = drift_core::commands::resolve(&keymap_overrides(app));
         let menu = build_command_menu_item(app, &resolved, "settings.shortcuts")
             .and_then(|shortcuts| help::build_popup(app, &shortcuts));
         return match (app.get_webview_window(MAIN_LABEL), menu) {
@@ -3560,14 +3560,14 @@ fn execute_command(app: &tauri::AppHandle, id: &str) -> zephium_ipc::OperationAd
     }
     if let Some(destination) = id.strip_prefix("browser.") {
         let page = match destination {
-            "work" => Some(zephium_app::BrowserPage::Work),
-            "settings" => Some(zephium_app::BrowserPage::Settings),
-            "extensions" => Some(zephium_app::BrowserPage::Extensions),
-            "history" => Some(zephium_app::BrowserPage::History),
-            "downloads" => Some(zephium_app::BrowserPage::Downloads),
-            "tasks" => Some(zephium_app::BrowserPage::Tasks),
-            "notes" => Some(zephium_app::BrowserPage::Notes),
-            "time" => Some(zephium_app::BrowserPage::Time),
+            "work" => Some(drift_app::BrowserPage::Work),
+            "settings" => Some(drift_app::BrowserPage::Settings),
+            "extensions" => Some(drift_app::BrowserPage::Extensions),
+            "history" => Some(drift_app::BrowserPage::History),
+            "downloads" => Some(drift_app::BrowserPage::Downloads),
+            "tasks" => Some(drift_app::BrowserPage::Tasks),
+            "notes" => Some(drift_app::BrowserPage::Notes),
+            "time" => Some(drift_app::BrowserPage::Time),
             "return" => None,
             _ => return rejected_operation(),
         };
@@ -3623,7 +3623,7 @@ fn execute_command(app: &tauri::AppHandle, id: &str) -> zephium_ipc::OperationAd
         }
         return rejected_operation();
     }
-    if zephium_core::commands::get(id).is_some() {
+    if drift_core::commands::get(id).is_some() {
         if let Some(shell) = app.try_state::<Handle>() {
             return dispatch_operation(app, &shell, Command::Run(id.to_string()));
         }
@@ -3637,7 +3637,7 @@ fn execute_command(app: &tauri::AppHandle, id: &str) -> zephium_ipc::OperationAd
 fn execute_tab_menu_action(
     app: &tauri::AppHandle,
     action: &str,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     let Some(target) = app.try_state::<TabMenuTarget>() else {
         return rejected_operation();
     };
@@ -3692,7 +3692,7 @@ fn run_command(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     id: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "run_command") || !bounded(&id, MAX_COMMAND_ID_BYTES)
     {
         return rejected_operation();
@@ -3708,7 +3708,7 @@ fn newtab_search_context(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     tab_id: String,
-) -> Option<zephium_ipc::SearchContext> {
+) -> Option<drift_ipc::SearchContext> {
     if !authorize(&caller, CallerPolicy::Main, "newtab_search_context")
         || ItemId::parse(&tab_id).is_none()
     {
@@ -3731,7 +3731,7 @@ fn newtab_search(
     app: tauri::AppHandle,
     shell: State<'_, Handle>,
     query: String,
-    context: zephium_ipc::SearchContext,
+    context: drift_ipc::SearchContext,
 ) -> bool {
     if !authorize(&caller, CallerPolicy::Main, "newtab_search")
         || !bounded(&query, MAX_LAUNCHER_QUERY_BYTES)
@@ -3749,7 +3749,7 @@ fn newtab_search(
     accepted
 }
 
-fn newtab_context_valid(context: &zephium_ipc::SearchContext) -> bool {
+fn newtab_context_valid(context: &drift_ipc::SearchContext) -> bool {
     context
         .session_id
         .strip_prefix("newtab:")
@@ -3773,7 +3773,7 @@ fn newtab_context_valid(context: &zephium_ipc::SearchContext) -> bool {
 fn newtab_cancel(
     caller: WebviewWindow,
     shell: State<'_, Handle>,
-    context: zephium_ipc::SearchContext,
+    context: drift_ipc::SearchContext,
 ) -> bool {
     if !authorize(&caller, CallerPolicy::Main, "newtab_cancel") || !newtab_context_valid(&context) {
         return false;
@@ -3790,9 +3790,9 @@ fn newtab_run(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     shell: State<'_, Handle>,
-    action: zephium_ipc::SearchAction,
-    context: zephium_ipc::SearchContext,
-) -> zephium_ipc::OperationAdmission {
+    action: drift_ipc::SearchAction,
+    context: drift_ipc::SearchContext,
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "newtab_run")
         || !newtab_context_valid(&context)
         || !search_action_in_bounds(&action)
@@ -3850,10 +3850,10 @@ fn launcher_search(
 fn launcher_run(
     caller: WebviewWindow,
     app: tauri::AppHandle,
-    action: zephium_ipc::SearchAction,
-    context: zephium_ipc::SearchContext,
+    action: drift_ipc::SearchAction,
+    context: drift_ipc::SearchContext,
     background: bool,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Panel, "launcher_run") || !search_action_in_bounds(&action)
     {
         return rejected_operation();
@@ -3876,7 +3876,7 @@ fn launcher_run(
     }
     // Only an address can be sent behind the current tab; every other action
     // is about where the user is going next.
-    let background = background && matches!(action, zephium_ipc::SearchAction::OpenUrl { .. });
+    let background = background && matches!(action, drift_ipc::SearchAction::OpenUrl { .. });
     if !overlay.arm_action(&operation_id, &context, background) {
         return finish_operation_admission(&ledger, operation_id, false);
     }
@@ -4042,9 +4042,9 @@ async fn resource_call(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     expected_profile: String,
-    call: zephium_ipc::ResourceCall,
-) -> zephium_ipc::ResourceReply {
-    use zephium_core::resources::{ResourceError, ResourceReply, ResourceResponse};
+    call: drift_ipc::ResourceCall,
+) -> drift_ipc::ResourceReply {
+    use drift_core::resources::{ResourceError, ResourceReply, ResourceResponse};
     let failed = |error| ResourceReply {
         profile: None,
         response: ResourceResponse::Error { error },
@@ -4073,11 +4073,11 @@ async fn resource_call(
     if !shell.dispatch(Command::ResourceCall {
         expected_profile,
         call: Arc::new(call),
-        done: zephium_app::ResourceCompletion::new(move |reply| {
+        done: drift_app::ResourceCompletion::new(move |reply| {
             let _permit = permit;
             let changed = match &reply.response {
                 ResourceResponse::Applied { record, .. } => {
-                    use zephium_core::resources::ResourceKind;
+                    use drift_core::resources::ResourceKind;
                     match record.draft.kind() {
                         ResourceKind::Task => Some(ResourceChangeKind::Task),
                         ResourceKind::Object => Some(ResourceChangeKind::Object),
@@ -4100,7 +4100,7 @@ async fn resource_call(
                 };
                 // The launcher never hosts a resource view, so waking it for
                 // every write would only cost a hidden WebView work.
-                emit_to_privileged(&app, MAIN_LABEL, "zephium:resource-changed", &event);
+                emit_to_privileged(&app, MAIN_LABEL, "drift:resource-changed", &event);
             }
             let _ = send.send(reply);
         }),
@@ -4122,10 +4122,10 @@ fn browser_open_url(
     shell: State<'_, Handle>,
     url: String,
     new_tab: bool,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Both, "browser_open_url")
         || !bounded(&url, MAX_NAVIGATION_INPUT_BYTES)
-        || !zephium_core::navigation::is_allowed_str(&url)
+        || !drift_core::navigation::is_allowed_str(&url)
     {
         return rejected_operation();
     }
@@ -4145,9 +4145,9 @@ async fn download_call(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     expected_profile: String,
-    call: zephium_core::downloads::DownloadCall,
-) -> zephium_core::downloads::DownloadResponse {
-    use zephium_core::downloads::{DownloadCompletion, DownloadError, DownloadResponse};
+    call: drift_core::downloads::DownloadCall,
+) -> drift_core::downloads::DownloadResponse {
+    use drift_core::downloads::{DownloadCompletion, DownloadError, DownloadResponse};
     let failed = |error| DownloadResponse::Error { error };
     if !authorize(&caller, CallerPolicy::Both, "download_call") || shutdown_started(&app) {
         return failed(DownloadError::Unavailable);
@@ -4165,7 +4165,7 @@ async fn download_call(
         return failed(DownloadError::Capacity);
     };
     let (send, receive) = tokio::sync::oneshot::channel();
-    let interactive = matches!(call, zephium_core::downloads::DownloadCall::ChooseDirectory);
+    let interactive = matches!(call, drift_core::downloads::DownloadCall::ChooseDirectory);
     let shell = app.state::<Handle>().inner().clone();
     if !shell.dispatch(Command::DownloadCall {
         expected_profile: profile,
@@ -4229,7 +4229,7 @@ fn favicon_probe(
     else {
         return false;
     };
-    if origins.len() > zephium_core::ports::store::MAX_FAVICON_BATCH_ORIGINS
+    if origins.len() > drift_core::ports::store::MAX_FAVICON_BATCH_ORIGINS
         || origins.iter().any(|origin| origin.len() > 2048)
     {
         return false;
@@ -4244,9 +4244,9 @@ async fn history_call(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     expected_profile: String,
-    call: zephium_ipc::HistoryCall,
-) -> zephium_ipc::HistoryResponse {
-    use zephium_ipc::{HistoryError, HistoryResponse};
+    call: drift_ipc::HistoryCall,
+) -> drift_ipc::HistoryResponse {
+    use drift_ipc::{HistoryError, HistoryResponse};
     let failed = |error| HistoryResponse::Error { error };
     if !authorize(&caller, CallerPolicy::Both, "history_call") || shutdown_started(&app) {
         return failed(HistoryError::Unavailable);
@@ -4268,7 +4268,7 @@ async fn history_call(
     if !shell.dispatch(Command::HistoryCall {
         expected_profile,
         call: Box::new(call),
-        done: zephium_app::HistoryCompletion::new(move |response| {
+        done: drift_app::HistoryCompletion::new(move |response| {
             let _permit = permit;
             let _ = send.send(response);
         }),
@@ -4282,7 +4282,7 @@ async fn history_call(
 }
 
 /// Finds `query` in the page in front, stepping forward or back when it
-/// repeats; no query ends the search. Results arrive as `zephium:find`.
+/// repeats; no query ends the search. Results arrive as `drift:find`.
 #[tauri::command]
 #[specta::specta]
 fn page_find(
@@ -4291,7 +4291,7 @@ fn page_find(
     query: Option<String>,
     forward: bool,
 ) -> bool {
-    use zephium_core::ports::engine::{FindRequest, MAX_FIND_QUERY_BYTES};
+    use drift_core::ports::engine::{FindRequest, MAX_FIND_QUERY_BYTES};
     if !authorize(&caller, CallerPolicy::Main, "page_find")
         || query
             .as_deref()
@@ -4311,9 +4311,9 @@ async fn bookmark_call(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     expected_profile: String,
-    call: zephium_ipc::BookmarkCall,
-) -> zephium_ipc::BookmarkResponse {
-    use zephium_ipc::{BookmarkError, BookmarkResponse};
+    call: drift_ipc::BookmarkCall,
+) -> drift_ipc::BookmarkResponse {
+    use drift_ipc::{BookmarkError, BookmarkResponse};
     let failed = |error| BookmarkResponse::Error { error };
     if !authorize(&caller, CallerPolicy::Main, "bookmark_call") || shutdown_started(&app) {
         return failed(BookmarkError::Unavailable);
@@ -4335,7 +4335,7 @@ async fn bookmark_call(
     if !shell.dispatch(Command::BookmarkCall {
         expected_profile,
         call: Box::new(call),
-        done: zephium_app::BookmarkCompletion::new(move |response| {
+        done: drift_app::BookmarkCompletion::new(move |response| {
             let _permit = permit;
             let _ = send.send(response);
         }),
@@ -4354,9 +4354,9 @@ async fn time_call(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     expected_profile: String,
-    call: zephium_ipc::TimeCall,
-) -> zephium_ipc::TimeResponse {
-    use zephium_ipc::{TimeError, TimeResponse};
+    call: drift_ipc::TimeCall,
+) -> drift_ipc::TimeResponse {
+    use drift_ipc::{TimeError, TimeResponse};
     let failed = |error| TimeResponse::Error { error };
     if !authorize(&caller, CallerPolicy::Main, "time_call") || shutdown_started(&app) {
         return failed(TimeError::Unavailable);
@@ -4378,7 +4378,7 @@ async fn time_call(
     if !shell.dispatch(Command::TimeCall {
         expected_profile,
         call: Box::new(call),
-        done: zephium_app::TimeCompletion::new(move |response| {
+        done: drift_app::TimeCompletion::new(move |response| {
             let _permit = permit;
             let _ = send.send(response);
         }),
@@ -4397,8 +4397,8 @@ fn focus_control(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     shell: State<'_, Handle>,
-    control: zephium_ipc::FocusControl,
-) -> zephium_ipc::OperationAdmission {
+    control: drift_ipc::FocusControl,
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "focus_control")
         || shutdown_started(&app)
         || !control.validate()
@@ -4419,7 +4419,7 @@ async fn setting_get(caller: WebviewWindow, key: String) -> Option<String> {
     }
     #[cfg(feature = "work-product")]
     if key == "work.screenshots" {
-        return Some(zephium_app::work_screenshots::enabled().to_string());
+        return Some(drift_app::work_screenshots::enabled().to_string());
     }
     // A synchronous command runs on the main thread, and the store may be
     // busy for seconds (an import, a deletion); the read waits off it.
@@ -4439,7 +4439,7 @@ fn setting_set(
     shell: State<'_, Handle>,
     key: String,
     value: String,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "setting_set") {
         return rejected_operation();
     }
@@ -4454,7 +4454,7 @@ fn setting_set(
     if SETTING_KEYS.contains(&key.as_str()) && setting_value_allowed(&key, &value) {
         #[cfg(feature = "work-product")]
         if key == "work.screenshots" {
-            let Some(change) = zephium_app::work_screenshots::begin_preference(value == "true")
+            let Some(change) = drift_app::work_screenshots::begin_preference(value == "true")
             else {
                 return rejected_operation();
             };
@@ -4771,7 +4771,7 @@ fn panel_hide(caller: WebviewWindow, app: tauri::AppHandle) {
 fn panel_ready(
     caller: WebviewWindow,
     overlay: State<'_, overlay::Overlay>,
-) -> Option<zephium_ipc::PanelState> {
+) -> Option<drift_ipc::PanelState> {
     authorize(&caller, CallerPolicy::Panel, "panel_ready").then(|| {
         #[cfg(target_os = "windows")]
         platform::imp::renderer::ready(&caller);
@@ -4783,7 +4783,7 @@ fn panel_ready(
 fn panel_intent(
     caller: WebviewWindow,
     app: tauri::AppHandle,
-    intent: zephium_ipc::PanelIntent,
+    intent: drift_ipc::PanelIntent,
 ) -> bool {
     if !authorize(&caller, CallerPolicy::Both, "panel_intent") {
         return false;
@@ -4794,15 +4794,15 @@ fn panel_intent(
 /// instead of the browser.
 const ONBOARDING_PAGE: &str = "onboarding.html";
 
-/// Whether this launch opens onboarding. `ZEPHIUM_ONBOARDING=1 pnpm dev`
+/// Whether this launch opens onboarding. `DRIFT_ONBOARDING=1 pnpm dev`
 /// opens it on an existing profile without recording anything until it is
 /// finished.
 fn onboarding_first(store: &SqliteStore) -> bool {
     #[cfg(debug_assertions)]
-    if std::env::var("ZEPHIUM_ONBOARDING").as_deref() == Ok("1") {
+    if std::env::var("DRIFT_ONBOARDING").as_deref() == Ok("1") {
         return true;
     }
-    zephium_app::onboarding_due(store)
+    drift_app::onboarding_due(store)
 }
 
 /// Onboarding's commands answer only the onboarding page, and only until it
@@ -4837,7 +4837,7 @@ fn onboarding_finish(caller: WebviewWindow, gate: State<'_, UiStartupGate>) -> b
     // onboarding simply shows once more on the next launch.
     if !APP_STORE
         .get()
-        .is_some_and(|store| zephium_app::finish_onboarding(store.as_ref()))
+        .is_some_and(|store| drift_app::finish_onboarding(store.as_ref()))
     {
         diagnostic!("onboarding: finishing could not be recorded");
     }
@@ -4920,7 +4920,7 @@ fn launcher_open_accessibility(caller: WebviewWindow) {
 fn panel_layout(
     caller: WebviewWindow,
     overlay: State<'_, overlay::Overlay>,
-    layout: zephium_ipc::PanelLayout,
+    layout: drift_ipc::PanelLayout,
 ) {
     if authorize(&caller, CallerPolicy::Panel, "panel_layout") {
         overlay.layout(layout);
@@ -5030,7 +5030,7 @@ fn tab_drop(
     id: String,
     x: f64,
     y: f64,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "tab_drop") {
         return rejected_operation();
     }
@@ -5075,7 +5075,7 @@ fn divider_release(
     shell: State<'_, Handle>,
     x: Option<f64>,
     y: Option<f64>,
-) -> zephium_ipc::OperationAdmission {
+) -> drift_ipc::OperationAdmission {
     if !authorize(&caller, CallerPolicy::Main, "divider_release") {
         return rejected_operation();
     }
@@ -5109,7 +5109,7 @@ fn inner_logical(window: &tauri::WebviewWindow) -> Size {
 
 fn build_command_menu_item(
     handle: &tauri::AppHandle,
-    resolved: &[zephium_core::commands::ResolvedCommand],
+    resolved: &[drift_core::commands::ResolvedCommand],
     id: &str,
 ) -> tauri::Result<tauri::menu::MenuItem<tauri::Wry>> {
     build_command_menu_item_enabled(handle, resolved, id, true)
@@ -5117,7 +5117,7 @@ fn build_command_menu_item(
 
 fn build_command_menu_item_enabled(
     handle: &tauri::AppHandle,
-    resolved: &[zephium_core::commands::ResolvedCommand],
+    resolved: &[drift_core::commands::ResolvedCommand],
     id: &str,
     enabled: bool,
 ) -> tauri::Result<tauri::menu::MenuItem<tauri::Wry>> {
@@ -5144,7 +5144,7 @@ fn build_quit_menu_item(
 ) -> tauri::Result<tauri::menu::MenuItem<tauri::Wry>> {
     // Native terminate: bypasses Tauri's ExitRequested path on macOS.
     // An ordinary menu event reaches the existing draft/store shutdown barrier.
-    tauri::menu::MenuItemBuilder::with_id("browser.quit", menu_text::label("Quit Zephium"))
+    tauri::menu::MenuItemBuilder::with_id("browser.quit", menu_text::label("Quit Drift"))
         .accelerator("CmdOrCtrl+Q")
         .build(handle)
 }
@@ -5162,14 +5162,14 @@ fn build_menu(
 ) -> tauri::Result<tauri::menu::Menu<tauri::Wry>> {
     use tauri::menu::{Menu, SubmenuBuilder};
 
-    let resolved = zephium_core::commands::resolve(overrides);
+    let resolved = drift_core::commands::resolve(overrides);
     let item = |id: &str| build_command_menu_item(handle, &resolved, id);
 
     // About is Settings' About page: the system panel cannot open links in a tab.
     let about =
-        tauri::menu::MenuItemBuilder::with_id(help::ABOUT, menu_text::label("About Zephium"))
+        tauri::menu::MenuItemBuilder::with_id(help::ABOUT, menu_text::label("About Drift"))
             .build(handle)?;
-    let app_menu = SubmenuBuilder::new(handle, menu_text::label("Zephium"))
+    let app_menu = SubmenuBuilder::new(handle, menu_text::label("Drift"))
         .item(&about)
         .separator()
         .item(&item("browser.settings")?)
@@ -5178,7 +5178,7 @@ fn build_menu(
     let app_menu = app_menu
         .services_with_text(menu_text::label("Services"))
         .separator()
-        .hide_with_text(menu_text::label("Hide Zephium"))
+        .hide_with_text(menu_text::label("Hide Drift"))
         .hide_others_with_text(menu_text::label("Hide Others"))
         .show_all_with_text(menu_text::label("Show All"))
         .separator();
@@ -5345,7 +5345,7 @@ fn build_add_menu(
 ) -> tauri::Result<tauri::menu::Menu<tauri::Wry>> {
     use tauri::menu::Menu;
 
-    let resolved = zephium_core::commands::resolve(overrides);
+    let resolved = drift_core::commands::resolve(overrides);
     let item = |id: &str| build_command_menu_item(handle, &resolved, id);
 
     let new_tab = item(ADD_MENU_COMMAND_IDS[0])?;
@@ -5429,7 +5429,7 @@ fn build_sidebar_menu(
         PredefinedMenuItem,
     };
 
-    let resolved = zephium_core::commands::resolve(overrides);
+    let resolved = drift_core::commands::resolve(overrides);
     let back = build_command_menu_item(handle, &resolved, SIDEBAR_MENU_COMMAND_IDS[0])?;
     let forward = build_command_menu_item(handle, &resolved, SIDEBAR_MENU_COMMAND_IDS[1])?;
     let reload = build_command_menu_item(handle, &resolved, SIDEBAR_MENU_COMMAND_IDS[2])?;
@@ -5514,7 +5514,7 @@ fn build_chrome_menu(
     can_split: bool,
 ) -> tauri::Result<tauri::menu::Menu<tauri::Wry>> {
     use tauri::menu::{Menu, PredefinedMenuItem};
-    let resolved = zephium_core::commands::resolve(overrides);
+    let resolved = drift_core::commands::resolve(overrides);
     let item =
         |id: &str, enabled: bool| build_command_menu_item_enabled(handle, &resolved, id, enabled);
     let new_tab = item("tab.new", true)?;
@@ -5629,7 +5629,7 @@ fn build_tools_menu(
     overrides: &std::collections::HashMap<String, String>,
 ) -> tauri::Result<tauri::menu::Menu<tauri::Wry>> {
     use tauri::menu::{Menu, PredefinedMenuItem};
-    let resolved = zephium_core::commands::resolve(overrides);
+    let resolved = drift_core::commands::resolve(overrides);
     let item = |id: &str| build_command_menu_item(handle, &resolved, id);
     let notes = item("tool.notes")?;
     let tasks = item("tool.tasks")?;
@@ -5658,7 +5658,7 @@ fn build_profile_menu(
     overrides: &std::collections::HashMap<String, String>,
 ) -> tauri::Result<tauri::menu::Menu<tauri::Wry>> {
     use tauri::menu::{Menu, MenuItemBuilder, PredefinedMenuItem};
-    let resolved = zephium_core::commands::resolve(overrides);
+    let resolved = drift_core::commands::resolve(overrides);
     let item = |id: &str| build_command_menu_item(handle, &resolved, id);
     let profile = MenuItemBuilder::with_id("settings.profiles", menu_text::label("Profile…"))
         .build(handle)?;
@@ -5822,7 +5822,7 @@ fn install_async_runtime() {
 pub fn run() {
     if cfg!(all(unix, not(target_os = "macos"))) {
         diagnostic!(
-            "Zephium isn't available on Linux yet. We're working on it; follow https://zephium.app for news."
+            "Drift isn't available on Linux yet. We're working on it; follow https://drift.app for news."
         );
         std::process::exit(1);
     }
@@ -5847,7 +5847,7 @@ pub fn run() {
     };
 
     #[cfg(all(unix, not(target_os = "macos")))]
-    let runtime_security_advisories = match zephium_engine::enforce_runtime_security_floor() {
+    let runtime_security_advisories = match drift_engine::enforce_runtime_security_floor() {
         Ok(advisory) => advisory,
         Err(error) => {
             // WebKitGTK is dynamically supplied by the OS. Reject known
@@ -5940,9 +5940,9 @@ pub fn run() {
                 #[cfg(target_os = "windows")]
                 updates::restore(app.handle(), &data_dir);
                 #[cfg(feature = "work-product")]
-                zephium_app::work_lead::skills::install_root(data_dir.clone());
+                drift_app::work_lead::skills::install_root(data_dir.clone());
                 #[cfg(feature = "work-product")]
-                zephium_app::work_files::trash::install_root(data_dir.clone());
+                drift_app::work_files::trash::install_root(data_dir.clone());
                 #[cfg(unix)]
                 {
                     use std::os::unix::fs::PermissionsExt;
@@ -5958,7 +5958,7 @@ pub fn run() {
                     // constructing WebView2 state merely to initialize logs.
                     platform::imp::redirect_stderr(&data_dir);
                     diagnostics::install(data_dir.clone());
-                    diagnostic!("zephium {} starting", env!("CARGO_PKG_VERSION"));
+                    diagnostic!("drift {} starting", env!("CARGO_PKG_VERSION"));
                 }
                 #[cfg(target_os = "macos")]
                 {
@@ -5967,7 +5967,7 @@ pub fn run() {
                     let logs = app.path().app_log_dir()?;
                     platform::imp::redirect_stderr(&logs);
                     diagnostics::install(logs);
-                    diagnostic!("zephium {} starting", env!("CARGO_PKG_VERSION"));
+                    diagnostic!("drift {} starting", env!("CARGO_PKG_VERSION"));
                 }
 
                 // Storage is the first fallible subsystem admitted after the
@@ -5980,7 +5980,7 @@ pub fn run() {
                     let session = qa_session.as_deref();
                     #[cfg(not(feature = "webext-qa"))]
                     let session = None;
-                    let work_storage = zephium_store::WindowsWorkStorage::for_application(
+                    let work_storage = drift_store::WindowsWorkStorage::for_application(
                         &app.config().identifier,
                         session,
                     )?;
@@ -5988,14 +5988,14 @@ pub fn run() {
                 };
                 #[cfg(not(all(target_os = "windows", feature = "work-product")))]
                 let store = Arc::new(SqliteStore::open(&data_dir)?);
-                app.manage(media::MediaBlobs(zephium_store::MediaStore::new(
+                app.manage(media::MediaBlobs(drift_store::MediaStore::new(
                     data_dir.join("media"),
                 )));
                 #[cfg(feature = "work-product")]
-                zephium_app::work_connections::store::install(&data_dir);
+                drift_app::work_connections::store::install(&data_dir);
                 #[cfg(feature = "work-product")]
                 app.manage(work_product::WorkFrames(Arc::new(
-                    zephium_store::WorkFrameStore::new(data_dir.join("work-frames")),
+                    drift_store::WorkFrameStore::new(data_dir.join("work-frames")),
                 )));
                 let startup_store = app.try_state::<StartupStore>().ok_or_else(|| {
                     std::io::Error::other("startup storage cleanup owner is unavailable")
@@ -6014,7 +6014,7 @@ pub fn run() {
                     std::io::Error::other("process-global application store is already installed")
                 })?;
                 for (key, value) in
-                    zephium_core::preferences::migrations(|key| store.app_setting(key))
+                    drift_core::preferences::migrations(|key| store.app_setting(key))
                 {
                     let _ = store.set_app_setting(key.into(), value);
                 }
@@ -6059,7 +6059,7 @@ pub fn run() {
                 .incognito(true)
                 .devtools(cfg!(debug_assertions))
                 .general_autofill_enabled(false)
-                .initialization_script_for_all_frames(zephium_engine::PAGE_PRINT_DENY_SCRIPT);
+                .initialization_script_for_all_frames(drift_engine::PAGE_PRINT_DENY_SCRIPT);
             #[cfg(feature = "work-development-traces")]
             let main_builder = main_builder.initialization_script(startup_styles::SCRIPT);
             #[cfg(target_os = "windows")]
@@ -6140,7 +6140,7 @@ pub fn run() {
             let startup_watchdog_gate = ui_startup_gate.clone();
             let startup_watchdog_app = app.handle().clone();
             std::thread::Builder::new()
-                .name("zephium-ui-startup-watchdog".into())
+                .name("drift-ui-startup-watchdog".into())
                 .spawn(move || {
                     std::thread::sleep(UI_INITIALIZATION_TIMEOUT);
                     if startup_watchdog_gate.is_visible() {
@@ -6171,9 +6171,9 @@ pub fn run() {
             // the engine exists, every privileged notification enters its
             // process-global dedupe gate and the shell can reconcile the bit
             // even if its command queue was not installed yet.
-            let slot: Arc<OnceLock<zephium_app::CallbackHandle>> = Arc::new(OnceLock::new());
+            let slot: Arc<OnceLock<drift_app::CallbackHandle>> = Arc::new(OnceLock::new());
             #[cfg(target_os = "windows")]
-            let runtime_engine_slot: Arc<OnceLock<Arc<zephium_engine::WebviewEngine>>> =
+            let runtime_engine_slot: Arc<OnceLock<Arc<drift_engine::WebviewEngine>>> =
                 Arc::new(OnceLock::new());
             #[cfg(target_os = "windows")]
             let pending_runtime_update = Arc::new(AtomicBool::new(false));
@@ -6220,7 +6220,7 @@ pub fn run() {
             let sink_slot = slot.clone();
             let sink_app = handle.clone();
             let terminal_failure_app = handle.clone();
-            let engine = Arc::new(zephium_engine::install(
+            let engine = Arc::new(drift_engine::install(
                 #[cfg(any(target_os = "macos", target_os = "windows"))]
                 parent,
                 dispatch.clone(),
@@ -6242,12 +6242,12 @@ pub fn run() {
                 ),
                 move |event| {
                     #[cfg(all(feature = "macos-work-retained-controller-probe", target_os = "macos"))]
-                    if zephium_work_composition::retained_qualification::retained_controller_policy_event(&event) { return; }
+                    if drift_work_composition::retained_qualification::retained_controller_policy_event(&event) { return; }
                     #[cfg(all(feature = "macos-work-resource-probe", target_os = "macos"))]
-                    if zephium_engine::work_resource_policy_event(&event) { return; }
+                    if drift_engine::work_resource_policy_event(&event) { return; }
                     #[cfg(all(feature = "macos-work-rendering-probe", target_os = "macos"))]
-                    if zephium_engine::foreground_rendering_policy_event(&event) { return; }
-                    if let zephium_core::ports::engine::EngineEvent::ShortcutPressed {
+                    if drift_engine::foreground_rendering_policy_event(&event) { return; }
+                    if let drift_core::ports::engine::EngineEvent::ShortcutPressed {
                         command,
                         ..
                     } = &event
@@ -6271,7 +6271,7 @@ pub fn run() {
             if !engine.initialize_downloads(store.clone(), move |profile| {
                 let event = DownloadsChanged { profile: profile.to_string() };
                 for label in [MAIN_LABEL, overlay::PANEL_LABEL] {
-                    emit_to_privileged(&downloads_app, label, "zephium:downloads-changed", &event);
+                    emit_to_privileged(&downloads_app, label, "drift:downloads-changed", &event);
                 }
             }) { return Err(std::io::Error::other("download service initialization was not admitted").into()); }
             let startup_engine = app.try_state::<StartupEngine>().ok_or_else(|| {
@@ -6320,7 +6320,7 @@ pub fn run() {
             let focused_shortcut_presses = platform::imp::FocusedShortcutPresses::default();
             #[cfg(target_os = "linux")]
             let linux_launcher_shortcut = {
-                let accelerator = zephium_core::commands::resolve(&keymap)
+                let accelerator = drift_core::commands::resolve(&keymap)
                     .iter()
                     .find(|command| command.id == linux_shortcut::LAUNCHER_COMMAND_ID)
                     .and_then(|command| command.accelerator.clone());
@@ -6361,12 +6361,12 @@ pub fn run() {
             let disposition_ledger = operation_ledger.clone();
             let emit: EmitFn = Box::new(move |projection| match projection {
                 Projection::WorkEnvironmentChanged(change) => emit_to_privileged(
-                    &emit_handle, MAIN_LABEL, "zephium:work-environment-changed", &change,
+                    &emit_handle, MAIN_LABEL, "drift:work-environment-changed", &change,
                 ),
                 Projection::WorkChanged(change) => emit_to_privileged(
                     &emit_handle,
                     MAIN_LABEL,
-                    "zephium:work-changed",
+                    "drift:work-changed",
                     &change,
                 ),
                 Projection::PanelOwner(owner) => overlay::update_context(&emit_handle, &owner),
@@ -6382,8 +6382,8 @@ pub fn run() {
                 Projection::Favicons(favicons) => emit_to_privileged(
                     &emit_handle,
                     match favicons.surface {
-                        zephium_ipc::IconSurface::Chrome => MAIN_LABEL,
-                        zephium_ipc::IconSurface::Panel => overlay::PANEL_LABEL,
+                        drift_ipc::IconSurface::Chrome => MAIN_LABEL,
+                        drift_ipc::IconSurface::Panel => overlay::PANEL_LABEL,
                     },
                     EVENT_FAVICONS,
                     &favicons,
@@ -6452,7 +6452,7 @@ pub fn run() {
                     }
                     emit_ui_command(&emit_handle, &id);
                 }
-                Projection::OpenNote { profile, id } => emit_to_privileged(&emit_handle, MAIN_LABEL, "zephium:note-open-requested", &NoteOpenRequested { profile, id }),
+                Projection::OpenNote { profile, id } => emit_to_privileged(&emit_handle, MAIN_LABEL, "drift:note-open-requested", &NoteOpenRequested { profile, id }),
                 Projection::Search(results) => {
                     emit_to_privileged(&emit_handle, if results.context.as_ref().is_some_and(|context| context.session_id.starts_with("newtab:")) { MAIN_LABEL } else { overlay::PANEL_LABEL }, EVENT_SEARCH, &results)
                 }
@@ -6487,7 +6487,7 @@ pub fn run() {
                     }
                 }
                 Projection::Profiles(view) => {
-                    emit_to_privileged(&emit_handle, MAIN_LABEL, "zephium:profiles", &view)
+                    emit_to_privileged(&emit_handle, MAIN_LABEL, "drift:profiles", &view)
                 }
 
             });
@@ -6495,9 +6495,9 @@ pub fn run() {
             let chrome: SharedChrome = platform::imp::make_chrome(&window, dispatch.clone());
             // Official source candidates must pass the same native compiler
             // as profile policies before becoming the durable current lists.
-            let native_validation:zephium_blocker_service::NativeRuleValidator={
+            let native_validation:drift_blocker_service::NativeRuleValidator={
                 let engine=engine.clone();
-                Arc::new(move |rules,done|zephium_core::ports::engine::Engine::validate_content_rules(engine.as_ref(),rules,done))
+                Arc::new(move |rules,done|drift_core::ports::engine::Engine::validate_content_rules(engine.as_ref(),rules,done))
             };
             let blocker = blocker_service::start_with_updates(&data_dir,native_validation).map_err(|error| {
                 std::io::Error::other(format!(
@@ -6530,8 +6530,8 @@ pub fn run() {
                 // has kept the saved data as it was.
                 if matches!(
                     failure,
-                    zephium_app::ShellTerminalFailure::SessionUnavailable
-                        | zephium_app::ShellTerminalFailure::SessionFromNewerVersion
+                    drift_app::ShellTerminalFailure::SessionUnavailable
+                        | drift_app::ShellTerminalFailure::SessionFromNewerVersion
                 ) {
                     let app = terminal_failure_app.clone();
                     let shutdown = terminal_failure_shutdown.clone();
@@ -6540,7 +6540,7 @@ pub fn run() {
                         startup_alert::show_blocking(
                             if matches!(
                                 failure,
-                                zephium_app::ShellTerminalFailure::SessionFromNewerVersion
+                                drift_app::ShellTerminalFailure::SessionFromNewerVersion
                             ) {
                                 startup_alert::StartupProblem::NewerProfile
                             } else {
@@ -6560,7 +6560,7 @@ pub fn run() {
                     failure,
                 )
             });
-            let shell = match zephium_app::spawn_suspended(
+            let shell = match drift_app::spawn_suspended(
                 engine.clone(),
                 store.clone(),
                 blocker.clone(),
@@ -6788,7 +6788,7 @@ pub fn run() {
                             "y": logical.y,
                         })) {
                             let _ = resize_window.eval(format!(
-                                "window.dispatchEvent(new CustomEvent('zephium:work-paths-dropped',{{detail:{detail}}}))"
+                                "window.dispatchEvent(new CustomEvent('drift:work-paths-dropped',{{detail:{detail}}}))"
                             ));
                         }
                     }
@@ -6841,11 +6841,11 @@ pub fn run() {
                         .map_err(|error| std::io::Error::other(error.to_string()))?,
                 ),
             )
-            .title("Zephium")
+            .title("Drift")
             .incognito(true)
             .devtools(cfg!(debug_assertions))
             .general_autofill_enabled(false)
-            .initialization_script_for_all_frames(zephium_engine::PAGE_PRINT_DENY_SCRIPT);
+            .initialization_script_for_all_frames(drift_engine::PAGE_PRINT_DENY_SCRIPT);
             #[cfg(target_os = "windows")]
             let panel_builder = panel_builder
                 .data_directory(privileged_runtime.panel.clone())
@@ -7033,7 +7033,7 @@ pub fn run() {
             }
             window.navigate(app_url)?;
             #[cfg(all(unix, not(target_os = "macos")))]
-            if std::env::var("ZEPHIUM_NATIVE_STARTUP_PROBE").as_deref() == Ok("1") {
+            if std::env::var("DRIFT_NATIVE_STARTUP_PROBE").as_deref() == Ok("1") {
                 // CI accepts this marker only after both privileged WebViews
                 // exist, their deny-by-default GTK policy/composition has
                 // completed, and both trusted navigations were admitted.
@@ -7048,7 +7048,7 @@ pub fn run() {
         })
         .build(context)
         .unwrap_or_else(|error| {
-            diagnostic!("startup: failed to build Zephium: {error}");
+            diagnostic!("startup: failed to build Drift: {error}");
             #[cfg(not(target_os = "linux"))]
             {
                 let error = error.to_string();
@@ -7104,7 +7104,7 @@ mod frame_sources;
 mod tests {
 
     use tauri::Url;
-    use zephium_ipc::{
+    use drift_ipc::{
         OperationDisposition, OperationOutcome, OperationReason, OperationStatus, SearchAction,
     };
 
@@ -7151,9 +7151,9 @@ mod tests {
             .expect("menu builder");
         assert!(!menu.contains("\"Work\""), "the menu bar has no Work menu");
         assert!(menu.contains("for id in WORK_PANE_MENU_COMMAND_IDS"));
-        let pane: Vec<_> = zephium_core::commands::REGISTRY
+        let pane: Vec<_> = drift_core::commands::REGISTRY
             .iter()
-            .filter(|command| command.group == zephium_core::commands::Group::Work)
+            .filter(|command| command.group == drift_core::commands::Group::Work)
             .map(|command| command.id)
             .collect();
         assert_eq!(pane, super::WORK_PANE_MENU_COMMAND_IDS);
@@ -7202,12 +7202,12 @@ mod tests {
             "../frame/src/shared/ipc/work-constants.ts",
             format!(
                 "// Generated by export_typescript_bindings. Do not edit.\nexport const WORK_PLACEMENT_PIN = {} as const;\n",
-                zephium_core::work::environment::WORK_PLACEMENT_PIN
+                drift_core::work::environment::WORK_PLACEMENT_PIN
             ),
         ).expect("export Work constants");
         std::fs::write(
             "../frame/src/shared/ipc/theme-presets.json",
-            zephium_core::theme::presets_json(),
+            drift_core::theme::presets_json(),
         )
         .expect("export theme presets");
     }
@@ -7249,7 +7249,7 @@ mod tests {
             .expect("a visible logical button rectangle is accepted");
         assert_eq!(
             valid.rect(),
-            zephium_core::geometry::Rect::new(110.5, 8.0, 28.0, 28.0)
+            drift_core::geometry::Rect::new(110.5, 8.0, 28.0, 28.0)
         );
         for invalid in [
             super::extension_popup_anchor_in_bounds(-1.0, 8.0, 28.0, 28.0, 240.0, 800.0),
@@ -7267,7 +7267,7 @@ mod tests {
         assert_eq!(super::ADD_MENU_COMMAND_IDS, ["tab.new", "split.choose"]);
         for id in super::ADD_MENU_COMMAND_IDS {
             assert!(
-                zephium_core::commands::get(id).is_some(),
+                drift_core::commands::get(id).is_some(),
                 "native add-menu command is not registered: {id}"
             );
         }
@@ -7313,7 +7313,7 @@ mod tests {
         // with the registry ids the launcher and the keymap may run directly.
         for id in super::TAB_MENU_ACTION_IDS {
             assert!(
-                zephium_core::commands::get(id).is_none(),
+                drift_core::commands::get(id).is_none(),
                 "tab-menu action shadows a registered command: {id}"
             );
         }
@@ -7324,7 +7324,7 @@ mod tests {
         let target = super::TabMenuTarget::default();
         assert_eq!(target.take(), None);
 
-        let id = zephium_core::ids::ItemId::generate();
+        let id = drift_core::ids::ItemId::generate();
         assert!(target.arm(id));
         assert_eq!(target.take(), Some(id));
         // A duplicated or delayed menu event cannot replay against a stale tab.
@@ -7353,7 +7353,7 @@ mod tests {
 
     #[test]
     fn the_launcher_may_only_run_registered_commands() {
-        use zephium_ipc::SearchAction;
+        use drift_ipc::SearchAction;
 
         assert!(super::search_action_in_bounds(&SearchAction::RunCommand {
             id: "tab.new".into(),
@@ -7487,14 +7487,14 @@ mod tests {
         // it presentationally; unmounting it would conceal page content for as
         // long as the sidebar stays compact.
         assert!(address.contains("class:sr-only={compact}"));
-        assert_eq!(address.matches("data-zephium-address").count(), 1);
+        assert_eq!(address.matches("data-drift-address").count(), 1);
 
         for (name, source) in [("tab rail", rail), ("essentials rail", essentials)] {
             for sentinel in [
-                "data-zephium-tab-id",
-                "data-zephium-tab-url",
-                "data-zephium-projection-revision",
-                "data-zephium-tab-label",
+                "data-drift-tab-id",
+                "data-drift-tab-url",
+                "data-drift-projection-revision",
+                "data-drift-tab-label",
             ] {
                 assert_eq!(
                     source.matches(sentinel).count(),
@@ -7503,7 +7503,7 @@ mod tests {
                 );
             }
             let label = source
-                .split("<span data-zephium-tab-label")
+                .split("<span data-drift-tab-label")
                 .nth(1)
                 .and_then(|rest| rest.split("</span>").next())
                 .expect("bounded exact title sentinel");
@@ -7537,7 +7537,7 @@ mod tests {
         );
         for id in super::SIDEBAR_MENU_COMMAND_IDS {
             assert!(
-                zephium_core::commands::get(id).is_some(),
+                drift_core::commands::get(id).is_some(),
                 "collapsed sidebar menu references an unregistered command: {id}"
             );
         }
@@ -7568,7 +7568,7 @@ mod tests {
             .map(|entry| entry.trim().trim_matches('"'))
             .filter(|entry| !entry.is_empty())
             .collect();
-        assert_eq!(frame, zephium_core::preferences::LANGUAGES[1..]);
+        assert_eq!(frame, drift_core::preferences::LANGUAGES[1..]);
     }
 
     #[test]
@@ -7646,7 +7646,7 @@ mod tests {
             super::shutdown_receive_outcome(
                 receiver.recv_timeout(std::time::Duration::from_millis(1)),
             ),
-            zephium_app::ShutdownOutcome::Unclean
+            drift_app::ShutdownOutcome::Unclean
         );
     }
 
@@ -7657,22 +7657,22 @@ mod tests {
             super::shutdown_receive_outcome(
                 receiver.recv_timeout(std::time::Duration::from_millis(1)),
             ),
-            zephium_app::ShutdownOutcome::Unclean
+            drift_app::ShutdownOutcome::Unclean
         );
     }
 
     #[test]
     fn every_unproven_desktop_shutdown_is_a_terminal_failure() {
         assert_eq!(
-            super::shutdown_exit_code(zephium_app::ShutdownOutcome::Clean),
+            super::shutdown_exit_code(drift_app::ShutdownOutcome::Clean),
             0
         );
         assert_eq!(
-            super::shutdown_exit_code(zephium_app::ShutdownOutcome::RetryableFailure),
+            super::shutdown_exit_code(drift_app::ShutdownOutcome::RetryableFailure),
             1
         );
         assert_eq!(
-            super::shutdown_exit_code(zephium_app::ShutdownOutcome::Unclean),
+            super::shutdown_exit_code(drift_app::ShutdownOutcome::Unclean),
             1
         );
     }
@@ -7680,13 +7680,13 @@ mod tests {
     #[test]
     fn startup_failure_is_sticky_even_after_clean_teardown() {
         assert_eq!(
-            super::coordinated_exit_code(zephium_app::ShutdownOutcome::Clean, false),
+            super::coordinated_exit_code(drift_app::ShutdownOutcome::Clean, false),
             0
         );
         for outcome in [
-            zephium_app::ShutdownOutcome::Clean,
-            zephium_app::ShutdownOutcome::RetryableFailure,
-            zephium_app::ShutdownOutcome::Unclean,
+            drift_app::ShutdownOutcome::Clean,
+            drift_app::ShutdownOutcome::RetryableFailure,
+            drift_app::ShutdownOutcome::Unclean,
         ] {
             assert_eq!(super::coordinated_exit_code(outcome, true), 1);
         }
@@ -7762,11 +7762,11 @@ mod tests {
         let owned = owner.take().expect("pre-shell blocker owner");
         assert!(std::sync::Arc::ptr_eq(&owned, &blocker));
         assert_eq!(
-            zephium_core::ports::blocker::BlockerCompiler::shutdown_until(
+            drift_core::ports::blocker::BlockerCompiler::shutdown_until(
                 owned.as_ref(),
                 std::time::Instant::now() + std::time::Duration::from_secs(2),
             ),
-            zephium_core::ports::blocker::BlockerShutdownOutcome::Clean
+            drift_core::ports::blocker::BlockerShutdownOutcome::Clean
         );
     }
 
@@ -7824,16 +7824,16 @@ mod tests {
             .find("window.dispatchEvent(new CustomEvent")
             .expect("exact projection dispatch");
         let row = barrier
-            .find("[data-zephium-tab-id]")
+            .find("[data-drift-tab-id]")
             .expect("exact tab row verification");
         let title = barrier
-            .find("[data-zephium-tab-label]")
+            .find("[data-drift-tab-label]")
             .expect("visible title verification");
         let address = barrier
-            .find("[data-zephium-address]")
+            .find("[data-drift-address]")
             .expect("active address verification");
         let new_tab = barrier
-            .find("[data-zephium-new-tab]")
+            .find("[data-drift-new-tab]")
             .expect("real New Tab removal verification");
         let layout = barrier
             .find("getBoundingClientRect")
@@ -7841,7 +7841,7 @@ mod tests {
         assert!(dispatch < row && row < title && title < address && address < new_tab);
         assert!(new_tab < layout);
         assert!(barrier.contains("tab.projection_revision"));
-        assert!(barrier.contains("zephium-presentation-v1:"));
+        assert!(barrier.contains("drift-presentation-v1:"));
         assert!(barrier.contains("eval_with_callback"));
     }
 
@@ -7861,23 +7861,23 @@ mod tests {
             .expect("synchronous initial mount flush");
         assert!(mount < initial_flush);
 
-        assert_eq!(shell.matches("data-zephium-active-tab").count(), 1);
-        assert!(shell.contains(r#"data-zephium-active-tab={tabs.activeId() ?? ""}"#));
-        assert_eq!(shell.matches("data-zephium-new-tab").count(), 1);
+        assert_eq!(shell.matches("data-drift-active-tab").count(), 1);
+        assert!(shell.contains(r#"data-drift-active-tab={tabs.activeId() ?? ""}"#));
+        assert_eq!(shell.matches("data-drift-new-tab").count(), 1);
         // The focus cover, when there is one, stands in the same chain ahead
         // of New Tab, so the two never render together.
         assert!(shell.contains("{:else if newTabShown}"));
         assert!(shell
             .contains(r#"if (!tab || tab.url || (tab.content ?? "web") !== "web") return false;"#));
-        assert!(shell.contains("data-zephium-surface="));
+        assert!(shell.contains("data-drift-surface="));
         assert!(!shell.contains("transition:"));
         assert!(!shell.contains("out:"));
 
         for sentinel in [
-            "data-zephium-tab-id",
-            "data-zephium-tab-url",
-            "data-zephium-projection-revision",
-            "data-zephium-tab-label",
+            "data-drift-tab-id",
+            "data-drift-tab-url",
+            "data-drift-projection-revision",
+            "data-drift-tab-label",
         ] {
             assert_eq!(
                 row.matches(sentinel).count(),
@@ -7885,17 +7885,17 @@ mod tests {
                 "tab row must own exactly one {sentinel} binding"
             );
         }
-        assert!(row.contains("data-zephium-tab-id={tab.id}"));
-        assert!(row.contains(r#"data-zephium-tab-url={tab.url ?? ""}"#));
-        assert!(row.contains("data-zephium-projection-revision={tab.projection_revision}"));
+        assert!(row.contains("data-drift-tab-id={tab.id}"));
+        assert!(row.contains(r#"data-drift-tab-url={tab.url ?? ""}"#));
+        assert!(row.contains("data-drift-projection-revision={tab.projection_revision}"));
         assert!(list.contains("{#each displayUnits as unit, index (unit.key)}"));
         assert!(list.contains("<SplitGroupRow"));
         assert!(split_group.contains("<TabRow"));
         for sentinel in [
-            "data-zephium-tab-id",
-            "data-zephium-tab-url",
-            "data-zephium-projection-revision",
-            "data-zephium-tab-label",
+            "data-drift-tab-id",
+            "data-drift-tab-url",
+            "data-drift-projection-revision",
+            "data-drift-tab-label",
         ] {
             assert!(
                 !split_group.contains(sentinel),
@@ -7903,7 +7903,7 @@ mod tests {
             );
         }
         let label = row
-            .split("<span data-zephium-tab-label")
+            .split("<span data-drift-tab-label")
             .nth(1)
             .and_then(|source| source.split("</span>").next())
             .expect("bounded exact title sentinel");
@@ -7918,7 +7918,7 @@ mod tests {
             .nth(1)
             .and_then(|source| source.split("/>").next())
             .expect("bounded address input");
-        assert!(address_input.contains("data-zephium-address"));
+        assert!(address_input.contains("data-drift-address"));
         assert!(address_input.contains("{value}"));
         assert!(address_input.contains("oninput={handleInput}"));
         assert!(!address_input.contains("bind:value"));
@@ -8011,7 +8011,7 @@ mod tests {
             .expect("browser navigation");
         assert!(hidden < navigated);
         assert!(hand_over.contains("self.serves_onboarding(window)"));
-        assert!(hand_over.contains("zephium-handover-watchdog"));
+        assert!(hand_over.contains("drift-handover-watchdog"));
 
         // Shown again only through the gate, once the browser has loaded and
         // acknowledged initialization.
@@ -8116,7 +8116,7 @@ mod tests {
             .nth(1)
             .and_then(|body| body.split("pub(crate) fn shutdown").next())
             .expect("bounded post-map Wayland startup");
-        assert!(portal_start.contains("zephium-wayland-shortcut"));
+        assert!(portal_start.contains("drift-wayland-shortcut"));
     }
 
     #[test]
@@ -8128,7 +8128,7 @@ mod tests {
             config
                 .get("productName")
                 .and_then(serde_json::Value::as_str),
-            Some("app.zephium")
+            Some("app.drift")
         );
         for pointer in [
             "/bundle/linux/deb/desktopTemplate",
@@ -8136,13 +8136,13 @@ mod tests {
         ] {
             assert_eq!(
                 config.pointer(pointer).and_then(serde_json::Value::as_str),
-                Some("linux/zephium.desktop.hbs")
+                Some("linux/drift.desktop.hbs")
             );
         }
-        let template = include_str!("../linux/zephium.desktop.hbs");
+        let template = include_str!("../linux/drift.desktop.hbs");
         for exact in [
-            "Name=Zephium",
-            "StartupWMClass=app.zephium",
+            "Name=Drift",
+            "StartupWMClass=app.drift",
             "Exec={{exec}} %U",
             "Icon={{icon}}",
         ] {
@@ -8216,7 +8216,7 @@ mod tests {
         assert!(parent_handle - parent_gate < 100);
 
         let engine_install = setup
-            .find("let engine = Arc::new(zephium_engine::install")
+            .find("let engine = Arc::new(drift_engine::install")
             .expect("native engine installation");
         let startup_engine_owner = setup
             .find("if !startup_engine.install(engine.clone())")
@@ -8243,7 +8243,7 @@ mod tests {
             .find("let shell_terminal_failure: ShellTerminalFailureCallback")
             .expect("terminal Shell failure callback");
         let shell_spawn = setup
-            .find("let shell = match zephium_app::spawn_suspended(")
+            .find("let shell = match drift_app::spawn_suspended(")
             .expect("suspended shell actor construction");
         let blocker_transfer = setup
             .find("if !startup_blocker.transfer_to(&blocker)")
@@ -8602,7 +8602,7 @@ mod tests {
         let source = include_str!("lib.rs");
         let all_frames_call = [
             ".initialization_script_for_all_frames(",
-            "zephium_engine::PAGE_PRINT_DENY_SCRIPT)",
+            "drift_engine::PAGE_PRINT_DENY_SCRIPT)",
         ]
         .concat();
         assert_eq!(source.matches(&all_frames_call).count(), 2);
@@ -8753,13 +8753,13 @@ mod tests {
         assert!(plist.contains("<key>NSCameraUsageDescription</key>"));
         assert!(plist.contains("<key>NSMicrophoneUsageDescription</key>"));
         assert!(
-            plist.contains("Zephium uses the camera only when you allow a website to access it.")
+            plist.contains("Drift uses the camera only when you allow a website to access it.")
         );
         assert!(plist.contains(
-            "Zephium uses the microphone while you dictate in Work, and for a website only when you allow it."
+            "Drift uses the microphone while you dictate in Work, and for a website only when you allow it."
         ));
         assert!(plist.contains("<key>NSSpeechRecognitionUsageDescription</key>"));
-        assert!(plist.contains("Zephium turns what you dictate in Work into text on this Mac."));
+        assert!(plist.contains("Drift turns what you dictate in Work into text on this Mac."));
     }
 
     #[test]
@@ -8799,7 +8799,7 @@ mod tests {
         assert_eq!(directive("style-src"), "'self' 'unsafe-inline'");
         assert_eq!(
             directive("img-src"),
-            "'self' data: zephium-media: http://zephium-media.localhost"
+            "'self' data: drift-media: http://drift-media.localhost"
         );
         assert_eq!(directive("font-src"), "'self' data:");
         // Same-origin workers only: the diagram layout engine runs off the page thread.
@@ -8998,7 +8998,7 @@ mod tests {
     #[test]
     fn work_pane_inputs_are_finite_positive_and_trusted() {
         let rect = |x, y, width, height| {
-            super::work_pane_rect(zephium_ipc::WorkPaneRect {
+            super::work_pane_rect(drift_ipc::WorkPaneRect {
                 x,
                 y,
                 width,
@@ -9007,7 +9007,7 @@ mod tests {
         };
         assert_eq!(
             rect(10.0, 20.0, 640.0, 480.0),
-            Some(zephium_core::geometry::Rect::new(10.0, 20.0, 640.0, 480.0))
+            Some(drift_core::geometry::Rect::new(10.0, 20.0, 640.0, 480.0))
         );
         assert_eq!(rect(-5.0, 20.0, 640.0, 480.0).map(|r| r.x), Some(-5.0));
         assert!(rect(10.0, 20.0, 0.0, 480.0).is_none());

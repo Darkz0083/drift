@@ -3,8 +3,8 @@ import { IS_MAC } from "$shared/platform";
 
 const ID = /^[0-9A-HJKMNP-TV-Z]{26}$/;
 const base = IS_MAC
-  ? "zephium-media://localhost/avatar/"
-  : "http://zephium-media.localhost/avatar/";
+  ? "drift-media://localhost/avatar/"
+  : "http://drift-media.localhost/avatar/";
 
 /** A saved photo, by revision so a new picture is never served from cache. */
 const photoUrl = (profile: string, revision: number) =>

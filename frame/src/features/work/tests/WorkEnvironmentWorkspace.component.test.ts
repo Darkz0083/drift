@@ -134,8 +134,8 @@ test("the production manual environment attaches a real tab, opens it in the pan
   const hole = native.paneShow.mock.lastCall?.[1];
   expect(hole.width).toBeGreaterThanOrEqual(480);
   expect(onopen).not.toHaveBeenCalled();
-  const row = screen.container.querySelector<HTMLElement>("[data-zephium-tab-id]")!;
-  expect(row.dataset.zephiumTabId).toBe("retained-tab");
+  const row = screen.container.querySelector<HTMLElement>("[data-drift-tab-id]")!;
+  expect(row.dataset.driftTabId).toBe("retained-tab");
   emitNativeEvent("layoutChanged", {
     dividers: [],
     work_pane: { tab: "retained-tab", ...hole, presented: true, generation: 1 },
@@ -357,7 +357,7 @@ test("prompt submission keeps work on canvas and clarification choices above the
   });
   // The zoom reads at the canvas's bottom edge; the canvas draws no top toolbar.
   expect(screen.container.querySelector("[data-work-zoom-slot] [role='group']")).not.toBeNull();
-  expect(screen.container.querySelector("[data-zephium-work-chrome]")).toBeNull();
+  expect(screen.container.querySelector("[data-drift-work-chrome]")).toBeNull();
   await screen.getByRole("button", { name: "Fit view", exact: true }).click();
   await expect.element(screen.getByText("Reviewed findings", { exact: true })).toBeVisible();
   expect(screen.container.querySelector(".detail")).toBeNull();

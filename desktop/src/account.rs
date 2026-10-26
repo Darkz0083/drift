@@ -1,8 +1,8 @@
-//! The optional Zephium account, as the frame sees it. The bearer stays in
+//! The optional Drift account, as the frame sees it. The bearer stays in
 //! native code; the frame gets the account's state and closed faults only.
 use super::*;
-use zephium_account::wire::{self, Billing, PlanChange, Purchase, Receipt, SignupMode, Usage};
-use zephium_account::{AccountError, AccountSettings, CallSource, Service, SystemVault, View};
+use drift_account::wire::{self, Billing, PlanChange, Purchase, Receipt, SignupMode, Usage};
+use drift_account::{AccountError, AccountSettings, CallSource, Service, SystemVault, View};
 
 pub(crate) mod avatar;
 
@@ -297,7 +297,7 @@ pub(crate) struct AccountV1 {
     /// Purchases and the billing portal are offered here.
     pub(crate) billing: Option<bool>,
     pub(crate) signup_open: Option<bool>,
-    /// The server asks for a newer Zephium than this one.
+    /// The server asks for a newer Drift than this one.
     pub(crate) update_required: bool,
     pub(crate) signed_in: bool,
     /// The address a sign-in code was sent to, while waiting for it.
@@ -305,7 +305,7 @@ pub(crate) struct AccountV1 {
     pub(crate) resend_in: Option<u32>,
     pub(crate) email: Option<String>,
     pub(crate) name: Option<String>,
-    /// The account picture's revision, served by `zephium-media` at
+    /// The account picture's revision, served by `drift-media` at
     /// `account-avatar/<revision>`; null shows initials. Never the service's
     /// address for it.
     pub(crate) avatar: Option<u32>,
@@ -358,7 +358,7 @@ pub(crate) enum AccountPurchaseV1 {
 
 /// The account changed; read it again.
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type, tauri_specta::Event)]
-#[tauri_specta(event_name = "zephium:account-changed")]
+#[tauri_specta(event_name = "drift:account-changed")]
 pub(crate) struct AccountChanged {
     pub(crate) version: u16,
 }
@@ -386,7 +386,7 @@ fn device_label(app: &tauri::AppHandle) -> String {
     } else {
         "Linux"
     };
-    format!("Zephium {} · {system}", app.package_info().version)
+    format!("Drift {} · {system}", app.package_info().version)
 }
 
 /// Creates the account service after the app store exists. A session left in
@@ -409,7 +409,7 @@ pub(crate) fn install(app: &tauri::AppHandle) {
         emit_to_privileged(
             &events,
             MAIN_LABEL,
-            "zephium:account-changed",
+            "drift:account-changed",
             &AccountChanged { version: 1 },
         );
         #[cfg(feature = "work-product")]
@@ -450,9 +450,9 @@ fn contacted(service: &Service) -> bool {
 #[cfg(feature = "work-product")]
 mod hosted {
     use super::*;
-    use zephium_agentic::lead::{LeadCloudRecord, LeadCredential, LeadSecret, LeadSecretFuture};
-    use zephium_app::work_models::{self, WorkCallSource, WorkCloudSession};
-    use zephium_core::work::model::WorkModelError;
+    use drift_agentic::lead::{LeadCloudRecord, LeadCredential, LeadSecret, LeadSecretFuture};
+    use drift_app::work_models::{self, WorkCallSource, WorkCloudSession};
+    use drift_core::work::model::WorkModelError;
 
     static SIGNED_IN: AtomicBool = AtomicBool::new(false);
 
@@ -495,7 +495,7 @@ mod hosted {
             let per_credit =
                 |service: &Service| service.view().usage.and_then(|usage| usage.credit_units());
             let unsettled = record.unsettled();
-            if let (Some(id), zephium_agentic::lead::LeadCloudAccounting::Settled { charged }) =
+            if let (Some(id), drift_agentic::lead::LeadCloudAccounting::Settled { charged }) =
                 (&record.request_id, &record.accounting)
             {
                 super::super::page_assist::hosted_charged(
@@ -588,7 +588,7 @@ fn available() -> bool {
 fn project(view: View) -> AccountV1 {
     let config = view.config.as_ref();
     let billing = view.billing.as_ref();
-    // Until Zephium's own server has been asked, what it offers is known.
+    // Until Drift's own server has been asked, what it offers is known.
     let ours = (!view.custom_server).then_some(true);
     // The signed-in account's own answers outrank the public hints.
     let hosted_models = view
@@ -723,7 +723,7 @@ fn funding(source: Option<&str>) -> Option<String> {
         .map(str::to_owned)
 }
 
-fn price(price: &Option<zephium_account::wire::Price>) -> Option<AccountPriceV1> {
+fn price(price: &Option<drift_account::wire::Price>) -> Option<AccountPriceV1> {
     let price = price.as_ref()?;
     Some(AccountPriceV1 {
         amount_minor: u32::try_from(price.amount_minor).ok()?,
@@ -759,7 +759,7 @@ fn unavailable_view() -> AccountV1 {
     AccountV1 {
         version: 1,
         available: false,
-        server: zephium_account::DEFAULT_ORIGIN.to_owned(),
+        server: drift_account::DEFAULT_ORIGIN.to_owned(),
         custom_server: false,
         hosted_models: None,
         billing: None,
@@ -1111,7 +1111,7 @@ pub(crate) async fn account_revoke_session(caller: WebviewWindow, id: String) ->
     reply(result)
 }
 
-/// Points accounts at another server, or back at Zephium's with null.
+/// Points accounts at another server, or back at Drift's with null.
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn account_set_server(
@@ -1269,7 +1269,7 @@ pub(crate) async fn account_export(caller: WebviewWindow) -> AccountExportV1 {
     let picked = tokio::task::spawn_blocking(move || {
         app.dialog()
             .file()
-            .set_file_name("Zephium account.json")
+            .set_file_name("Drift account.json")
             .add_filter("JSON", &["json"])
             .blocking_save_file()
     })
@@ -1498,7 +1498,7 @@ mod tests {
         }))
         .unwrap();
         let view = View {
-            server: "https://staging-api.zephium.app".into(),
+            server: "https://staging-api.drift.app".into(),
             config: Some(wire::ClientConfig {
                 signup_mode: Some(SignupMode::Allowlist),
                 billing_enabled: true,
@@ -1522,9 +1522,9 @@ mod tests {
 
     #[test]
     fn the_frame_gets_a_picture_revision_never_its_address_or_the_bearer() {
-        let url = "https://staging-api.zephium.app/v1/account/avatar/3f9a2c.webp";
+        let url = "https://staging-api.drift.app/v1/account/avatar/3f9a2c.webp";
         let view = View {
-            server: "https://staging-api.zephium.app".into(),
+            server: "https://staging-api.drift.app".into(),
             signed_in: true,
             profile: Some(wire::Profile {
                 id: "u1".into(),

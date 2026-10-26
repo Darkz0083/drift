@@ -128,10 +128,10 @@ export class Reorder {
     // stand before, so the drop lands before the next row that does.
     const others = this.#slots.filter((_, at) => at !== this.#from).slice(this.#index);
     for (const { element } of others) {
-      const tab = element.dataset.zephiumTabId
+      const tab = element.dataset.driftTabId
         ? element
-        : element.querySelector<HTMLElement>("[data-zephium-tab-id]");
-      if (tab?.dataset.zephiumTabId) return { changed: true, before: tab.dataset.zephiumTabId };
+        : element.querySelector<HTMLElement>("[data-drift-tab-id]");
+      if (tab?.dataset.driftTabId) return { changed: true, before: tab.dataset.driftTabId };
     }
     return { changed: true, before: null };
   }

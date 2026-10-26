@@ -7,9 +7,9 @@
  * own subtree with `data-theme-scope` and gets its own ladder.
  *
  * Each step is the graphite ladder's own distance from ground toward ink,
- * so Zephium's seeds land on graphite. `--seed-k` scales every step: 0.5 at
+ * so Drift's seeds land on graphite. `--seed-k` scales every step: 0.5 at
  * no contrast, 1 at the default and 1.5 at full. The chrome steps are
- * mirrored in Rust (zephium_core::theme), which paints the window's ground.
+ * mirrored in Rust (drift_core::theme), which paints the window's ground.
  *
  * The @supports wrapper is for the build, not the browser: every engine we
  * ship on mixes colours, and without it Tailwind adds a static fallback and

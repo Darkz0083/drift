@@ -29,10 +29,10 @@ async function sealedScenario(scenario: string): Promise<Result> {
   frame.srcdoc = `<button id="a">Send</button><button id="b">Send</button><select aria-label="Mode"><option>First</option><option>Second</option></select><script>
     ${entropy}
     let pull=null,parks=0;
-    Object.defineProperty(globalThis,"webkit",{value:{messageHandlers:{zephiumSemanticRuntimeV1:{postMessage(message){if(message==="P1")return new Promise(resolve=>pull=resolve);if(message==="K1:A"){parks++;return Promise.resolve("A1");}throw new Error("unexpected synthetic channel");}}}}});
+    Object.defineProperty(globalThis,"webkit",{value:{messageHandlers:{driftSemanticRuntimeV1:{postMessage(message){if(message==="P1")return new Promise(resolve=>pull=resolve);if(message==="K1:A"){parks++;return Promise.resolve("A1");}throw new Error("unexpected synthetic channel");}}}}});
   </script><script>${inject("semanticMediaRuntime")}
   addEventListener("load",async()=>{try{
-    const scenario=${JSON.stringify(scenario)},api=globalThis.__zephiumSemanticRuntimeV1;
+    const scenario=${JSON.stringify(scenario)},api=globalThis.__driftSemanticRuntimeV1;
     let cursor=0,attempt=0,clicks=0,focus=0;
     document.addEventListener("click",e=>{if(e.target.tagName==="BUTTON")clicks++;});
     document.addEventListener("focus",()=>focus++,true);
@@ -171,8 +171,8 @@ test("real document replacement cannot reuse an original private approval", asyn
     new Promise<void>((done) => frame.addEventListener("load", () => done(), { once: true }));
   type Api = { invoke(input: string): string | Promise<string> };
   const api = () =>
-    (frame.contentWindow as unknown as { __zephiumSemanticRuntimeV1: Api })
-      .__zephiumSemanticRuntimeV1;
+    (frame.contentWindow as unknown as { __driftSemanticRuntimeV1: Api })
+      .__driftSemanticRuntimeV1;
   const capture = async () =>
     JSON.parse(
       await api().invoke(

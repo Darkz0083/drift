@@ -17,7 +17,7 @@ export function i18nLocales(): Plugin {
     return index.get(key);
   };
   return {
-    name: "zephium-i18n-locales",
+    name: "drift-i18n-locales",
     enforce: "pre",
     buildStart() {
       index = null;

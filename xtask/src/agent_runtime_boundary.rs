@@ -5,15 +5,15 @@ use std::path::Path;
 
 use toml::Value;
 
-const MANIFEST: &str = "crates/zephium-agent-runtime/Cargo.toml";
-const ROOT: &str = "crates/zephium-agent-runtime/src/lib.rs";
+const MANIFEST: &str = "crates/drift-agent-runtime/Cargo.toml";
+const ROOT: &str = "crates/drift-agent-runtime/src/lib.rs";
 const WORKSPACE_MANIFEST: &str = "Cargo.toml";
 const ALLOWED_DEPENDENCIES: [&str; 4] =
-    ["crossbeam-queue", "thiserror", "tokio", "zephium-agentic"];
+    ["crossbeam-queue", "thiserror", "tokio", "drift-agentic"];
 const FORBIDDEN_SOURCE_TOKENS: [&str; 10] = [
-    "zephium_engine",
-    "zephium_store",
-    "zephium_app",
+    "drift_engine",
+    "drift_store",
+    "drift_app",
     "tauri",
     "wry",
     "webkit",
@@ -37,7 +37,7 @@ pub(crate) fn check(repository: &Path) -> Result<(), String> {
     validate_manifest(&manifest)?;
     validate_workspace_manifest(&workspace)?;
     validate_root(&source)?;
-    validate_all_sources(&repository.join("crates/zephium-agent-runtime/src"))?;
+    validate_all_sources(&repository.join("crates/drift-agent-runtime/src"))?;
     for (path, required, forbidden) in SCOPED_RULES {
         let source =
             std::fs::read_to_string(repository.join(path)).map_err(|error| error.to_string())?;
@@ -72,7 +72,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
         .and_then(Value::as_table)
         .and_then(|package| package.get("name"))
         .and_then(Value::as_str)
-        != Some("zephium-agent-runtime")
+        != Some("drift-agent-runtime")
     {
         return Err("agent runtime package name drifted".to_owned());
     }
@@ -96,7 +96,7 @@ fn validate_manifest(source: &str) -> Result<(), String> {
     if actual != expected {
         return Err("agent runtime dependency set drifted from the approved boundary".to_owned());
     }
-    for dependency in ["crossbeam-queue", "thiserror", "zephium-agentic"] {
+    for dependency in ["crossbeam-queue", "thiserror", "drift-agentic"] {
         if dependencies
             .get(dependency)
             .and_then(Value::as_table)
@@ -208,7 +208,7 @@ fn validate_root(source: &str) -> Result<(), String> {
 }
 
 const SCOPED_RULES: &[(&str, &[&str], &[&str])] = &[
-    ("crates/zephium-agent-runtime/src/runtime/scoped.rs", &[
+    ("crates/drift-agent-runtime/src/runtime/scoped.rs", &[
         "lease.run()!=manifest.run()", "lease.deadline()>manifest.expires_at()||lease.deadline()<=manifest.issued_at()",
         "contains(&lease.resource().identity().profile())",
         "AgentRunPolicySettlementBinding::new(manifest)",
@@ -228,13 +228,13 @@ const SCOPED_RULES: &[(&str, &[&str], &[&str])] = &[
         "AgentBrowserPort", "AgentRuntimeBrowser", "ContextRegistry", "Serialize", "Deserialize",
         "std::thread", "tokio::spawn", "is_clean(", "native_event_sink(", "shutdown_audit(",
     ]),
-    ("crates/zephium-agentic/src/agent_work_journal.rs", &[
+    ("crates/drift-agentic/src/agent_work_journal.rs", &[
         "previous.disposition()!=AgentWorkDisposition::Running",
         "previous.0[32..48]!=policy.closure().manifest().bytes()",
         "previous.0[48..64]!=delivery.lease().run().bytes()",
         "previous.0[64..96]!=policy.closure().manifest_guard()",
     ], &[]),
-    ("crates/zephium-agent-runtime/src/runtime.rs", &[
+    ("crates/drift-agent-runtime/src/runtime.rs", &[
         "enumRuntimeController", "Scoped(Box<dynAgentRuntimeScopedController>)",
         "Some(controller.run(worker))", "asyncfnclaim_terminal(",
         "self.inner.mailbox.try_claim_clean_quiescence().await",
@@ -252,13 +252,13 @@ const SCOPED_RULES: &[(&str, &[&str], &[&str])] = &[
         "recover_lock(&inner.scoped_closure).take()",
         "self.inner.control_wake.notify_waiters();Ok(ticket)",
     ], &["worker.take().is_some_and(RuntimeWorkerOwnership::join)", "worker.is_finished()", "control_wake.notify_one()"]),
-    ("crates/zephium-agentic/src/agent_policy.rs", &[
+    ("crates/drift-agentic/src/agent_policy.rs", &[
         "pubstructAgentRunPolicySettlementBinding", "manifest:AgentRunManifestId,guard:[u8;32]",
         "settlement.closure.manifest()==self.manifest&&settlement.closure.manifest_guard()==self.guard",
         "std::mem::size_of::<AgentRunPolicySettlementBinding>()<=64",
     ], &[]),
-    ("crates/zephium-agent-controller/tests/scoped_runtime.rs", &[
-        "#![cfg(feature=\"provider-transport\")]", "usezephium_agent_runtime::*;",
+    ("crates/drift-agent-controller/tests/scoped_runtime.rs", &[
+        "#![cfg(feature=\"provider-transport\")]", "usedrift_agent_runtime::*;",
         "AgentRuntimeScopedBinding::try_new(", "PendingScopedAgentRuntime::spawn_suspended(",
         "rows.revoke_with_delivery(&lease)", "ended.join_delivery(ticket.try_take().unwrap().unwrap())",
         "AgentProviderTransport::try_new(AgentProviderTransportConfig::STANDARD)",
@@ -306,14 +306,14 @@ mod tests {
     fn rejects_a_probe_feature() {
         let source = r#"
             [package]
-            name = "zephium-agent-runtime"
+            name = "drift-agent-runtime"
             [features]
             probe-harness = []
             [dependencies]
             crossbeam-queue = { workspace = true }
             thiserror.workspace = true
             tokio.workspace = true
-            zephium-agentic.workspace = true
+            drift-agentic.workspace = true
         "#;
         assert!(validate_manifest(source).is_err());
     }
@@ -343,14 +343,14 @@ mod tests {
 
     #[test]
     fn runtime_cannot_enable_transport_through_normal_or_test_dependencies() {
-        let source = include_str!("../../crates/zephium-agent-runtime/Cargo.toml");
+        let source = include_str!("../../crates/drift-agent-runtime/Cargo.toml");
         validate_manifest(source).unwrap();
         for changed in [
             source.replace(
-                "zephium-agentic.workspace = true",
-                "zephium-agentic = { workspace = true, features = [\"provider-transport\"] }",
+                "drift-agentic.workspace = true",
+                "drift-agentic = { workspace = true, features = [\"provider-transport\"] }",
             ),
-            format!("{source}\n[dev-dependencies]\nzephium-agentic = {{ workspace = true, features = [\"provider-transport\"] }}"),
+            format!("{source}\n[dev-dependencies]\ndrift-agentic = {{ workspace = true, features = [\"provider-transport\"] }}"),
             format!("{source}\nreqwest = \"0.13\""),
         ] {
             assert!(validate_manifest(&changed).is_err());

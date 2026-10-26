@@ -10,8 +10,8 @@ export function engineName(engine: VoiceEngineV1): string {
   switch (engine) {
     case "on_device":
       return IS_MAC ? m.voice_engine_mac() : m.voice_engine_device();
-    case "zephium":
-      return m.voice_engine_zephium();
+    case "drift":
+      return m.voice_engine_drift();
     case "open_ai":
       return m.voice_engine_openai();
     case "groq":

@@ -82,7 +82,7 @@ const sidebar = page(164, 314, 250, name(164, 116, 46));
 /** Its inner pages carry a strip of it at the top right. */
 const header = page(150, 57, 74, name(150, 92, 22));
 
-const scratch = mkdtempSync(join(tmpdir(), "zephium-installer-"));
+const scratch = mkdtempSync(join(tmpdir(), "drift-installer-"));
 const browser = await webkit.launch();
 async function render(html, width, height, scale) {
   const file = join(scratch, `${width}x${height}.html`);

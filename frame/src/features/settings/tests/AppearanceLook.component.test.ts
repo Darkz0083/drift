@@ -37,8 +37,8 @@ afterEach(() => {
 });
 
 const cases: [string, "light" | "dark", string][] = [
-  ["zephium", "dark", "liquid_glass"],
-  ["zephium", "light", "liquid_glass"],
+  ["drift", "dark", "liquid_glass"],
+  ["drift", "light", "liquid_glass"],
   ["paper", "light", "none"],
   ["paper", "dark", "none"],
   ["nord", "dark", "liquid_glass"],
@@ -100,9 +100,9 @@ test("a copied theme imports back, and a broken one says so", async () => {
   const screen = await render(AppearanceStage);
   await screen.getByRole("button", { name: "Import" }).click();
   const field = screen.getByRole("textbox", { name: "Theme to import" });
-  await field.fill("zephium-theme:v1:bm90IGEgdGhlbWU");
+  await field.fill("drift-theme:v1:bm90IGEgdGhlbWU");
   await screen.getByRole("button", { name: "Use theme" }).click();
-  await expect.element(screen.getByText("That isn’t a Zephium theme.")).toBeVisible();
+  await expect.element(screen.getByText("That isn’t a Drift theme.")).toBeVisible();
   const scroller = document.querySelector<HTMLElement>(".settings-content")!;
   scroller.scrollTop = 900;
   await settle();

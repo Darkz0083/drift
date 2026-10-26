@@ -1,4 +1,4 @@
-# Releasing Zephium
+# Releasing Drift
 
 Pushing a `v*` tag runs [`release.yml`](workflows/release.yml). It builds and
 verifies macOS (Apple Silicon) and Windows (x64), then creates a **draft**
@@ -31,7 +31,7 @@ Generate the minisign key pair once and keep the private key and password in a
 password manager:
 
 ```sh
-pnpm --dir desktop tauri signer generate -w ~/.tauri/zephium-updater.key
+pnpm --dir desktop tauri signer generate -w ~/.tauri/drift-updater.key
 ```
 
 The public key (the `.pub` file contents) is embedded in
@@ -70,7 +70,7 @@ existing install on its current version.
 
 2. **Bump the version** in `desktop/Cargo.toml` (`[package] version`, e.g.
    `1.0.0-beta.1`). It is the only version source: `tauri.conf.json` has none.
-   Run `cargo check -p zephium-desktop` so `Cargo.lock` follows.
+   Run `cargo check -p drift-desktop` so `Cargo.lock` follows.
 3. **Run the release gate locally.** It is the same check the workflow runs
    first: strict engine-floor and advisory reviews, seed freshness, and
    outstanding vendor fixes.
@@ -83,7 +83,7 @@ existing install on its current version.
 5. **Tag and push** the merged commit:
 
    ```sh
-   git tag -a v1.0.0-beta.1 -m "Zephium 1.0.0-beta.1"
+   git tag -a v1.0.0-beta.1 -m "Drift 1.0.0-beta.1"
    git push origin v1.0.0-beta.1
    ```
 
@@ -105,9 +105,9 @@ contract:
 
 | Asset | Purpose |
 | --- | --- |
-| `Zephium-macOS-arm64.dmg` | macOS download |
-| `Zephium-macOS-arm64.app.tar.gz` + `.sig` | macOS updater payload |
-| `Zephium-Windows-x64-setup.exe` + `.sig` | Windows download and updater payload |
+| `Drift-macOS-arm64.dmg` | macOS download |
+| `Drift-macOS-arm64.app.tar.gz` + `.sig` | macOS updater payload |
+| `Drift-Windows-x64-setup.exe` + `.sig` | Windows download and updater payload |
 | `latest.json` | Updater manifest (`darwin-aarch64[-app]`, `windows-x86_64[-nsis]`) |
 | `SHA256SUMS` | Digests of every other asset |
 
@@ -117,7 +117,7 @@ updater.
 
 ## What the workflow verifies
 
-- The tag is `v` + the `zephium-desktop` version, valid semver, and
+- The tag is `v` + the `drift-desktop` version, valid semver, and
   `tauri.conf.json` carries no competing version.
 - `cargo xtask check-release-engine-security` passes.
 - macOS: `codesign --verify --deep --strict`, the signing team is
@@ -127,7 +127,7 @@ updater.
 - Both updater signatures verify against the public key in
   `desktop/tauri.conf.json`, and the asset set is exactly the one above.
 - Build provenance is attested for the DMG, the updater archive and the
-  installer (`gh attestation verify <file> --repo zephium-browser/Zephium`).
+  installer (`gh attestation verify <file> --repo drift-browser/Drift`).
 
 The macOS dSYM and Windows PDB are kept as workflow artifacts for 90 days.
 Download them for any release you need to symbolicate later.
@@ -141,11 +141,11 @@ changes the installer's bytes, so sign it first, then replace Tauri's `.sig`
 by running `pnpm tauri signer sign` over the signed file.
 
 Until then, SmartScreen judges each installer by its own download reputation.
-After publishing, submit `Zephium-Windows-x64-setup.exe` at
+After publishing, submit `Drift-Windows-x64-setup.exe` at
 <https://www.microsoft.com/wdsi/filesubmission> as a software developer
 ("Incorrectly detected as malware/malicious" when it is flagged). Keep the
 asset name and download URL unchanged between releases, and keep the bundle's
-`publisher` at `Zephium`: Windows keys the per-user install by it.
+`publisher` at `Drift`: Windows keys the per-user install by it.
 
 ## Recovery
 

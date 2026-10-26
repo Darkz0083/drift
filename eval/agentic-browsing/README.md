@@ -1,7 +1,7 @@
 # Agentic browsing evidence
 
 This directory contains reviewable, non-sensitive manifests for the browser
-execution proof. The Rust contract in `zephium-agentic` is the wire-schema
+execution proof. The Rust contract in `drift-agentic` is the wire-schema
 authority. These files describe exact pinned capabilities, named-device
 measurement procedures, and the absence or presence of reviewed results.
 
@@ -13,52 +13,52 @@ reviewed hardware class, OS/runtime versions, and aggregate resource counters.
 Deterministic contract and fixture checks:
 
 ```sh
-cargo test --locked -p zephium-agentic --features probe-harness
-cargo clippy --locked -p zephium-agentic --all-targets \
+cargo test --locked -p drift-agentic --features probe-harness
+cargo clippy --locked -p drift-agentic --all-targets \
   --features probe-harness -- -D warnings
-cargo test --locked -p zephium-agent-provider-transport
-cargo clippy --locked -p zephium-agent-provider-transport \
+cargo test --locked -p drift-agent-provider-transport
+cargo clippy --locked -p drift-agent-provider-transport \
   --all-targets -- -D warnings
-cargo test --locked -p zephium-engine \
+cargo test --locked -p drift-engine \
   --features native-agentic-input-probe --lib
-cargo test --locked -p zephium-engine \
+cargo test --locked -p drift-engine \
   --features native-agentic-input-probe \
   --bin macos-agentic-input-probe
-cargo clippy --locked -p zephium-engine \
+cargo clippy --locked -p drift-engine \
   --features native-agentic-input-probe \
   --bin macos-agentic-input-probe --lib -- -D warnings
-cargo test --locked -p zephium-engine \
+cargo test --locked -p drift-engine \
   --features agentic-browser --lib
-cargo clippy --locked -p zephium-engine \
+cargo clippy --locked -p drift-engine \
   --features agentic-browser --all-targets -- -D warnings
-cargo check --locked -p zephium-engine \
+cargo check --locked -p drift-engine \
   --features native-agentic-semantic-probe \
   --bin macos-agentic-semantic-probe
 cargo check --locked --target x86_64-pc-windows-msvc \
-  -p zephium-engine --features native-agentic-input-probe \
+  -p drift-engine --features native-agentic-input-probe \
   --bin windows-agentic-input-probe
 cargo clippy --locked --target x86_64-pc-windows-msvc \
-  -p zephium-engine --features native-agentic-input-probe \
+  -p drift-engine --features native-agentic-input-probe \
   --bin windows-agentic-input-probe
 cargo check --locked --target x86_64-pc-windows-msvc \
-  -p zephium-engine --features agentic-browser
+  -p drift-engine --features agentic-browser
 cargo check --locked --target x86_64-pc-windows-msvc \
-  -p zephium-engine --features native-agentic-semantic-probe \
+  -p drift-engine --features native-agentic-semantic-probe \
   --bin windows-agentic-semantic-probe
 cargo clippy --locked --target x86_64-pc-windows-msvc \
-  -p zephium-engine --features native-agentic-semantic-probe \
+  -p drift-engine --features native-agentic-semantic-probe \
   --bin windows-agentic-semantic-probe
 cargo xtask check-agentic-probe-boundary
 ```
 
-The default `zephium-agentic` tests also exercise the shipping Milestone 2
+The default `drift-agentic` tests also exercise the shipping Milestone 2
 context/profile/cookie/handoff core, the semantic runtime, and the bounded
 action/read/extract/screenshot functional core. They require no native view,
 worker, network listener, profile data, provider call, or diagnostic feature.
 See `docs/agentic-browsing.md` for the implemented and still-pending boundaries.
 
 An optimized build with `probe-harness` is expected to fail at compile time.
-The ordinary `zephium-desktop` resolved graph may reach the production
+The ordinary `drift-desktop` resolved graph may reach the production
 functional core through Store, but is separately required not to activate
 `probe-harness`, `native-agentic-input-probe`, or
 `native-agentic-semantic-probe`. All probe-only contract,
@@ -80,7 +80,7 @@ missing device work into a pass.
 macOS CI also executes the hidden 14-case fixed-DOM matrix:
 
 ```sh
-cargo run --locked -p zephium-engine \
+cargo run --locked -p drift-engine \
   --features native-agentic-input-probe \
   --bin macos-agentic-input-probe -- --ci-hidden-fixed-dom
 ```
@@ -95,7 +95,7 @@ non-sensitive fields rather than committed raw.
 The macOS production semantic adapter has a separate one-shot qualifier:
 
 ```sh
-cargo run --locked -p zephium-engine \
+cargo run --locked -p drift-engine \
   --features native-agentic-semantic-probe \
   --bin macos-agentic-semantic-probe -- --ci-hidden-fixed-dom
 ```
@@ -128,7 +128,7 @@ retains only these explicitly public qualification responses for dashboard
 inspection, and emits content-free aggregate metrics locally:
 
 ```sh
-cargo run --locked -p zephium-terra-macos-probe \
+cargo run --locked -p drift-terra-macos-probe \
   --features live-probe -- --live-public-luna-suite-inspectable
 ```
 
@@ -188,24 +188,24 @@ these exact closed modes in order:
 New-Item -ItemType Directory -Force `
   eval/agentic-browsing/local-results | Out-Null
 cargo --offline check --locked --target x86_64-pc-windows-msvc `
-  -p zephium-engine --features agentic-browser
-cargo --offline run --locked -p zephium-engine `
+  -p drift-engine --features agentic-browser
+cargo --offline run --locked -p drift-engine `
   --features native-agentic-input-probe `
   --bin windows-agentic-input-probe -- --ci-hidden-fixed-dom `
   --evidence-directory eval/agentic-browsing/local-results
-cargo --offline run --locked -p zephium-engine `
+cargo --offline run --locked -p drift-engine `
   --features native-agentic-input-probe `
   --bin windows-agentic-input-probe -- --ci-hidden-hwnd `
   --evidence-directory eval/agentic-browsing/local-results
-cargo --offline run --locked -p zephium-engine `
+cargo --offline run --locked -p drift-engine `
   --features native-agentic-input-probe `
   --bin windows-agentic-input-probe -- --ci-hidden-cdp `
   --evidence-directory eval/agentic-browsing/local-results
-cargo --offline run --locked -p zephium-engine `
+cargo --offline run --locked -p drift-engine `
   --features native-agentic-input-probe `
   --bin windows-agentic-input-probe -- --visible-background-windows-all `
   --evidence-directory eval/agentic-browsing/local-results
-cargo --offline run --locked -p zephium-agentic `
+cargo --offline run --locked -p drift-agentic `
   --features probe-harness `
   --bin windows-agentic-input-evidence-review -- `
   --directory eval/agentic-browsing/local-results `
@@ -293,31 +293,31 @@ Run the six non-debugger modes as ordinary processes on an authorized
 physical Windows device:
 
 ```powershell
-cargo --offline run --locked -p zephium-engine `
+cargo --offline run --locked -p drift-engine `
   --features native-agentic-semantic-probe `
   --bin windows-agentic-semantic-probe -- --ci-hidden-fixed-documents `
   --evidence-directory eval/agentic-browsing/local-results
-cargo --offline run --locked -p zephium-engine `
+cargo --offline run --locked -p drift-engine `
   --features native-agentic-semantic-probe `
   --bin windows-agentic-semantic-probe -- --ci-hidden-redirect-lifecycle `
   --evidence-directory eval/agentic-browsing/local-results
-cargo --offline run --locked -p zephium-engine `
+cargo --offline run --locked -p drift-engine `
   --features native-agentic-semantic-probe `
   --bin windows-agentic-semantic-probe -- --ci-hidden-location-replacement `
   --evidence-directory eval/agentic-browsing/local-results
-cargo --offline run --locked -p zephium-engine `
+cargo --offline run --locked -p drift-engine `
   --features native-agentic-semantic-probe `
   --bin windows-agentic-semantic-probe -- --ci-hidden-suspend-resume `
   --evidence-directory eval/agentic-browsing/local-results
-cargo --offline run --locked -p zephium-engine `
+cargo --offline run --locked -p drift-engine `
   --features native-agentic-semantic-probe `
   --bin windows-agentic-semantic-probe -- --ci-hidden-event-flood `
   --evidence-directory eval/agentic-browsing/local-results
-cargo --offline run --locked -p zephium-engine `
+cargo --offline run --locked -p drift-engine `
   --features native-agentic-semantic-probe `
   --bin windows-agentic-semantic-probe -- --ci-hidden-renderer-loss `
   --evidence-directory eval/agentic-browsing/local-results
-cargo --offline build --locked -p zephium-engine `
+cargo --offline build --locked -p drift-engine `
   --features native-agentic-semantic-probe `
   --bin windows-agentic-semantic-probe
 ```
@@ -360,7 +360,7 @@ samples debugger state and foreground, active-window, and thread-focus state
 throughout native work. Review only the exact seven create-new records:
 
 ```powershell
-cargo --offline run --locked -p zephium-agentic `
+cargo --offline run --locked -p drift-agentic `
   --features probe-harness `
   --bin windows-agentic-semantic-evidence-review -- `
   --directory eval/agentic-browsing/local-results `

@@ -362,7 +362,7 @@ class LocalFixtureTests(unittest.TestCase):
 class FixtureCleanupTests(unittest.TestCase):
     def setup_fixture(self, home):
         task={"id":"local-json-edit","category":"local-fixture"}
-        root=home/'zephium-work-fixture-Abc123'
+        root=home/'drift-work-fixture-Abc123'
         root.mkdir(mode=0o700)
         (root/'docs').mkdir()
         (root/'TASK.md').write_text('synthetic task\n')

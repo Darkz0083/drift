@@ -86,7 +86,7 @@ impl LinuxLauncherShortcut {
         self.key
     }
 
-    pub(crate) fn focused_shortcut(self) -> zephium_core::ports::engine::Shortcut {
+    pub(crate) fn focused_shortcut(self) -> drift_core::ports::engine::Shortcut {
         let key = match self.key {
             LinuxLauncherKey::Space => 0x20,
             LinuxLauncherKey::Tab => 0x09,
@@ -95,7 +95,7 @@ impl LinuxLauncherShortcut {
             }
             LinuxLauncherKey::AsciiAlphanumeric(key) => u32::from(key),
         };
-        zephium_core::ports::engine::Shortcut {
+        drift_core::ports::engine::Shortcut {
             id: LAUNCHER_COMMAND_ID.to_owned(),
             ctrl: self.ctrl,
             shift: self.shift,

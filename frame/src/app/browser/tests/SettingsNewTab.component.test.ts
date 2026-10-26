@@ -58,5 +58,5 @@ test("a new tab opened from Settings over a page shows the new tab", async () =>
     tabs: [page, fresh],
     active: fresh.id,
   });
-  await expect.poll(() => screen.container.querySelector("[data-zephium-new-tab]")).not.toBeNull();
+  await expect.poll(() => screen.container.querySelector("[data-drift-new-tab]")).not.toBeNull();
 });

@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-DmjEkyC-.js";var t=((t={},n={})=>(n.locale??e(),`End focus?`)),n=((t={},n={})=>(n.locale??e(),`Focus couldn't change. Try again.`));export{t as n,n as t};

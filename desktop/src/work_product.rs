@@ -1,9 +1,9 @@
 //! Privileged Work intent transport. Serialized data cannot create an attempt.
 use tauri::{Manager, WebviewWindow};
-use zephium_core::work::{WorkCommandId, WorkId};
-use zephium_core::{ids::ProfileId, work::WorkError};
-use zephium_ipc::work::{WorkCallV1, WorkResponseV1};
-use zephium_ipc::work::{WorkOperationResponseV1, WorkOperationStateV1, WorkOperationV1};
+use drift_core::work::{WorkCommandId, WorkId};
+use drift_core::{ids::ProfileId, work::WorkError};
+use drift_ipc::work::{WorkCallV1, WorkResponseV1};
+use drift_ipc::work::{WorkOperationResponseV1, WorkOperationStateV1, WorkOperationV1};
 
 #[cfg(feature = "work-product")]
 pub(crate) struct WorkProductState {
@@ -14,8 +14,8 @@ pub(crate) struct WorkProductState {
 impl WorkProductState {
     pub(crate) fn page_frame(
         &self,
-        attempt: zephium_core::work::WorkAttemptId,
-        step: zephium_core::work::WorkStepId,
+        attempt: drift_core::work::WorkAttemptId,
+        step: drift_core::work::WorkStepId,
     ) -> Option<std::sync::Arc<Vec<u8>>> {
         self.providers.activity.frame(attempt, step)
     }
@@ -37,7 +37,7 @@ pub(crate) fn admit_run(
         .try_state::<WorkProductState>()
         .ok_or(WorkError::Unavailable)?;
     let provider = owner.providers.clone();
-    let shell = app.state::<zephium_app::Handle>().inner().clone();
+    let shell = app.state::<drift_app::Handle>().inner().clone();
     let task_input = input.clone();
     owner
         .operations
@@ -47,21 +47,21 @@ pub(crate) fn admit_run(
 }
 
 /// Durable last frames of pages the agent read, managed beside the media blobs.
-pub(crate) struct WorkFrames(pub(crate) std::sync::Arc<zephium_store::WorkFrameStore>);
+pub(crate) struct WorkFrames(pub(crate) std::sync::Arc<drift_store::WorkFrameStore>);
 
 #[cfg(feature = "work-product")]
 pub(crate) fn install(
     app: &tauri::AppHandle,
-    engine: std::sync::Arc<zephium_engine::WebviewEngine>,
-    store: std::sync::Arc<zephium_store::SqliteStore>,
-    frames: Option<std::sync::Arc<zephium_store::WorkFrameStore>>,
+    engine: std::sync::Arc<drift_engine::WebviewEngine>,
+    store: std::sync::Arc<drift_store::SqliteStore>,
+    frames: Option<std::sync::Arc<drift_store::WorkFrameStore>>,
 ) -> bool {
-    use zephium_core::ports::store::Store;
+    use drift_core::ports::store::Store;
     #[cfg(feature = "work-development-traces")]
     super::work_diagnostics::install(app);
     #[cfg(feature = "work-integration-qa")]
     super::work_captures::install(app);
-    zephium_app::work_screenshots::initialize(store.app_setting_readback("work.screenshots"));
+    drift_app::work_screenshots::initialize(store.app_setting_readback("work.screenshots"));
     let ai_enabled = store.app_setting("ai.enabled").as_deref() != Some("false");
     let work_enabled = store.app_setting("work.enabled").as_deref() != Some("false");
     let providers = std::sync::Arc::new(super::work_provider::WorkProviders::new(
@@ -72,7 +72,7 @@ pub(crate) fn install(
         providers
             .activity
             .set_page_observer(std::sync::Arc::new(move |change| {
-                super::emit_to_privileged(&app, super::MAIN_LABEL, "zephium:work-changed", &change);
+                super::emit_to_privileged(&app, super::MAIN_LABEL, "drift:work-changed", &change);
             }));
     }
     {
@@ -81,7 +81,7 @@ pub(crate) fn install(
             super::emit_to_privileged(
                 &app,
                 super::MAIN_LABEL,
-                "zephium:work-decision-preference-changed",
+                "drift:work-decision-preference-changed",
                 &change,
             );
         }));
@@ -96,7 +96,7 @@ pub(crate) fn install(
                 super::emit_to_privileged(
                     &app,
                     super::MAIN_LABEL,
-                    "zephium:work-human-changed",
+                    "drift:work-human-changed",
                     &change,
                 );
                 alerts.refresh(&app);
@@ -113,7 +113,7 @@ pub(crate) fn install(
 
 pub(crate) fn preference_processed(
     app: &tauri::AppHandle,
-    disposition: &zephium_ipc::OperationDisposition,
+    disposition: &drift_ipc::OperationDisposition,
 ) {
     #[cfg(feature = "work-product")]
     if let Some(owner) = app.try_state::<WorkProductState>() {
@@ -134,7 +134,7 @@ async fn selected_work(
     let profile = ProfileId::parse(profile)
         .filter(|id| id.to_string() == profile)
         .ok_or(WorkError::Invalid)?;
-    let shell = app.state::<zephium_app::Handle>();
+    let shell = app.state::<drift_app::Handle>();
     let response = tokio::time::timeout(
         std::time::Duration::from_secs(8),
         admit("projection", None, || shell.work_projection(profile, work)).await?,
@@ -197,7 +197,7 @@ pub(crate) async fn work_activity(
     app: tauri::AppHandle,
     expected_profile: String,
     work: WorkId,
-) -> zephium_ipc::work::WorkActivityResponseV1 {
+) -> drift_ipc::work::WorkActivityResponseV1 {
     let result = async {
         if !super::authorize(&caller, super::CallerPolicy::Main, "work_activity")
             || super::shutdown_started(&app)
@@ -209,7 +209,7 @@ pub(crate) async fn work_activity(
             .ok_or(WorkError::Invalid)?;
         let response = tokio::time::timeout(
             std::time::Duration::from_secs(8),
-            app.state::<zephium_app::Handle>()
+            app.state::<drift_app::Handle>()
                 .work_projection(profile, work)?,
         )
         .await
@@ -217,7 +217,7 @@ pub(crate) async fn work_activity(
         if response.profile != profile {
             return Err(WorkError::ProfileUnavailable);
         }
-        let zephium_core::work::port::WorkReply::Runtime(state) = response.reply else {
+        let drift_core::work::port::WorkReply::Runtime(state) = response.reply else {
             return Err(WorkError::Invalid);
         };
         #[cfg(feature = "work-product")]
@@ -236,7 +236,7 @@ pub(crate) async fn work_activity(
         Ok((signals, pages)) => (signals, pages, None),
         Err(error) => (Vec::new(), Vec::new(), Some(error.into())),
     };
-    zephium_ipc::work::WorkActivityResponseV1 {
+    drift_ipc::work::WorkActivityResponseV1 {
         version: 1,
         profile: expected_profile,
         work,
@@ -260,7 +260,7 @@ pub(crate) async fn work_operation(
             return Err(WorkError::Unavailable);
         }
         if serde_json::to_vec(&input).map_or(true, |bytes| {
-            bytes.len() > zephium_core::work::MAX_WORK_REQUEST_BYTES
+            bytes.len() > drift_core::work::MAX_WORK_REQUEST_BYTES
         }) {
             return Err(WorkError::Capacity);
         }
@@ -269,7 +269,7 @@ pub(crate) async fn work_operation(
         {
             let owner = app.state::<WorkProductState>();
             let provider = owner.providers.clone();
-            let shell = app.state::<zephium_app::Handle>().inner().clone();
+            let shell = app.state::<drift_app::Handle>().inner().clone();
             let task_input = input.clone();
             owner
                 .operations
@@ -304,13 +304,13 @@ pub(crate) async fn work_edit_draft(
     app: tauri::AppHandle,
     expected_profile: String,
     work: WorkId,
-    expected_revision: zephium_core::work::WorkRevision,
+    expected_revision: drift_core::work::WorkRevision,
     command: WorkCommandId,
-    execution: zephium_core::work::WorkExecutionId,
-    artifact: zephium_core::work::WorkArtifactId,
+    execution: drift_core::work::WorkExecutionId,
+    artifact: drift_core::work::WorkArtifactId,
     body: String,
 ) -> WorkResponseV1 {
-    use zephium_core::work::{
+    use drift_core::work::{
         artifact::WorkArtifactDataV1, port::WorkReply, runtime::WorkRuntimeIntent,
     };
     let result = async {
@@ -325,7 +325,7 @@ pub(crate) async fn work_edit_draft(
             .ok_or(WorkError::Invalid)?;
         let response = tokio::time::timeout(
             std::time::Duration::from_secs(8),
-            app.state::<zephium_app::Handle>()
+            app.state::<drift_app::Handle>()
                 .work_projection(profile, work)?,
         )
         .await
@@ -363,7 +363,7 @@ pub(crate) async fn work_edit_draft(
         let evidence = edited.map_or_else(|| original.evidence.clone(), |u| u.evidence.clone());
         data.validate(evidence.len())?;
         Ok(WorkCallV1::Execute {
-            command: zephium_ipc::work::WorkCommandV1 {
+            command: drift_ipc::work::WorkCommandV1 {
                 version: 1,
                 work,
                 expected_revision,
@@ -383,7 +383,7 @@ pub(crate) async fn work_edit_draft(
         Err(error) => WorkResponseV1 {
             version: 1,
             profile: expected_profile,
-            reply: zephium_ipc::work::WorkReplyV1::Error {
+            reply: drift_ipc::work::WorkReplyV1::Error {
                 error: error.into(),
             },
         },
@@ -397,10 +397,10 @@ pub(crate) async fn work_context_preview(
     caller: WebviewWindow,
     app: tauri::AppHandle,
     expected_profile: String,
-    purpose: zephium_core::work::context::WorkContextPurpose,
-    selection: zephium_core::work::context::WorkContextSelectionV1,
-) -> zephium_ipc::work::WorkContextPreviewV1 {
-    use zephium_ipc::work::WorkContextPreviewV1;
+    purpose: drift_core::work::context::WorkContextPurpose,
+    selection: drift_core::work::context::WorkContextSelectionV1,
+) -> drift_ipc::work::WorkContextPreviewV1 {
+    use drift_ipc::work::WorkContextPreviewV1;
     let result = async {
         if !super::authorize(&caller, super::CallerPolicy::Main, "work_context_preview")
             || super::shutdown_started(&app)
@@ -413,10 +413,10 @@ pub(crate) async fn work_context_preview(
         selection.validate()?;
         #[cfg(feature = "work-product")]
         {
-            let shell = app.state::<zephium_app::Handle>().inner().clone();
+            let shell = app.state::<drift_app::Handle>().inner().clone();
             tokio::time::timeout(
                 std::time::Duration::from_secs(10),
-                zephium_app::work_context::WorkContextAdmission::new(shell)
+                drift_app::work_context::WorkContextAdmission::new(shell)
                     .preview(profile, purpose, &selection),
             )
             .await
@@ -508,7 +508,7 @@ pub(crate) async fn work_call(
     let failed = |error: WorkError| WorkResponseV1 {
         version: 1,
         profile: expected_profile.clone(),
-        reply: zephium_ipc::work::WorkReplyV1::Error {
+        reply: drift_ipc::work::WorkReplyV1::Error {
             error: error.into(),
         },
     };
@@ -523,14 +523,14 @@ pub(crate) async fn work_call(
         return failed(WorkError::Invalid);
     };
     if serde_json::to_vec(&call).map_or(true, |bytes| {
-        bytes.len() > zephium_core::work::MAX_WORK_REQUEST_BYTES
+        bytes.len() > drift_core::work::MAX_WORK_REQUEST_BYTES
     }) {
         return failed(WorkError::Capacity);
     }
     if !super::resource_close::touch(&app, caller.label()) {
         return failed(WorkError::Unavailable);
     }
-    let shell = app.state::<zephium_app::Handle>();
+    let shell = app.state::<drift_app::Handle>();
     let name = call_name(&call);
     let request = match admit(name, call_fault(&call), || {
         shell.work_call(profile, call.clone())
@@ -549,7 +549,7 @@ pub(crate) async fn work_call(
             Ok(response) => response,
             Err(_) => failed(WorkError::OutcomeUnknown),
         };
-    if let zephium_ipc::work::WorkReplyV1::Error { error } = &response.reply {
+    if let drift_ipc::work::WorkReplyV1::Error { error } = &response.reply {
         if name.starts_with("environment:c") {
             trace(format_args!("work: phase=call call={name} error={error:?}"));
         }
@@ -607,7 +607,7 @@ fn refusal(
 
 /// The bound a refused checkpoint view broke, named for the log.
 fn call_fault(call: &WorkCallV1) -> Option<&'static str> {
-    use zephium_core::work::environment::WorkEnvironmentCall;
+    use drift_core::work::environment::WorkEnvironmentCall;
     match call {
         WorkCallV1::Environment {
             request: WorkEnvironmentCall::Checkpoint { view, .. },
@@ -625,7 +625,7 @@ fn trace(arguments: std::fmt::Arguments<'_>) {
 }
 
 fn call_name(call: &WorkCallV1) -> &'static str {
-    use zephium_core::work::environment::WorkEnvironmentCall;
+    use drift_core::work::environment::WorkEnvironmentCall;
     match call {
         WorkCallV1::Environment { request, .. } => match request {
             WorkEnvironmentCall::Checkpoint { .. } => "environment:checkpoint",
@@ -689,7 +689,7 @@ mod admission_tests {
 
     #[test]
     fn a_refused_checkpoint_names_the_bound_its_view_broke() {
-        use zephium_core::work::environment::{
+        use drift_core::work::environment::{
             WorkElementPlacement, WorkEnvironmentCall, WorkEnvironmentView,
         };
         let mut view = WorkEnvironmentView::default();

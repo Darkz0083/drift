@@ -50,7 +50,7 @@
               initials(account.email, account.name),
               avatarUrl(account.avatar),
             )}
-          />{:else}<img class="mark" src="/zephium-icon.png" alt="" />{/if}<span class="copy"
+          />{:else}<img class="mark" src="/drift-icon.png" alt="" />{/if}<span class="copy"
           ><strong>{title}</strong><small>{detail}</small></span
         ></button
       >{/if}

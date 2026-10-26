@@ -1,6 +1,6 @@
 //! `cargo xtask webext-suite`: runs real Chrome Web Store extensions through
 //! the WebKit runtime's lab harness and checks each still starts, and still
-//! renders its popup, as `crates/zephium-webext-macos/suite.json` expects.
+//! renders its popup, as `crates/drift-webext-macos/suite.json` expects.
 //! An entry's `check` loads a page and asks whether the extension did its
 //! job there, for extensions the browser recommends.
 //! Packages are downloaded into `target/webext-suite/` and refreshed weekly.
@@ -64,7 +64,7 @@ struct Outcome {
 pub(crate) fn run(arguments: &[String]) -> Result<(), String> {
     let repository = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
     let suite: Vec<Expectation> = serde_json::from_slice(
-        &std::fs::read(repository.join("crates/zephium-webext-macos/suite.json"))
+        &std::fs::read(repository.join("crates/drift-webext-macos/suite.json"))
             .map_err(|e| e.to_string())?,
     )
     .map_err(|e| format!("suite.json: {e}"))?;
@@ -89,7 +89,7 @@ pub(crate) fn run(arguments: &[String]) -> Result<(), String> {
             "build",
             "-q",
             "-p",
-            "zephium-webext-macos",
+            "drift-webext-macos",
             "--features",
             "lab",
             "--bin",
