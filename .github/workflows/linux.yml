@@ -1,0 +1,65 @@
+name: Probe Linux
+
+# Not a release: a one-question probe. Drift has a real WebKitGTK adapter in
+# `crates/drift-engine/src/platform/linux`, but CI has never compiled app code
+# on Linux, so nobody knows whether it still builds. This answers that.
+#
+# Run it from Actions → Probe Linux → Run workflow. If it fails, the error
+# says exactly how far Linux is, which is what a port would have to start from.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: System libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            build-essential pkg-config libssl-dev \
+            libgtk-3-dev libwebkit2gtk-4.1-dev libsoup-3.0-dev \
+            libayatana-appindicator3-dev librsvg2-dev libxkbcommon-dev
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.95.0"
+
+      - name: Cache cargo
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "-> target"
+
+      - name: Install frontend deps
+        working-directory: frame
+        run: npm install --no-audit --no-fund
+
+      - name: Install desktop deps
+        working-directory: desktop
+        run: npm install --no-audit --no-fund
+
+      - name: Build frontend
+        working-directory: frame
+        run: npm run build
+
+      # `cargo build` rather than `tauri build`: this asks whether the app
+      # compiles and links against WebKitGTK, not whether a bundle tool works.
+      - name: Compile the app
+        run: cargo build -p drift-desktop
+
+      - name: Report
+        if: success()
+        run: |
+          echo "Linux compiles." >> "$GITHUB_STEP_SUMMARY"
+          ls -lh target/debug/drift-desktop >> "$GITHUB_STEP_SUMMARY"
