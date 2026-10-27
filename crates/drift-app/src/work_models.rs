@@ -401,9 +401,7 @@ fn endpoint_usable(base: Option<&str>, status: WorkKeyStatus) -> bool {
 fn usable(state: &State, provider: WorkModelProvider) -> bool {
     match provider {
         P::Cloud => cloud().is_some() && state.cloud.iter().any(|model| model.available),
-        P::Compatible => {
-            endpoint_usable(compatible_base().as_deref(), key_status(state, provider))
-        }
+        P::Compatible => endpoint_usable(compatible_base().as_deref(), key_status(state, provider)),
         provider => {
             state.presence.get(&provider).copied().unwrap_or(false)
                 && key_status(state, provider) != WorkKeyStatus::Invalid
@@ -591,8 +589,12 @@ fn is_local(base: &str) -> bool {
         .map_or(authority, |(_, host)| host);
     // An IPv6 host is bracketed, so its colons are not a port separator.
     let host = match authority.strip_prefix('[') {
-        Some(bracketed) => bracketed.split_once(']').map_or(bracketed, |(host, _)| host),
-        None => authority.split_once(':').map_or(authority, |(host, _)| host),
+        Some(bracketed) => bracketed
+            .split_once(']')
+            .map_or(bracketed, |(host, _)| host),
+        None => authority
+            .split_once(':')
+            .map_or(authority, |(host, _)| host),
     };
     let host = host.to_ascii_lowercase();
     host == "localhost"
