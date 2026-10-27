@@ -8792,9 +8792,16 @@ mod tests {
 
         assert_eq!(directive("default-src"), "'self'");
         assert_eq!(directive("script-src"), "'self'");
+        // The chrome talks to IPC and, because this fork signs in against
+        // Firebase and calls the Drift proxy from the frame, to exactly those
+        // origins. Still an exact list, never a wildcard: a widened origin set
+        // is what this test exists to catch.
         assert_eq!(
             directive("connect-src"),
-            "ipc: http://ipc.localhost",
+            "ipc: http://ipc.localhost \
+             https://identitytoolkit.googleapis.com \
+             https://securetoken.googleapis.com \
+             https://drift-proxy.kolesovl848.workers.dev",
             "privileged IPC origins must remain exact"
         );
         assert_eq!(directive("style-src"), "'self' 'unsafe-inline'");

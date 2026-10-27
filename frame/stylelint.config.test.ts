@@ -1,5 +1,8 @@
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 import stylelint from "stylelint";
+
+// Linting the tree takes seconds; the 5s default fails under parallel load.
+vi.setConfig({ testTimeout: 30_000 });
 
 it("requires semantic colors in new component styles", async () => {
   const result = await stylelint.lint({

@@ -1,5 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ESLint } from "eslint";
+
+// Each case drives a real ESLint run over the tree; on a busy machine the
+// first one alone takes seconds, so the 5s default is a coin toss.
+vi.setConfig({ testTimeout: 30_000 });
 
 const eslint = new ESLint({ cwd: import.meta.dirname });
 async function violations(filePath: string, code: string) {

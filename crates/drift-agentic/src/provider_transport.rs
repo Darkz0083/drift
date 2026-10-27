@@ -4583,7 +4583,10 @@ mod tests {
             .headers()
             .get(OPENAI_CLIENT_REQUEST_ID_HEADER)
             .expect("client request id");
-        assert_eq!(request_id.as_bytes().len(), 54);
+        // `drift-v1-` plus the 32-byte digest in unpadded base64url. The prefix
+        // is two characters shorter than the one this length was first pinned
+        // against, so the id is 52 bytes rather than 54.
+        assert_eq!(request_id.as_bytes().len(), 52);
         assert_ne!(
             request_id,
             &openai_client_request_id(call, ProviderRequestPhase::InputTokens)

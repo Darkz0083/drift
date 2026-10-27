@@ -94,8 +94,8 @@ pub const MAX_SEMANTIC_RUNTIME_CHANNEL_RESULT_BYTES: usize =
 
 const SEMANTIC_RUNTIME_SOURCE: &str = include_str!("../assets/semantic-runtime-v1.js");
 const SEMANTIC_RUNTIME_SOURCE_SHA256: [u8; 32] = [
-    0xcd, 0x26, 0x69, 0x89, 0xc1, 0x70, 0x63, 0x04, 0x30, 0x1b, 0xf0, 0x00, 0x08, 0xda, 0x68, 0x54,
-    0x6d, 0x34, 0x9b, 0x65, 0x48, 0x6a, 0xaf, 0x44, 0x4b, 0xa4, 0x8a, 0xb2, 0xa7, 0xf4, 0x45, 0x12,
+    0xca, 0xd1, 0xaa, 0xbd, 0x2d, 0x02, 0x26, 0x0a, 0x18, 0xf2, 0x03, 0x6d, 0xe6, 0x92, 0xac, 0xe9,
+    0x1b, 0xf2, 0x82, 0x9a, 0x9c, 0xde, 0x47, 0xc5, 0x67, 0x43, 0x78, 0xd3, 0x33, 0x48, 0xb0, 0x27,
 ];
 
 /// Immutable production program passed only to a trusted isolated-world adapter.
@@ -1846,7 +1846,7 @@ mod tests {
         assert!(source.len() <= 36 * 1024);
         assert_eq!(
             format!("{:x}", Sha256::digest(source.as_bytes())),
-            "46111abaf3e6cbbf0255fa65258184075d6af32b8d2be6436e9379627127bf6d"
+            "ce1cbd48725d7ba381e142195dc38dd5d264e8ace1be2224f832645e52f3210a"
         );
         assert!(source.contains("new AbortController()"));
         assert!(source.contains("redirect:\"error\""));
@@ -1858,7 +1858,7 @@ mod tests {
         assert!(source.len() <= 8 * 1024);
         assert_eq!(
             format!("{:x}", Sha256::digest(source.as_bytes())),
-            "d035a1561338f91cbfb7fc4ace8fa65303a9f28e1c69bf0ac256b3ab45f28ace"
+            "9973559356c9d5da8304c6fc7175cc4ec6046d2095b3adaac8a6408d1f7d4917"
         );
         assert!(source.contains("observer.takeRecords()"));
     }

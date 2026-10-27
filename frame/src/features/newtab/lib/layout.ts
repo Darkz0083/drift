@@ -58,11 +58,23 @@ export function layout(
   // where the clouds draw back toward the horizon, and the time and the
   // date read on one line under it.
   const horizon = Math.round(height * (height < 600 ? 0.62 : 0.6));
-  const markW = Math.round(Math.min(480, Math.max(260, width * 0.36)));
-  const markH = Math.ceil((markW * WORDMARK.height) / WORDMARK.width);
-  const group = markH + (clock ? WHEN.gap + WHEN.height : 0);
+  const aspect = WORDMARK.height / WORDMARK.width;
+  const line = clock ? WHEN.gap + WHEN.height : 0;
+  const top0 = NOTCH.height + 32;
+  // The name and the line under it stand in the open sky: below the notch and
+  // above the horizon. A mark too tall for that room shrinks instead of
+  // crossing either edge — the outline wordmark is nearly twice as tall for
+  // its width as the one the page was first built around.
+  const room = horizon - 40 - top0 - line;
+  const widest = Math.round(Math.min(480, Math.max(260, width * 0.36)));
+  const markW = Math.max(120, Math.min(widest, Math.floor(room / aspect)));
+  const markH = Math.ceil(markW * aspect);
+  const group = markH + line;
   const centre = NOTCH.height + (horizon - NOTCH.height) * 0.74;
-  const top = Math.max(NOTCH.height + 32, Math.round(centre - group / 2));
+  const top = Math.max(
+    top0,
+    Math.min(Math.round(centre - group / 2), horizon - 40 - group - 1),
+  );
   const mark = { x: Math.round((width - markW) / 2), y: top, w: markW, h: markH };
 
   return {
