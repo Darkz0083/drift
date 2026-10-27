@@ -1169,6 +1169,17 @@ pub(crate) fn observe_items(_state: &drift_ipc::ItemsState) {}
 pub(crate) fn observe_tab(_tab: &drift_ipc::TabView) {}
 #[cfg(any(not(feature = "work-product"), target_os = "linux"))]
 pub(crate) fn preference_changed(_key: &str, _value: &str) {}
+// A hosted call's charge joins the assistant reply it paid for. Without the
+// assistant there is no reply to join, so both ends are no-ops.
+#[cfg(any(not(feature = "work-product"), target_os = "linux"))]
+pub(crate) fn hosted_sourced(_request_id: &str, _conversation: &str, _reply: u32) {}
+#[cfg(any(not(feature = "work-product"), target_os = "linux"))]
+pub(crate) fn hosted_charged(
+    _request_id: &str,
+    _charged_units: Option<u64>,
+    _units_per_credit: Option<u64>,
+) {
+}
 
 macro_rules! with_service {
     ($none:expr, |$service:ident| $body:expr) => {{
