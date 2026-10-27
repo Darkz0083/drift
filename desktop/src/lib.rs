@@ -84,6 +84,14 @@ mod help;
 mod history_menu;
 mod intro_sound;
 mod keymap;
+// The launcher is a global shortcut plus, on macOS, a double tap of a
+// modifier. The plugin that provides the shortcut is a macOS and Windows
+// dependency. Linux registers the launcher through
+// `linux_global_shortcuts`, so it gets the same surface backed by that.
+#[cfg(not(target_os = "linux"))]
+mod launcher_trigger;
+#[cfg(target_os = "linux")]
+#[path = "launcher_trigger_linux.rs"]
 mod launcher_trigger;
 #[cfg(target_os = "linux")]
 mod linux_global_shortcuts;
