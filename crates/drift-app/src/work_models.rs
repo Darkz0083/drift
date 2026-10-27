@@ -1671,8 +1671,12 @@ mod tests {
             COMPATIBLE_BASE_KEY.into(),
             "https://models.example.com/v1".into()
         ));
+        // A remote endpoint with no key is not resolved automatically. Upstream
+        // prices it and leaves it selectable; this fork requires the key first,
+        // because resolving a model that cannot be called is what left every
+        // helper step refused with Unauthorized.
         for role in ROLES {
-            assert!(effective(&state(), other, role).unwrap().price.is_none());
+            assert!(effective(&state(), other, role).is_none());
         }
         assert!(store_setting(COMPATIBLE_BASE_KEY.into(), String::new()));
         // All test secret operations use the injected memory vault.

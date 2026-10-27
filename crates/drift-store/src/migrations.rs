@@ -2078,7 +2078,7 @@ pub static PROFILE: &[Migration] = &[
                      source TEXT NOT NULL
                          CHECK (length(CAST(source AS BLOB)) BETWEEN 1 AND 2097152
                                 AND instr(CAST(source AS BLOB), X'00') = 0),
-                     -- SHA-256(\"drift-userscript-source-v1\" || UTF-8 source).
+                     -- SHA-256(\"zephium-userscript-source-v1\" || UTF-8 source).
                      -- The versioned name prevents a future digest change
                      -- from silently reinterpreting durable bytes.
                      source_sha256_v1 BLOB NOT NULL

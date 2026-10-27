@@ -23,14 +23,16 @@ const HEADER: &str = "// ==UserScript==";
 const FOOTER: &str = "// ==/UserScript==";
 
 /// Durable v1 integrity witness: SHA-256 of the fixed
-/// `drift-userscript-source-v1` domain followed by exact UTF-8 source bytes.
+/// `zephium-userscript-source-v1` domain followed by exact UTF-8 source bytes.
+/// The domain is not branding: it is baked into every userscript digest already
+/// stored, so renaming it invalidates them.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct UserscriptSourceDigest([u8; 32]);
 
 impl UserscriptSourceDigest {
     pub fn for_source(source: &str) -> Self {
         let mut digest = Sha256::new();
-        digest.update(b"drift-userscript-source-v1");
+        digest.update(b"zephium-userscript-source-v1");
         digest.update(source.as_bytes());
         Self(digest.finalize().into())
     }
