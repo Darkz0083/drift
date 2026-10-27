@@ -1,19 +1,25 @@
-name: Probe Linux
+name: Build Linux
 
-# Not a release: a one-question probe. Drift has a real WebKitGTK adapter in
-# `crates/drift-engine/src/platform/linux`, but CI has never compiled app code
-# on Linux, so nobody knows whether it still builds. This answers that.
+# A real Linux build: `.deb` and AppImage, downloadable as an artifact.
 #
-# Run it from Actions → Probe Linux → Run workflow. If it fails, the error
-# says exactly how far Linux is, which is what a port would have to start from.
+# This started as a compile probe — the engine has a WebKitGTK adapter in
+# `crates/drift-engine/src/platform/linux`, but CI had never compiled app code
+# on Linux, so whether it still built was unknown. It does (commit 555fabbc).
+#
+# What this build is NOT: the assistant is compiled out on Linux
+# (`work_provider.rs` gates the lead on macOS and Windows), and nobody has run
+# this on a real desktop yet. Treat it as a browser you can try, not a release.
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - "v*"
 
 jobs:
   linux:
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 120
 
     steps:
       - uses: actions/checkout@v4
@@ -49,17 +55,31 @@ jobs:
         working-directory: desktop
         run: npm install --no-audit --no-fund
 
-      - name: Build frontend
-        working-directory: frame
-        run: npm run build
+      # `tauri build` runs `npm --prefix ../frame run build` itself, so the
+      # frontend is not built separately here.
+      #
+      # Deb and AppImage only: `bundle.targets` is "all", and rpm would need
+      # `rpmbuild` installed for a format nobody asked for.
+      - name: Build the app
+        working-directory: desktop
+        run: npx tauri build --bundles deb,appimage
 
-      # `cargo build` rather than `tauri build`: this asks whether the app
-      # compiles and links against WebKitGTK, not whether a bundle tool works.
-      - name: Compile the app
-        run: cargo build -p drift-desktop
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-linux
+          if-no-files-found: error
+          path: |
+            target/release/bundle/deb/*.deb
+            target/release/bundle/appimage/*.AppImage
 
       - name: Report
         if: success()
         run: |
-          echo "Linux compiles." >> "$GITHUB_STEP_SUMMARY"
-          ls -lh target/debug/drift-desktop >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "Linux build produced:"
+            ls -lh target/release/bundle/deb/*.deb \
+                   target/release/bundle/appimage/*.AppImage
+            echo
+            echo "The assistant is compiled out on Linux; this is the browser."
+          } >> "$GITHUB_STEP_SUMMARY"
