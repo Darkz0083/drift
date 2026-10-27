@@ -3102,12 +3102,14 @@ UI presentation can evolve without changing the native admission boundary.
 
 ## 13. Platform layer
 
-Linux is not a supported platform at launch: `run()` in `desktop/src/lib.rs`
-prints that Drift isn't available on Linux yet and exits 1. The Linux code
-stays in the tree and CI keeps it compiling, but no Linux build ships. Native
+Linux builds and runs in this fork. `run()` in `desktop/src/lib.rs` no longer
+refuses to start, and CI produces a `.deb` and an AppImage from
+`.github/workflows/linux.yml`. The assistant is compiled out on Linux
+(`work_provider.rs` gates the lead on macOS and Windows), so a Linux build is
+the browser only. No Linux desktop has been exercised yet: the packaged
+hostile-page and endurance matrix is still required on real machines. Native
 code is written against the OS it runs on; no blind ports. CI keeps all
-targets compiling (§14). The current source-level/native checks do not replace the
-packaged hostile-page and endurance matrix still required on real machines.
+targets compiling (§14).
 
 Per-OS map for the native seams (each a `cfg`-selected module with the same
 inherent surface; no `dyn`):

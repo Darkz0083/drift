@@ -246,10 +246,11 @@ Any change that breaks one of these invariants must fail review and release:
    pass after the exact document reaches load completion. Rust accepts only an exact,
    canonical 32-by-32 RGBA raster for the current navigation epoch and origin; chrome
    paints that fixed raster without parsing a page-controlled image container.
-10. Linux is not a supported platform at launch: `run()` in `desktop/src/lib.rs` prints
-    that Drift isn't available on Linux yet and exits with status 1 before any
-    runtime is touched. The Linux engine code stays in the tree and keeps the
-    admission described here, but none of it is exercised by a shipped build. On
+10. Linux builds and runs in this fork. `run()` in `desktop/src/lib.rs` no longer
+    refuses to start, and CI produces a `.deb` and an AppImage. The Linux engine
+    code that stays in the tree keeps the admission described here, so the
+    packaged browser is subject to the same rules as the other platforms. The
+    assistant is not compiled on Linux, so no agent surface exists there. On
     Linux, browsing requires WebKitGTK 2.54.0 or newer. Older builds,
     odd-minor development builds, and unrelated major lines fail closed. A
     newer stable even-minor WebKitGTK 2.x line is admitted with a visible
