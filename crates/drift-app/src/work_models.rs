@@ -575,12 +575,31 @@ fn stored_choice(state: &State, profile: ProfileId, role: WorkModelRole) -> Opti
 
 /// A server on this computer, such as Ollama or LM Studio.
 fn is_local(base: &str) -> bool {
-    ["http://localhost", "http://127.0.0.1", "http://[::1]"]
-        .iter()
-        .any(|origin| {
-            base.strip_prefix(origin)
-                .is_some_and(|rest| rest.is_empty() || rest.starts_with([':', '/']))
-        })
+    // The scheme decides nothing about where the server is, so `https` counts
+    // too: people run local servers behind TLS, and a server that was not
+    // recognised as local would demand a key it does not have.
+    let Some((scheme, rest)) = base.split_once("://") else {
+        return false;
+    };
+    if !scheme.eq_ignore_ascii_case("http") && !scheme.eq_ignore_ascii_case("https") {
+        return false;
+    }
+    let authority = rest.split(['/', '?', '#']).next().unwrap_or_default();
+    // Credentials before an `@` are not part of the host.
+    let authority = authority
+        .rsplit_once('@')
+        .map_or(authority, |(_, host)| host);
+    // An IPv6 host is bracketed, so its colons are not a port separator.
+    let host = match authority.strip_prefix('[') {
+        Some(bracketed) => bracketed.split_once(']').map_or(bracketed, |(host, _)| host),
+        None => authority.split_once(':').map_or(authority, |(host, _)| host),
+    };
+    let host = host.to_ascii_lowercase();
+    host == "localhost"
+        || host == "127.0.0.1"
+        || host == "::1"
+        // RFC 6761: every name under `.localhost` is loopback.
+        || host.ends_with(".localhost")
 }
 
 /// A model on this computer costs nothing per token. Unpriced, it would be
@@ -1424,8 +1443,16 @@ mod tests {
         assert!(is_local("http://localhost:11434/v1"));
         assert!(is_local("http://127.0.0.1:1234/v1"));
         assert!(is_local("http://[::1]:11434"));
+        // A scheme and letter case say nothing about where the server is.
+        assert!(is_local("https://localhost:11434"));
+        assert!(is_local("HTTPS://LOCALHOST:11434/v1"));
+        assert!(is_local("http://user:pass@127.0.0.1:1234/v1"));
+        assert!(is_local("http://ollama.localhost/v1"));
         assert!(!is_local("http://localhost.example.com/v1"));
         assert!(!is_local("https://llm.example.com/v1"));
+        // Not an address at all.
+        assert!(!is_local("localhost:11434"));
+        assert!(!is_local(""));
         let entry = models::builtin()
             .into_iter()
             .next()
