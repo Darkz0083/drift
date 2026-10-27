@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Archive`)),n=((t={},n={})=>(n.locale??e(),`Closing`)),r=((t={},n={})=>(n.locale??e(),`Opening`));export{n,t as r,r as t};

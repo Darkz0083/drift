@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Your browsing history belongs here`)),n=((t={},n={})=>(n.locale??e(),`Pages you visit are listed here so you can find your way back.`));export{t as n,n as t};

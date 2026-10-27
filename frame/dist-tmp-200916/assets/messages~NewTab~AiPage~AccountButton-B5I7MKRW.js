@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t,n={})=>(n.locale??e(),`${t?.percent}% used`));export{t};

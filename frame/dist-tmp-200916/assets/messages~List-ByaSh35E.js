@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Add an item`)),n=((t={},n={})=>(n.locale??e(),`Priority`)),r=((t={},n={})=>(n.locale??e(),`Show answer`));export{n,t as r,r as t};

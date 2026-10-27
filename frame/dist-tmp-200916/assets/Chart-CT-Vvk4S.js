@@ -1,2 +1,0 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/ui-core-BtSVXPC0.css","assets/Chart-BVgejI5X.css"])))=>i.map(i=>d[i]);
-import{U as e}from"./chrome-menu-BK4dy4of.js";import"./chart-LjHIxnkq.js";var t=()=>e(()=>import(`./Chart-By62LL2c.js`),__vite__mapDeps([0,1]));export{t};

@@ -1,1 +1,0 @@
-function e(e){let t=e.lastIndexOf(`/`);return t<0?{folder:``,name:e}:{folder:e.slice(0,t+1),name:e.slice(t+1)}}export{e as t};

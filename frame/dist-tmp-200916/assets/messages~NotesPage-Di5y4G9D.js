@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Not saved yet — trying again`)),n=((t={},n={})=>(n.locale??e(),`Saving…`)),r=((t={},n={})=>(n.locale??e(),`Each note is saved as a Markdown file in a folder you own.`)),i=((t={},n={})=>(n.locale??e(),`Choose a note, or start a new one`));export{t as i,r as n,n as r,i as t};

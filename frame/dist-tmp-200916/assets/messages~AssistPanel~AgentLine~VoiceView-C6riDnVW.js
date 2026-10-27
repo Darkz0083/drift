@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Open account`)),n=((t={},n={})=>(n.locale??e(),`See plans`));export{t as n,n as t};

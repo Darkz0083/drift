@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`AI and Work`)),n=((t={},n={})=>(n.locale??e(),`Tools`));export{t as n,n as t};

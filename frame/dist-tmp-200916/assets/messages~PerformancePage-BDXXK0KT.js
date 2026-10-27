@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Enter a valid website or URL.`)),n=((t={},n={})=>(n.locale??e(),`Website or URL`)),r=((t={},n={})=>(n.locale??e(),`Resource preferences`)),i=((t={},n={})=>(n.locale??e(),`Sleeping tabs`));export{t as i,r as n,n as r,i as t};

@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Trash`)),n=((t={},n={})=>(n.locale??e(),`Close tasks`)),r=((t={},n={})=>(n.locale??e(),`All tasks`)),i=((t={},n={})=>(n.locale??e(),`Completed`)),a=((t={},n={})=>(n.locale??e(),`Search tasks`));export{t as a,n as i,i as n,r,a as t};

@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Add a column`)),n=((t={},n={})=>(n.locale??e(),`New row`)),r=((t,n={})=>(n.locale??e(),`Column ${t?.number}`)),i=((t={},n={})=>(n.locale??e(),`Remove row`));export{t as i,r as n,n as r,i as t};

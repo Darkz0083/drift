@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Copy as Markdown`)),n=((t={},n={})=>(n.locale??e(),`Delete`)),r=((t={},n={})=>(n.locale??e(),`Note actions`)),i=((t={},n={})=>(n.locale??e(),`Pin`)),a=((t={},n={})=>(n.locale??e(),`Recently Deleted`)),o=((t={},n={})=>(n.locale??e(),`Unpin`));export{n as a,r as i,a as n,t as o,i as r,o as t};

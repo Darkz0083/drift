@@ -1,2 +1,0 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/ui-core-BtSVXPC0.css","assets/chrome-menu-DCsesd2f.css","assets/SegmentedControl-DzwfU9kZ.css","assets/LazyView-KO1oNSbi.css","assets/IconButton-CtSiShXh.css","assets/browser-0sJeg2rQ.css","assets/AccountSummary-HsQmQZcK.css","assets/AccountButton-kKsgirbb.css"])))=>i.map(i=>d[i]);
-import{U as e}from"./chrome-menu-BK4dy4of.js";var t=()=>e(()=>import(`./AccountButton-Drtzg1cp.js`),__vite__mapDeps([0,1,2,3,4,5,6,7]));export{t as loadAccountButton};

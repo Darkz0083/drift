@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Today`)),n=((t={},n={})=>(n.locale??e(),`Upcoming`));export{t as n,n as t};

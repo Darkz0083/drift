@@ -1,1 +1,0 @@
-function e(e=new Date){let t=Date.UTC(e.getUTCFullYear(),e.getUTCMonth(),e.getUTCDate()+1);return new Intl.DateTimeFormat(void 0,{hour:`numeric`,minute:`2-digit`}).format(t)}export{e as t};

@@ -1,1 +1,0 @@
-import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Open Time`)),n=((t={},n={})=>(n.locale??e(),`Time settings`)),r=((t={},n={})=>(n.locale??e(),`This week`)),i=((t={},n={})=>(n.locale??e(),`Today`));export{t as i,r as n,n as r,i as t};
