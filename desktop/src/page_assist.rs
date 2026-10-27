@@ -68,7 +68,7 @@ fn valid_id(id: &str) -> bool {
             .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'.')
 }
 
-#[cfg(feature = "work-product")]
+#[cfg(all(feature = "work-product", not(target_os = "linux")))]
 mod product {
     use super::*;
     use std::collections::HashMap;
@@ -1147,28 +1147,39 @@ mod product {
     }
 }
 
-#[cfg(feature = "work-product")]
+#[cfg(all(feature = "work-product", not(target_os = "linux")))]
 pub(crate) use product::{
     hosted_charged, hosted_sourced, install, observe_items, observe_tab, preference_changed,
 };
 
-#[cfg(not(feature = "work-product"))]
+// Linux builds the browser without the assistant: `drift-work-composition` is a
+// macOS and Windows dependency, so the assistant's service cannot exist here.
+// These stubs keep the commands and the frame's own surface intact, and every
+// one of them answers "unavailable".
+#[cfg(any(not(feature = "work-product"), target_os = "linux"))]
+pub(crate) fn install(
+    _app: &tauri::AppHandle,
+    _engine: Arc<drift_engine::WebviewEngine>,
+    _store: Arc<drift_store::SqliteStore>,
+) {
+}
+#[cfg(any(not(feature = "work-product"), target_os = "linux"))]
 pub(crate) fn observe_items(_state: &drift_ipc::ItemsState) {}
-#[cfg(not(feature = "work-product"))]
+#[cfg(any(not(feature = "work-product"), target_os = "linux"))]
 pub(crate) fn observe_tab(_tab: &drift_ipc::TabView) {}
-#[cfg(not(feature = "work-product"))]
+#[cfg(any(not(feature = "work-product"), target_os = "linux"))]
 pub(crate) fn preference_changed(_key: &str, _value: &str) {}
 
 macro_rules! with_service {
     ($none:expr, |$service:ident| $body:expr) => {{
-        #[cfg(feature = "work-product")]
+        #[cfg(all(feature = "work-product", not(target_os = "linux")))]
         {
             match product::service() {
                 Some($service) => $body,
                 None => $none,
             }
         }
-        #[cfg(not(feature = "work-product"))]
+        #[cfg(any(not(feature = "work-product"), target_os = "linux"))]
         {
             $none
         }
@@ -1484,7 +1495,7 @@ pub(crate) async fn page_style_remove(
     with_service!(no_styles(tab), |service| service.remove_style(&tab, &style))
 }
 
-#[cfg(feature = "work-product")]
+#[cfg(all(feature = "work-product", not(target_os = "linux")))]
 fn profile_of(profile: &str) -> Option<drift_core::ids::ProfileId> {
     drift_core::ids::ProfileId::parse(profile).filter(|id| id.to_string() == profile)
 }
@@ -1562,7 +1573,7 @@ mod tests {
 
 /// "Run in Work" from the Ask panel: the same Work documents and operation
 /// owner the panel's own Work flow uses, in order.
-#[cfg(feature = "work-product")]
+#[cfg(all(feature = "work-product", not(target_os = "linux")))]
 mod handoff {
     use super::*;
     use std::time::Duration;

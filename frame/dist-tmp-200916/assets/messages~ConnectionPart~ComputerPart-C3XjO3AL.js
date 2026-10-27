@@ -1,0 +1,1 @@
+import{x as e}from"./chrome-shared-BPcNoa3e.js";var t=((t={},n={})=>(n.locale??e(),`Declined`)),n=((t={},n={})=>(n.locale??e(),`Waiting for you`));export{t as n,n as t};
