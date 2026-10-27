@@ -1,6 +1,6 @@
 # `tauri-runtime-wry` fork update procedure
 
-1. Freeze a clean Zephium commit. Record the old and proposed Tauri revisions,
+1. Freeze a clean Drift commit. Record the old and proposed Tauri revisions,
    release notes, security notices, dependency changes, and lockfile digests.
 2. Obtain the complete old-upstream-to-local and old-upstream-to-new-upstream
    diffs. Start from the exact new upstream source; do not overlay selected

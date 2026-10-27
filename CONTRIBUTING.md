@@ -1,7 +1,7 @@
 # Contributing
 
 **This is a personal fork of [Zephium](https://github.com/zephium-browser/Zephium).**
-It is not the upstream project, and changes here are not reviewed by Zephium's
+It is not the upstream project, and changes here are not reviewed by Drift's
 maintainer.
 
 ## If you want to improve the browser

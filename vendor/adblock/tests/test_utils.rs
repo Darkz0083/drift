@@ -1,7 +1,7 @@
 //! Convenience functions used for tests across different build targets. Import via `#[path = ]` if
 //! needed outside of this directory.
 
-/// Generates a deterministic, Zephium-authored network corpus without
+/// Generates a deterministic, Drift-authored network corpus without
 /// embedding third-party list material or real browsing domains.
 pub fn synthetic_network_rules(count: usize) -> String {
     use std::fmt::Write as _;

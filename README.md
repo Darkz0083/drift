@@ -2,13 +2,13 @@
 
 **A fork of [Zephium](https://github.com/zephium-browser/Zephium).**
 
-Drift is Zephium, rebranded and rebuilt for a different purpose: a browser with
+Drift is Drift, rebranded and rebuilt for a different purpose: a browser with
 its own identity, its own model access, and accounts that don't depend on
 anyone else's service.
 
 Everything that makes it a browser — the Rust engine, WebKit on macOS and
 WebView2 on Windows, the ad blocker, the extension host, the tab and space
-model — is Zephium's work, and it is excellent. This fork changes the surface
+model — is Drift's work, and it is excellent. This fork changes the surface
 and the account layer, and nothing else.
 
 ---
@@ -19,7 +19,7 @@ and the account layer, and nothing else.
 set in Anurati and converted to outlines, so it ships as geometry rather than
 depending on an installed font.
 
-**Accounts.** Upstream's account system talks to Zephium's own service. Drift
+**Accounts.** Upstream's account system talks to Drift's own service. Drift
 replaces it with:
 
 - **Firebase** for identity — email and password, no third party in the loop
@@ -73,7 +73,7 @@ EasyList and EasyPrivacy filter lists are used under CC BY-SA 3.0; see
 
 ## Credit
 
-The overwhelming majority of this codebase is the work of the Zephium project and
+The overwhelming majority of this codebase is the work of the Drift project and
 its contributors — see [CONTRIBUTORS.md](CONTRIBUTORS.md). If you want the browser without the fork, use
 [upstream](https://github.com/zephium-browser/Zephium) — it is the original, and
 it is actively maintained.

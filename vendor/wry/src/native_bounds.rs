@@ -26,7 +26,7 @@ pub(crate) const PAGE_TITLE_LIMIT: NativeStringLimit = NativeStringLimit {
   max_utf8_bytes: 4 * 1_024,
 };
 
-// Keep this synchronized with Zephium's committed-navigation ceiling. The
+// Keep this synchronized with Drift's committed-navigation ceiling. The
 // second check is intentional: 8 Ki UTF-16 units can expand past 8 KiB in
 // UTF-8, while navigation policy is byte based.
 pub(crate) const PAGE_URL_LIMIT: NativeStringLimit = NativeStringLimit {

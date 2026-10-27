@@ -2,5 +2,5 @@
 /test/fixture/src-tauri/tauri.conf.json text eol=lf
 /test/fixture/src-tauri/icons/* binary
 # Preserve the exact upstream bytes; this bundled Swift source contains
-# upstream trailing whitespace outside Zephium's patch set.
+# upstream trailing whitespace outside Drift's patch set.
 /mobile/ios-api/Sources/Tauri/Logger.swift -whitespace

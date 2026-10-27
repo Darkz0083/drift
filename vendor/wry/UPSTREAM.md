@@ -63,7 +63,7 @@ Its security-relevant deltas currently enforce these invariants:
   Only a request past both bounds (and, on other platforms, past the in-flight
   bound) completes synchronously with an empty 503 response and never acquires
   a native deferral. Teardown seals and drains accounting, and late permit drops
-  cannot underflow or reopen it. Zephium's page-evaluation integration accepts
+  cannot underflow or reopen it. Drift's page-evaluation integration accepts
   primitive-only contracts: fixed-size discard and favicon results and one
   explicitly bounded HTML string. Page objects and attacker-controlled object
   serialization are not accepted as host protocol messages.
@@ -111,7 +111,9 @@ Its security-relevant deltas currently enforce these invariants:
   buffer before budget arithmetic or slicing. Its trusted print method calls
   `ICoreWebView2_16::ShowPrintUI` directly instead of evaluating the same
   page-controlled scripted-print primitives an embedder may deny at document
-  creation. Disabling browser accelerator keys is a construction postcondition:
+  creation. WKWebView printing works on a copy of the shared `NSPrintInfo` and
+  keeps the system margins unless the caller sets some, so printing never
+  rewrites the user's page setup. Disabling browser accelerator keys is a construction postcondition:
   the fork requires `ICoreWebView2Settings3`, applies the setting, and reads it
   back before an untrusted page can load.
 - Desktop navigation callbacks expose one opaque per-WebView identity across
@@ -132,7 +134,7 @@ Its security-relevant deltas currently enforce these invariants:
   Before the embedder sees `Committed`, WebView2 hides both controller and
   child HWND, WebKitGTK revokes mapping, paint, and input, and WKWebView hides
   the native view. A guarded WebKitGTK child also remains unmapped throughout
-  construction; Zephium's stage performs its first map at validated offscreen
+  construction; Drift's stage performs its first map at validated offscreen
   geometry and is the only code allowed to reveal it after exact attribution.
   The embedder's synchronous callback can revoke its own per-view permit before
   those native calls pump re-entrant layout. Wry also exposes a bounded
@@ -239,4 +241,6 @@ On Windows the same handler is fed from `NavigationCompleted`'s
 `WebErrorStatus` (cancellation and download conversion stay silent). The
 `ContentLoading` of WebView2's built-in error page is hidden like a commit but
 not reported as one, so the failure lands on the document the person asked for
-and the host can show its own explanation.
+and the host can show its own explanation. The handler's `FailedDocument` says
+when that error document replaced the shown page, with the address from Wry's
+in-flight navigation record; macOS always reports `Kept`.

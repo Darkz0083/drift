@@ -137,7 +137,7 @@ pub struct RegexManager {
     prepared_regex_size_limit_bytes: usize,
     prepared_regex_dfa_size_limit_bytes: usize,
     max_filter_checks_per_request: usize,
-    // Zephium's synchronous native request adapter freezes the complete
+    // Drift's synchronous native request adapter freezes the complete
     // matcher on a worker. Frozen lookups never compile, discard, or mutate
     // usage metadata on the UI callback path.
     frozen: bool,

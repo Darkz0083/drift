@@ -9,7 +9,7 @@ upstream revision
 It is a narrow policy fork. Upstream unconditionally supplies a LocalData
 directory to Linux WebViews that omit one. That turns an incognito WebView's
 otherwise pathless context into a persistent context before Wry can enforce
-ephemeral storage. Zephium keeps the directory absent for implicit Linux
+ephemeral storage. Drift keeps the directory absent for implicit Linux
 incognito construction. Normal Linux views retain upstream's synthesized
 directory, and Windows behavior is unchanged. Supplying both incognito mode
 and an explicit Linux directory is a typed construction error raised before
@@ -20,7 +20,7 @@ and Windows case runs on every CI host. `FORK.toml` records the complete local
 delta; [`REBASE.md`](REBASE.md) is mandatory for upstream updates.
 
 When `vendor/tauri/Cargo.toml` is used as the root manifest, its
-`[patch.crates-io]` table selects Zephium's sibling `tauri-runtime-wry` and Wry
+`[patch.crates-io]` table selects Drift's sibling `tauri-runtime-wry` and Wry
 forks. Cargo ignores dependency-level patch tables in application builds; the
 repository root supplies the same paths there. `Cargo.toml.orig` remains the
 unaltered crates.io manifest for provenance comparison.
@@ -31,7 +31,7 @@ The published normalized manifest also omits upstream
 `Cargo.toml` restores that exact path dependency with default features off and
 `wry` enabled. It affects only this fork's test graph.
 
-Zephium's production graph exact-pins Specta 2.0.0-rc.25. The fork applies the
+Drift's production graph exact-pins Specta 2.0.0-rc.25. The fork applies the
 same pin to Tauri's optional Specta integration, makes its production-required
 `std` support explicit instead of relying on workspace feature unification,
 and uses its current `Types` registry API. This deliberately narrows upstream's
@@ -43,4 +43,4 @@ The published crate excludes `/test` even though two upstream library test
 modules compile-time include its normal application fixture. The five required
 files are restored byte-for-byte from the same immutable commit solely for
 standalone unit tests. [`TEST_FIXTURE.toml`](TEST_FIXTURE.toml) records each Git
-blob identity; these files are not linked into Zephium's production binary.
+blob identity; these files are not linked into Drift's production binary.

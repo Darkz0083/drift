@@ -1429,7 +1429,7 @@ mod metadata_limit_tests {
     fn release_policy_and_signature_are_checked_before_installation() {
         let updater = Updater {
             config: Config::default(),
-            app_name: "Zephium QA".into(),
+            app_name: "Drift QA".into(),
             current_version: Version::parse("1.2.3").unwrap(),
             version_comparator: None,
             timeout: None,

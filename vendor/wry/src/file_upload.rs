@@ -1,4 +1,4 @@
-// Copyright 2026 Zephium contributors
+// Copyright 2026 Drift contributors
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
@@ -65,7 +65,7 @@ mod tests {
       observed.set(observed.get() + 1);
     });
     let url = NSURL::fileURLWithPath(&objc2_foundation::NSString::from_str(
-      "/tmp/zephium-generated-fixture.txt",
+      "/tmp/drift-generated-fixture.txt",
     ));
     let urls = NSArray::from_retained_slice(&[url]);
     responder.respond(Some(&urls));

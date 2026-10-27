@@ -813,7 +813,7 @@ impl Blocker {
         source_independent_only: bool,
         remaining_checks: &mut usize,
     ) -> Option<Option<String>> {
-        // Zephium's runtime admission rejects every `$removeparam` rule. More
+        // Drift's runtime admission rejects every `$removeparam` rule. More
         // generally, an empty modifier list must not make a hostile query
         // string allocate one object per parameter on a synchronous native
         // request callback.

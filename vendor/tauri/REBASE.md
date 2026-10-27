@@ -1,14 +1,14 @@
 # Tauri fork update procedure
 
-Zephium maintains this as a narrow policy adapter. An update must not replace
+Drift maintains this as a narrow policy adapter. An update must not replace
 it with an unreviewed crates.io source.
 
-1. Freeze a clean Zephium commit and record the old revision and lockfiles.
+1. Freeze a clean Drift commit and record the old revision and lockfiles.
 2. Fetch the proposed Tauri tag and immutable commit from
    `https://github.com/tauri-apps/tauri`. Review the complete old-to-new diff,
    including `crates/tauri`, `tauri-runtime-wry`, and relevant Wry changes.
 3. Compare clean upstream `crates/tauri` at the old revision with this entire
-   directory, excluding only Zephium provenance files and the standalone
+   directory, excluding only Drift provenance files and the standalone
    lockfile. Explicitly classify every `FORK.toml` patch as reapplied,
    reworked, retired upstream, or intentionally removed.
 4. Re-review data-directory resolution and creation in

@@ -283,7 +283,7 @@ impl Request {
             source_hostname_hashes: None,
             url_lower_cased,
             request_tokens,
-            // Mutation rules are rejected before Zephium publishes this
+            // Mutation rules are rejected before Drift publishes this
             // source-independent matcher, so retaining a third URL copy for
             // removeparam rewriting would be dead callback-path memory.
             original_url: String::new(),

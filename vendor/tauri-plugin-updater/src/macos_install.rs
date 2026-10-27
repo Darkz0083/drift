@@ -1,4 +1,4 @@
-// Copyright 2026 Zephium contributors
+// Copyright 2026 Drift contributors
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 

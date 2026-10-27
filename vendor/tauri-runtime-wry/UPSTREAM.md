@@ -30,7 +30,7 @@ local invariants are:
   abort the browser process.
 
 The standalone manifest patches Wry to `../wry`, ensuring fork CI exercises
-the same native adapter as Zephium. Cargo ignores this nested patch table when
+the same native adapter as Drift. Cargo ignores this nested patch table when
 the repository workspace is the build root; the root manifest owns that build.
 The standalone lockfile is intentional and must be reviewed alongside the
 workspace lockfile.

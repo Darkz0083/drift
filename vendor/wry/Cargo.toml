@@ -55,7 +55,7 @@ cookie = "0.18"
 javascriptcore-rs = { version = "=1.1.2", features = [
   "v2_28",
 ], optional = true }
-# Zephium's admitted WebKitGTK runtime is substantially newer than 2.40. Keep
+# Drift's admitted WebKitGTK runtime is substantially newer than 2.40. Keep
 # the Rust API floor aligned with the non-deprecated JavaScript evaluation API
 # so workspace feature unification cannot turn Wry's calls into warnings.
 webkit2gtk = { version = "=2.0.2", features = ["v2_40"], optional = true }
@@ -138,7 +138,11 @@ objc2-web-kit = { version = "0.3.2", default-features = false, features = [
 ] }
 objc2-core-foundation = { version = "0.3.2", default-features = false, features = [
   "std",
+  "CFArray",
   "CFCGTypes",
+  "CFData",
+  "CFError",
+  "CFString",
 ] }
 objc2-foundation = { version = "0.3.2", default-features = false, features = [
   "std",
@@ -184,6 +188,14 @@ objc2-ui-kit = { version = "0.3.2", default-features = false, features = [
 ] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
+objc2-security = { version = "0.3.2", default-features = false, features = [
+  "std",
+  "SecBase",
+  "SecCertificate",
+  "SecPolicy",
+  "SecTrust",
+] }
+sha2 = "0.10"
 objc2-app-kit = { version = "0.3.2", default-features = false, features = [
   "std",
   "objc2-core-foundation",

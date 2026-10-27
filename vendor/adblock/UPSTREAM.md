@@ -19,7 +19,7 @@ pins the fork's independent validation graph. Application builds consume the
 fork through the root manifest patch and root lockfile; the fork is
 deliberately excluded from the root workspace. The Rust source, benches,
 tests, README, and license began as files from the recorded Git tree. The
-paths named in `FORK.toml` contain Zephium changes.
+paths named in `FORK.toml` contain Drift changes.
 
 [`UPSTREAM_FILES.toml`](UPSTREAM_FILES.toml) records every imported source,
 bench, test, and selected support file with both its upstream Git
@@ -38,14 +38,14 @@ build.
 The inventory anchors clean-upstream bytes and the exact union of locally
 divergent paths. It intentionally does not duplicate the current byte hash of
 every patched source file: those contents are anchored by the immutable
-Zephium commit and reviewed as code, while this gate proves that no imported
+Drift commit and reviewed as code, while this gate proves that no imported
 change can escape the declared patch surface. The active fork manifest is the
 one separately reviewed exception; the gate constrains its target layout,
 features, dependency names and sources, and test-only resolver patch so it
 cannot redirect compilation outside the inventoried source tree.
 
 No upstream `data/` payload is retained. Fixture-dependent upstream tests and
-benches are excluded, while retained tests use deterministic Zephium-authored
+benches are excluded, while retained tests use deterministic Drift-authored
 `.invalid` vectors and generated corpora. Production filter sources remain
 separate authenticated packages with an independent redistribution and
 license review. Other upstream
@@ -57,7 +57,7 @@ commit linked above remains the source for omitted material.
 Cargo's automatic integration-test discovery remains disabled. The manifest
 declares one explicit `fork_contract` target at
 `tests/ublock-coverage.rs`. It uses self-authored reserved-domain rules to test
-exact attribution, Zephium's conservative unknown-attribution behavior,
+exact attribution, Drift's conservative unknown-attribution behavior,
 preparation budgets, typed failure outcomes, and serialization. CI runs that
 target under every shipped graph and the optional
 exact-attribution graph; no retained test file is merely assumed to run.
@@ -70,7 +70,7 @@ through the authenticated source-package design.
 
 ## Security-relevant divergence
 
-Zephium uses adblock-rust in a narrower role than the upstream public API:
+Drift uses adblock-rust in a narrower role than the upstream public API:
 network-policy parsing and matching only. The application adapter rejects
 cosmetic rules, redirect resources, scriptlets, CSP mutation, URL-parameter
 rewriting, generic-hide controls, and tags before it publishes a native
@@ -101,7 +101,7 @@ request callback:
   matching shares it across block, exception, and conservative attribution
   checks. Exhaustion has a distinct typed outcome and the native adapter fails
   open.
-- An empty `$removeparam` set returns before query-parameter parsing. Zephium's
+- An empty `$removeparam` set returns before query-parameter parsing. Drift's
   compiler rejects every `$removeparam` rule, so hostile query strings cannot
   trigger that otherwise unnecessary callback-path work.
 - WebKit conversion derives `$domain` from the parser's final option boundary,
@@ -117,7 +117,7 @@ upstream 0.13.2. This fork increments the internal data version from 5 to 6
 and rejects earlier artifacts. Stable serialization hashes are fork
 compatibility sentinels, not values to update mechanically.
 
-Zephium's shipped feature graphs deliberately disable adblock-rust defaults:
+Drift's shipped feature graphs deliberately disable adblock-rust defaults:
 Windows uses `full-regex-handling,css-validation`; macOS and Linux use
 `full-regex-handling,css-validation,content-blocking`. Static cosmetic admission
 uses the upstream CSS parser; unchecked selectors are never treated as validated. The optional exact-attribution graph
@@ -145,7 +145,7 @@ only `advisory-not-detected`, because root-graph exceptions are intentionally
 absent from the smaller fork graph; an advisory which is actually present
 still fails.
 
-These changes do not make the full upstream feature set a Zephium guarantee.
+These changes do not make the full upstream feature set a Drift guarantee.
 The product adapter and native engine capability report are authoritative.
 See [`../../docs/adblock.md`](../../docs/adblock.md) for the implemented scope
 and current enablement gates.

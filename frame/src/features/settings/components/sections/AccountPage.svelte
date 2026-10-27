@@ -2,7 +2,7 @@
   /**
    * The Account page.
    *
-   * The upstream account system talked to Zephium's own service, which doesn't
+   * The upstream account system talked to Drift's own service, which doesn't
    * exist for this build. This replaces it with Drift's own: Firebase for
    * identity, and a Cloudflare Worker holding the model keys, so a signed-in
    * person gets the assistant without ever entering a key.

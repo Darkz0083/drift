@@ -1,13 +1,13 @@
 # adblock-rust fork update procedure
 
-Zephium treats this fork as a synchronous browser security component, not as a
+Drift treats this fork as a synchronous browser security component, not as a
 source copy that can be refreshed by changing a version string. Every update
 must review the complete upstream range and explicitly preserve, replace, or
 retire every patch set in `FORK.toml`.
 
 ## 1. Freeze and verify the inputs
 
-Work from a dedicated branch based on a clean, immutable Zephium commit.
+Work from a dedicated branch based on a clean, immutable Drift commit.
 Record:
 
 - the current upstream tag, commit, tree, and all local patch sets;
@@ -29,7 +29,7 @@ Before replacing source, retain two recursive, binary-capable diffs with the
 review evidence:
 
 1. old clean upstream versus the current `vendor/adblock` source and tests,
-   excluding only Zephium provenance files and generated build output; and
+   excluding only Drift provenance files and generated build output; and
 2. old clean upstream versus new clean upstream, with rename detection
    disabled.
 
@@ -48,7 +48,7 @@ name the exact missing, added, mutated, undeclared, or stale-patch path.
 
 The upstream inventory is not a substitute for reviewing the resulting local
 patch. It pins upstream bytes and the complete divergent-path union; the
-landed Zephium commit pins the current patched bytes. Review that commit's
+landed Drift commit pins the current patched bytes. Review that commit's
 entire patch content rather than adding self-authored “expected patched
 output” hashes that could conceal the implementation diff.
 
@@ -60,7 +60,7 @@ Create a review table with one row per `[[patch_sets]]` entry and one of:
 - **reworked** — the seam changed, with the replacement design and tests;
 - **retired upstream** — upstream now enforces the same or stronger invariant,
   with exact source and tests cited;
-- **removed intentionally** — Zephium no longer uses the capability, with all
+- **removed intentionally** — Drift no longer uses the capability, with all
   call sites and documentation removed.
 
 “Applied cleanly” is not a security result. Review these properties even when
@@ -85,12 +85,12 @@ the textual patch has no conflict:
 ## 4. Rebuild from the new upstream tree
 
 Begin with the exact new upstream source, then reapply the reviewed patches.
-Do not selectively copy new files over the old fork. Preserve Zephium
+Do not selectively copy new files over the old fork. Preserve Drift
 provenance documents only after the implementation diff is understood.
 
 Import only the selected source, tests, and benches. Do not import upstream
 `data/` payloads. Re-express required parser and matcher cases as minimal
-Zephium-authored rules under reserved `.invalid` domains, and use generated
+Drift-authored rules under reserved `.invalid` domains, and use generated
 corpora for deterministic scale coverage. Keep any licensed real-list
 performance corpus outside the public source tree and production catalog.
 
@@ -102,14 +102,14 @@ compatibility adjustment, and a removed upstreamed patch all require an
 explicit `FORK.toml` update.
 
 Reconcile the source manifest, normalized standalone fork manifest, feature
-set, root patch, and all Zephium call sites. Review both the fork-local
+set, root patch, and all Drift call sites. Review both the fork-local
 `Cargo.lock` and root application `Cargo.lock` diffs deliberately. No
 unreviewed Git dependency, alternate registry, source replacement, build
 script, default feature, resource payload, or runtime downloader may enter the
 graph.
 
 Resolve the standalone lock after the application lock is frozen. Every
-registry package reachable from the union of Zephium's shipped adblock feature
+registry package reachable from the union of Drift's shipped adblock feature
 graphs must have the same version, source, and checksum in both locks.
 Test-only packages may exist only in the standalone graph and must remain
 pinned. Do not hide a production mismatch by validating only the fork's
@@ -124,7 +124,7 @@ every value changed. Never reinterpret an old artifact under new semantics.
 Update `FORK.toml`, `UPSTREAM.md`, and this procedure only after the code review
 is complete.
 
-## 5. Validate independently and through Zephium
+## 5. Validate independently and through Drift
 
 At minimum, run:
 
@@ -150,11 +150,11 @@ cargo check --workspace --locked --all-targets
 The first and second fork graphs above are the exact shipped Windows and
 WebKit graphs. They intentionally omit default features and `single-thread`;
 their full library tests are mandatory, not substitutes for one default
-feature test. Check, test, and run test-target Clippy for `zephium-blocker` in
+feature test. Check, test, and run test-target Clippy for `drift-blocker` in
 runtime-only, runtime-exact, WebKit-only, runtime+WebKit, and
 runtime-exact+WebKit feature configurations. The explicit `fork_contract`
 target provides an ordinary-CI sentinel over provenance-locked,
-self-authored exact-attribution vectors and Zephium's unknown-attribution
+self-authored exact-attribution vectors and Drift's unknown-attribution
 policy. During each rebase, separately run exact-attribution behavior against
 the clean old and proposed upstream trees and retain that differential result
 with the review evidence; ordinary CI must not fetch a moving external tree.
@@ -192,6 +192,6 @@ Land an update only from a fully green immutable commit. Attach the upstream
 range, patch-disposition table, dependency review, differential results, and
 native evidence to the pull request. If an invariant, license, serialization
 boundary, or native result is ambiguous, keep the previous reviewed fork.
-Rollback restores the complete previous Zephium commit together with both the
+Rollback restores the complete previous Drift commit together with both the
 fork-local and root application lockfiles; do not mix old matcher source with
 new serialized artifacts or dependencies.

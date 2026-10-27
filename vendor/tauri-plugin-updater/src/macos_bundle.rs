@@ -1,4 +1,4 @@
-// Copyright 2026 Zephium contributors
+// Copyright 2026 Drift contributors
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
@@ -314,12 +314,12 @@ pub(crate) mod tests {
         fs::create_dir_all(bundle.join("Contents/MacOS")).unwrap();
         let mut info = plist::Dictionary::new();
         info.insert("CFBundlePackageType".into(), "APPL".into());
-        info.insert("CFBundleExecutable".into(), "Zephium".into());
+        info.insert("CFBundleExecutable".into(), "Drift".into());
         info.insert("CFBundleShortVersionString".into(), "1.2.3".into());
         plist::Value::Dictionary(info)
             .to_file_xml(bundle.join("Contents/Info.plist"))
             .unwrap();
-        let executable = bundle.join("Contents/MacOS/Zephium");
+        let executable = bundle.join("Contents/MacOS/Drift");
         fs::write(&executable, b"generated executable fixture").unwrap();
         fs::set_permissions(executable, fs::Permissions::from_mode(0o755)).unwrap();
     }
@@ -327,7 +327,7 @@ pub(crate) mod tests {
     fn archive(bundle: &Path) -> Vec<u8> {
         let encoder = flate2::write::GzEncoder::new(Vec::new(), flate2::Compression::fast());
         let mut tar = tar::Builder::new(encoder);
-        tar.append_dir_all("Zephium.app", bundle).unwrap();
+        tar.append_dir_all("Drift.app", bundle).unwrap();
         tar.into_inner().unwrap().finish().unwrap()
     }
 
@@ -359,7 +359,7 @@ pub(crate) mod tests {
         let staged = tempfile::tempdir().unwrap();
         write_valid_bundle(root.path());
         let bundle = extract_bundle(&archive(root.path()), staged.path()).unwrap();
-        assert!(bundle.ends_with("Zephium.app"));
+        assert!(bundle.ends_with("Drift.app"));
         validate_bundle(&bundle).unwrap();
     }
 
@@ -381,7 +381,7 @@ pub(crate) mod tests {
         ] {
             let staged = tempfile::tempdir().unwrap();
             write_valid_bundle(staged.path());
-            let binary = staged.path().join("Contents/MacOS/Zephium");
+            let binary = staged.path().join("Contents/MacOS/Drift");
             match variant {
                 "empty" => fs::remove_dir_all(staged.path().join("Contents")).unwrap(),
                 "missing" => fs::remove_file(&binary).unwrap(),
@@ -453,11 +453,11 @@ pub(crate) mod tests {
         header.set_mode(0o777);
         header.set_size(0);
         header.set_cksum();
-        tar.append_link(&mut header, "Zephium.app/outside", "../outside")
+        tar.append_link(&mut header, "Drift.app/outside", "../outside")
             .unwrap();
         let bytes = tar.into_inner().unwrap().finish().unwrap();
         assert!(extract_bundle(&bytes, output.path()).is_err());
-        assert!(!output.path().join("Zephium.app/outside").exists());
+        assert!(!output.path().join("Drift.app/outside").exists());
     }
 
     #[test]
@@ -467,7 +467,7 @@ pub(crate) mod tests {
         // A nonexistent out-of-tree target would make a following traversal
         // fail; synchronization must ignore the link itself instead.
         std::os::unix::fs::symlink(
-            "/nonexistent/zephium-sync-fixture",
+            "/nonexistent/drift-sync-fixture",
             bundle.path().join("outside"),
         )
         .unwrap();

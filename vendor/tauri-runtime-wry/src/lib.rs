@@ -4649,7 +4649,7 @@ fn handle_event_loop<T: UserEvent>(
                 if !should_prevent {
                   let outcome = drain_windows_for_exit(&windows, &window_id_map);
                   if outcome == ExitDrainOutcome::Failed {
-                    // The loop must still converge. Zephium's post-run exact
+                    // The loop must still converge. Drift's post-run exact
                     // process proof turns this ambiguous native teardown into
                     // a non-zero exit and retains the private-data quarantine.
                     log::error!(

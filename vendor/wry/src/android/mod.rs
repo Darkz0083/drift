@@ -356,7 +356,7 @@ impl InnerWebView {
   }
 
   pub fn document_title(&self) -> crate::Result<Option<String>> {
-    // Zephium's hardened desktop title-attribution path does not ship on
+    // Drift's hardened desktop title-attribution path does not ship on
     // Android. Preserve a bounded, capability-free result until the JNI
     // bridge has an equivalent native document-identity contract.
     Ok(None)

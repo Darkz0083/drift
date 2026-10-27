@@ -73,7 +73,7 @@ impl WebContextImpl {
     let Some(data_directory) = data_directory else {
       return Self::create_ephemeral();
     };
-    // Zephium security patch: this property is construct-only and defaults to
+    // Drift security patch: this property is construct-only and defaults to
     // false in WebKit2GTK 4.1. Every persistent context must opt into
     // a fresh Web process when the top-level site changes.
     let mut context_builder =
@@ -115,7 +115,7 @@ impl WebContextImpl {
   }
 
   pub fn create_context(context: WebContext) -> Self {
-    // Zephium security patch: enable the Web-process sandbox while the
+    // Drift security patch: enable the Web-process sandbox while the
     // context cannot yet own a WebView or have launched a Web process. A
     // post-build toggle is too late to be a reliable construction invariant.
     if !context.is_sandbox_enabled() {

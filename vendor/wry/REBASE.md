@@ -1,12 +1,12 @@
 # Wry fork update procedure
 
-Zephium treats this fork as a native security adapter, not as a source copy
+Drift treats this fork as a native security adapter, not as a source copy
 that can be refreshed with a version bump. Every update must account for the
 complete upstream range and every patch set in `FORK.toml`.
 
 ## 1. Freeze and record the inputs
 
-Work from a dedicated branch based on an immutable, fully reviewed Zephium
+Work from a dedicated branch based on an immutable, fully reviewed Drift
 commit. The working tree must be clean. Record:
 
 - the current `FORK.toml` upstream commit and standalone lockfile digest;
@@ -26,7 +26,7 @@ Before replacing any source, produce and retain a recursive, binary-capable
 diff between:
 
 1. a clean checkout of the old upstream commit from `FORK.toml`; and
-2. the current `vendor/wry` tree, excluding only the explicitly Zephium-owned
+2. the current `vendor/wry` tree, excluding only the explicitly Drift-owned
    provenance documents and generated standalone lockfile.
 
 Also produce the complete old-upstream-to-new-upstream diff with rename
@@ -83,10 +83,10 @@ platforms:
 
 Start from the exact new upstream source, then reapply the reviewed adapter
 changes. Do not copy new upstream files selectively over the old tree. Keep
-Zephium provenance files and update them only after the implementation review
+Drift provenance files and update them only after the implementation review
 is complete.
 
-Reconcile public API and every Zephium call site before regenerating locks.
+Reconcile public API and every Drift call site before regenerating locks.
 Dependency changes require an explicit source/license/advisory review. Update
 both dependency graphs deliberately:
 
@@ -155,7 +155,7 @@ that silently uses vanilla Wry defaults or cannot pass the locked build.
 
 If any invariant, native cleanup obligation, platform test, dependency source,
 or provenance check is ambiguous, stop and keep the previous reviewed fork.
-Rollback means restoring the complete previous Zephium commit and both
+Rollback means restoring the complete previous Drift commit and both
 lockfiles; never mix old adapter source with a new dependency graph. A release
 already signed from an invalid update is a security incident and follows the
 revocation procedure in `.github/RELEASE.md`.

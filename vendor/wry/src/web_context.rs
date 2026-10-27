@@ -351,7 +351,7 @@ mod tests {
     assert!(!widget.has_focus());
     assert_eq!(widget.opacity(), 0.0);
 
-    // Mirror Zephium Stage's pending path: establish the WebKit compositor at
+    // Mirror Drift Stage's pending path: establish the WebKit compositor at
     // a correctly-sized allocation wholly left of the trusted composition
     // root, while paint and input remain revoked.
     observations.stage_mapping_authorized.set(true);

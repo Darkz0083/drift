@@ -1,8 +1,8 @@
 # Contributors
 
-## Upstream — Zephium
+## Upstream — Drift
 
-Essentially all of the code in this repository was written by the Zephium project
+Essentially all of the code in this repository was written by the Drift project
 and its contributors. Their commit history is preserved here; `git log` is the
 authoritative record. By contribution count, as of this fork:
 
@@ -27,6 +27,6 @@ Windows CI pipeline. Those are listed in the README.
 
 ## A note on credit
 
-Zephium is MPL-2.0. That licence requires the source to stay available; it does
+Drift is MPL-2.0. That licence requires the source to stay available; it does
 not require anyone to be named. This file exists because the code deserves it, not
 because the licence compels it.

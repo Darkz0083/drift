@@ -1120,7 +1120,7 @@ impl InnerWebView {
       }
     });
 
-    // These surfaces have no origin-labelled Zephium broker yet. Claim the
+    // These surfaces have no origin-labelled Drift broker yet. Claim the
     // signal and complete the request with a denial rather than allowing a
     // page to summon privileged native UI.
     webview.connect_authenticate(|_, request| {

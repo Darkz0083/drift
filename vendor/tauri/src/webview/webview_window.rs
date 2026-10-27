@@ -1111,7 +1111,7 @@ impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
   ///
   /// ## Platform-specific:
   ///
-  /// - **Windows**: An enabled value is forwarded to Wry, whose Zephium adapter refuses construction before native initialization until an authenticated startup inventory fence exists.
+  /// - **Windows**: An enabled value is forwarded to Wry, whose Drift adapter refuses construction before native initialization until an authenticated startup inventory fence exists.
   /// - **MacOS / Linux / iOS / Android** - Unsupported.
   #[must_use]
   pub fn browser_extensions_enabled(mut self, enabled: bool) -> Self {
@@ -1127,7 +1127,7 @@ impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
   ///
   /// ## Platform-specific:
   ///
-  /// - **Windows**: The Zephium Wry adapter refuses construction with a configured extension path; installation is owned by the authenticated native extension host.
+  /// - **Windows**: The Drift Wry adapter refuses construction with a configured extension path; installation is owned by the authenticated native extension host.
   /// - **MacOS / iOS / Android** - Unsupported.
   #[must_use]
   pub fn extensions_path(mut self, path: impl AsRef<Path>) -> Self {
@@ -1320,7 +1320,7 @@ impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
   /// Useful if you need to share the same environment, for instance when using the [`Self::on_new_window`].
   ///
   /// A supplied COM environment has opaque extension-enablement state. Until
-  /// authenticated startup inventory fencing exists, Zephium may only reuse
+  /// authenticated startup inventory fencing exists, Drift may only reuse
   /// an environment observed from an earlier closed Wry construction.
   #[cfg(all(feature = "wry", windows))]
   pub fn with_environment(
