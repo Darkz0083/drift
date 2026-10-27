@@ -1,0 +1,68 @@
+name: Build macOS
+
+# The release workflow signs and notarizes, which needs Apple credentials that
+# only exist when the secrets are configured. This one builds the same app
+# unsigned, so a macOS artifact exists on every push without them.
+#
+# Actions → Build macOS → Run workflow. The .dmg and .app appear under the
+# run's "Artifacts" section. Unsigned builds are quarantined by Gatekeeper on
+# other machines; right-click → Open, or `xattr -dr com.apple.quarantine`.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          # Matches rust-toolchain.toml so the pinned toolchain doesn't fight us.
+          toolchain: "1.95.0"
+
+      - name: Cache cargo
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "-> target"
+
+      - name: Install frontend deps
+        working-directory: frame
+        run: npm install --no-audit --no-fund
+
+      - name: Install desktop deps
+        working-directory: desktop
+        run: npm install --no-audit --no-fund
+
+      - name: Build frontend
+        working-directory: frame
+        run: npm run build
+
+      - name: Build the app
+        working-directory: desktop
+        env:
+          # Without this the disk image opens as a plain folder window on CI:
+          # Tauri skips the Finder pass that lays out icon positions.
+          TAURI_BUNDLER_DMG_IGNORE_CI: "true"
+        run: npx tauri build --bundles app,dmg
+
+      - name: Upload the disk image and app
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-macos
+          if-no-files-found: error
+          path: |
+            target/release/bundle/dmg/*.dmg
+            target/release/bundle/macos/*.app
