@@ -1365,7 +1365,7 @@ dependencies = [
 
 [[package]]
 name = "drift-desktop"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "async-io",
  "base64 0.22.1",
