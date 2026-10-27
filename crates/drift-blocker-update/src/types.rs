@@ -182,7 +182,10 @@ impl RepositoryConfig {
         // v2 binds the project-owned single-segment target-name grammar.
         // Durable TUF state admitted under the former Tough-only grammar must
         // be reauthenticated before it can cross the compiler boundary.
-        hasher.update(b"drift:blocker-package-admission:v2\0");
+        // Not branding: this domain separates digests already recorded in
+        // durable TUF state, so renaming it reauthenticates every admitted
+        // package for no security gain.
+        hasher.update(b"zephium:blocker-package-admission:v2\0");
         for value in [
             self.limits.max_manifest_bytes as u64,
             self.limits.max_sources as u64,

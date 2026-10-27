@@ -36,7 +36,9 @@ fn time_batch_digest(
         return Err(invalid_data("time batch exceeds tally capacity"));
     }
     let mut hash = Sha256::new();
-    hash.update(b"drift:time-batch:v1\0");
+    // Not branding: this domain separates digests that are already stored
+    // against every time batch, so renaming it invalidates existing rows.
+    hash.update(b"zephium:time-batch:v1\0");
     hash.update(profile.bytes());
     hash.update(keep_from_hour.to_be_bytes());
     hash.update((tallies.len() as u64).to_be_bytes());

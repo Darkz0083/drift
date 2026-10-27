@@ -2701,7 +2701,11 @@ mod tests {
     fn beta_authority(channel: &str, target: &str) -> [u8; 32] {
         use sha2::{Digest, Sha256};
         let mut hash = Sha256::new();
-        hash.update(b"drift:beta-source-authority:v1\0");
+        // Not branding: this domain separates the authority digest that the
+        // immutable V1 `MAC`/`WIN` literals below were generated with. Renaming
+        // it stops those literals matching, and the v19 CHECK then accepts rows
+        // it exists to reject.
+        hash.update(b"zephium:beta-source-authority:v1\0");
         hash.update(channel.as_bytes());
         hash.update(b"\0");
         hash.update(target.as_bytes());
