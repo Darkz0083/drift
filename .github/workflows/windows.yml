@@ -51,7 +51,9 @@ jobs:
 
       - name: Build the app
         working-directory: desktop
-        run: npx tauri build
+        # Explicit bundles: the config default is the app alone, and the
+        # upload step requires an installer.
+        run: npx tauri build --bundles nsis,msi
         # Windows builds aren't code-signed yet, so SmartScreen will warn.
         # To sign, add TAURI_SIGNING_PRIVATE_KEY and
         # TAURI_SIGNING_PRIVATE_KEY_PASSWORD as repository secrets. Do not set
