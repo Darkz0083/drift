@@ -3,6 +3,29 @@
 The Worker the app calls for AI models. It holds the provider keys so the app
 never does, and speaks the OpenAI shape the app already uses.
 
+## Status
+
+Deployed as **`drift-proxy-v2`** — <https://drift-proxy-v2.kolesovl848.workers.dev>
+
+It is deliberately *not* deployed over `drift-proxy`, which still serves the
+app. Two things stand between this and a cut-over:
+
+1. **No Groq key.** Only OpenRouter is in the Keychain, so `groq/…` models
+   answer 503 and `/v1/models` lists OpenRouter alone. Setting
+   `GROQ_API_KEY` fixes it with no code change.
+2. **The authenticated path is untested end to end.** The auth gate and the
+   OpenRouter key are both verified; a full request needs a live Firebase
+   token, which only the running app has.
+
+To cut over, either deploy under the production name:
+
+```sh
+npx wrangler deploy --name drift-proxy
+```
+
+or point the app at v2 by changing `DEFAULT_COMPATIBLE_BASE` in
+`crates/drift-app/src/work_models.rs`.
+
 ## Contract
 
 | Endpoint | Method | Notes |
