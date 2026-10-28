@@ -3814,5 +3814,6 @@
   "pref_essentials_icons": "Essential icons",
   "pref_essentials_icons_help": "Each kept site shows its own favicon. Choose a picture to stand in for it.",
   "pref_essentials_icon_custom": "Showing the picture you chose.",
-  "pref_essentials_icon_site": "Showing the site's own favicon."
+  "pref_essentials_icon_site": "Showing the site's own favicon.",
+  "native_reader_view": "Reader View"
 }
