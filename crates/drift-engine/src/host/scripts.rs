@@ -590,13 +590,23 @@ fn style_script(style: &UserStyle) -> UserScript {
     }
 }
 
-fn builtin_script(id: u128, source: &str, all_frames: bool) -> UserScript {
+fn builtin_script(id: u128, source: &str, all_frames: bool, hosts: Option<&[&str]>) -> UserScript {
     UserScript {
         id: ScriptId::from(id),
         owner: ScriptOwner::Builtin,
         source: source.into(),
         world: World::Page,
-        matches: MatchSet::all_urls(),
+        // A built-in that edits one site's page says so here rather than
+        // running on every document.
+        matches: match hosts {
+            Some(patterns) => MatchSet::parse(
+                patterns.iter().copied(),
+                std::iter::empty::<&str>(),
+                drift_core::injection::MatchOptions::default(),
+            )
+            .expect("fixed host patterns"),
+            None => MatchSet::all_urls(),
+        },
         run_at: RunAt::DocumentStart,
         all_frames,
     }
@@ -616,25 +626,45 @@ struct ProtectedScriptSpec {
     id: u128,
     source: &'static str,
     all_frames: bool,
+    /// Hosts the script is confined to. `None` means every document.
+    hosts: Option<&'static [&'static str]>,
 }
 
+/// YouTube serves its in-video ads from its own origin, so only the page can
+/// refuse them. This is the one built-in that is scoped to a single site.
+const YOUTUBE_ADS_JS: &str = include_str!("youtube_ads.js");
+const YOUTUBE_HOSTS: &[&str] = &[
+    "https://youtube.com/*",
+    "https://*.youtube.com/*",
+    "https://youtu.be/*",
+];
+
 const PROTECTED_SCRIPT_SPECS: [ProtectedScriptSpec;
-    3 + cfg!(not(target_os = "macos")) as usize
+    4 + cfg!(not(target_os = "macos")) as usize
         + cfg!(any(target_os = "macos", target_os = "windows")) as usize] = [
     ProtectedScriptSpec {
         id: 6,
         source: CONTENT_STYLE_JS,
         all_frames: false,
+        hosts: None,
     },
     ProtectedScriptSpec {
         id: 1,
         source: DISCARD_SAFETY_BOOTSTRAP_JS,
         all_frames: false,
+        hosts: None,
     },
     ProtectedScriptSpec {
         id: 2,
         source: EXTRACT_HTML_BOOTSTRAP_JS,
         all_frames: false,
+        hosts: None,
+    },
+    ProtectedScriptSpec {
+        id: 7,
+        source: YOUTUBE_ADS_JS,
+        all_frames: false,
+        hosts: Some(YOUTUBE_HOSTS),
     },
     // WKWebView has no page-initiated print surface, so only WebView2 needs
     // the guard; on macOS it would only mark built-ins as altered.
@@ -643,6 +673,7 @@ const PROTECTED_SCRIPT_SPECS: [ProtectedScriptSpec;
         id: 3,
         source: crate::PAGE_PRINT_DENY_SCRIPT,
         all_frames: true,
+        hosts: None,
     },
     #[cfg(any(target_os = "macos", target_os = "windows"))]
     ProtectedScriptSpec {
@@ -650,6 +681,7 @@ const PROTECTED_SCRIPT_SPECS: [ProtectedScriptSpec;
         id: 5,
         source: drift_webext::store::PAGE_SCRIPT,
         all_frames: false,
+        hosts: None,
     },
 ];
 
@@ -671,7 +703,8 @@ fn protected_scripts() -> &'static [UserScript; PROTECTED_SCRIPT_SPECS.len()] {
     static SCRIPTS: std::sync::OnceLock<[UserScript; PROTECTED_SCRIPT_SPECS.len()]> =
         std::sync::OnceLock::new();
     SCRIPTS.get_or_init(|| {
-        PROTECTED_SCRIPT_SPECS.map(|spec| builtin_script(spec.id, spec.source, spec.all_frames))
+        PROTECTED_SCRIPT_SPECS
+            .map(|spec| builtin_script(spec.id, spec.source, spec.all_frames, spec.hosts))
     })
 }
 
@@ -1008,6 +1041,40 @@ mod tests {
     use drift_core::ids::{ExtensionInstallId, ProfileId, UserscriptId};
     use drift_core::ports::engine::{ScriptPrincipal, UserScriptRefusalReason};
 
+    /// The YouTube scriptlet edits one site's page, so it must not reach any
+    /// other document — including a lookalike host.
+    #[test]
+    fn the_youtube_scriptlet_runs_only_on_youtube() {
+        let script = protected_scripts()
+            .iter()
+            .find(|script| script.id == ScriptId::from(7))
+            .expect("the youtube built-in is registered");
+        for allowed in [
+            "https://youtube.com/",
+            "https://www.youtube.com/watch?v=abc",
+            "https://m.youtube.com/watch?v=abc",
+            "https://youtu.be/abc",
+        ] {
+            assert!(
+                script.matches.matches_url(&url::Url::parse(allowed).unwrap()),
+                "refused {allowed}"
+            );
+        }
+        for refused in [
+            "https://example.com/",
+            "https://notyoutube.com/",
+            "https://youtube.com.example.net/",
+            "https://evil.test/?u=https://youtube.com/",
+        ] {
+            assert!(
+                !script
+                    .matches
+                    .matches_url(&url::Url::parse(refused).unwrap()),
+                "accepted {refused}"
+            );
+        }
+    }
+
     fn generation(value: u64) -> UserContentGeneration {
         UserContentGeneration::new(value).unwrap()
     }
@@ -1172,7 +1239,7 @@ mod tests {
             Err(UserContentApplyFailure::ReservedScope)
         );
 
-        let host_script = builtin_script(100, "globalThis.hostOnly = true", false);
+        let host_script = builtin_script(100, "globalThis.hostOnly = true", false, None);
         let host_key = host_script.key();
         let failure = registry
             .replace(
@@ -1270,7 +1337,7 @@ mod tests {
                 ContentScope::Profile(profile),
                 generation(4),
                 UserContent {
-                    scripts: vec![builtin_script(201, "void 0", false)],
+                    scripts: vec![builtin_script(201, "void 0", false, None)],
                     styles: Vec::new(),
                 },
             )
