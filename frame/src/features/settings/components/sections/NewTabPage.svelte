@@ -20,12 +20,14 @@
   });
   async function chooseBackground() {
     backgroundFailed = false;
-    try {
-      const url = await commands.newtabBackgroundChoose();
-      if (url) background = url;
-    } catch {
+    // The command answers with a result, not a value: a refusal is reported
+    // rather than thrown, so it has to be unwrapped.
+    const result = await commands.newtabBackgroundChoose().catch(() => null);
+    if (!result || result.status === "error") {
       backgroundFailed = true;
+      return;
     }
+    if (result.data) background = result.data;
   }
   async function removeBackground() {
     await commands.newtabBackgroundClear();

@@ -54,7 +54,7 @@ function decode(encoded: string): ImageData | null {
 
 /** Measured over the opaque pixels only, so a small mark on a transparent
  *  field is judged by the mark rather than by the empty space around it. */
-function toneOf(image: ImageData): IconTone {
+export function toneOf(image: ImageData): IconTone {
   const pixels = image.data;
   let luminance = 0;
   let chroma = 0;

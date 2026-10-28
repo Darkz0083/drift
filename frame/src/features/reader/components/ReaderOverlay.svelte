@@ -12,7 +12,7 @@
     article = undefined;
     void commands
       .pageSource(asked)
-      .then((found) => extract(found.text, found.url))
+      .then((found) => (found ? extract(found.text, found.url) : null))
       .catch(() => null)
       .then((result) => {
         if (asked === tab) article = result;

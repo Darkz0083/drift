@@ -94,8 +94,8 @@
         onclick={() => !drag.swallowClick() && onSelect(tab.id)}
       >
         <FavIcon
-          image={essentialIcons.image(tab.id) ?? favicons.image(tab.icon)}
-          tone={favicons.tone(tab.icon)}
+          image={essentialIcons.mark(tab.id)?.image ?? favicons.image(tab.icon)}
+          tone={essentialIcons.mark(tab.id)?.tone ?? favicons.tone(tab.icon)}
           loading={tab.loading}
           size={16}
           lit

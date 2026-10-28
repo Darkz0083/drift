@@ -4,13 +4,17 @@
   import SettingsRow from "$shared/ui/SettingsRow";
   import Button from "$shared/ui/Button";
   import { sidebarTree } from "$features/tabs";
+  import { tabs } from "$domain/tabs";
   import { essentialIcons } from "$domain/essential-icons.svelte";
   import PreferenceSelect from "../PreferenceSelect.svelte";
   import PreferenceSwitch from "../PreferenceSwitch.svelte";
 
-  // The kept sites, in the order the rail shows them.
+  // The kept sites, in the order the rail shows them. `sidebarTree` is a
+  // function of the current nodes and tabs, not a store.
   let essentials = $derived(
-    sidebarTree.favorites.flatMap((entry) => (entry.kind === "tab" ? [entry.tab] : [])),
+    sidebarTree(tabs.sidebarNodes(), tabs.tabs()).favorites.flatMap((entry) =>
+      entry.kind === "tab" ? [entry.tab] : [],
+    ),
   );
   $effect(() => {
     void essentialIcons.load(essentials.map((tab) => tab.id));
@@ -39,14 +43,14 @@
     >{#each essentials as tab (tab.id)}<SettingsRow
         settingId={`essentials.icon.${tab.id}`}
         title={tab.title || m.untitled_tab()}
-        description={essentialIcons.image(tab.id)
+        description={essentialIcons.mark(tab.id)
           ? m.pref_essentials_icon_custom()
           : m.pref_essentials_icon_site()}
         ><div class="icon-actions">
           <Button size="compact" onclick={() => void essentialIcons.choose(tab.id)}
             >{m.pref_ntp_background_choose()}</Button
           >
-          {#if essentialIcons.image(tab.id)}<Button
+          {#if essentialIcons.mark(tab.id)}<Button
               size="compact"
               variant="ghost"
               onclick={() => void essentialIcons.clear(tab.id)}
