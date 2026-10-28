@@ -6,6 +6,11 @@ import * as __TAURI_EVENT from "@tauri-apps/api/event";
 /** Commands */
 export const commands = {
 	/**
+	 *  Records a feature's state. Answers false when the caller or the name is not
+	 *  one this module owns, so a refusal is visible rather than silent.
+	 */
+	featureSetEnabled: (feature: string, enabled: boolean) => __TAURI_INVOKE<boolean>("feature_set_enabled", { feature, enabled }),
+	/**
 	 *  Asks for an image, checks it, and stores it as this essential's mark.
 	 *
 	 *  `Ok(None)` means the picker was dismissed and nothing changed.

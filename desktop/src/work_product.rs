@@ -517,6 +517,11 @@ pub(crate) async fn work_call(
     {
         return failed(WorkError::Unavailable);
     }
+    // Work and the models behind it are one feature here. Switching either off
+    // closes the door rather than only hiding the pane.
+    if crate::features::off("work") || crate::features::off("ai") {
+        return failed(WorkError::Unavailable);
+    }
     let Some(profile) =
         ProfileId::parse(&expected_profile).filter(|id| id.to_string() == expected_profile)
     else {

@@ -101,6 +101,21 @@ export function commandOffered(command: string) {
 function apply(key: PreferenceKey, next: string) {
   values[key] = next;
   versions[key] = (versions[key] ?? 0) + 1;
+  if (key.endsWith(".enabled")) publishFeatures();
+}
+
+/**
+ * Tells native what is switched off.
+ *
+ * The flags are edited here, but hiding a surface is not the same as closing
+ * it: native refuses the commands a closed feature owns, and it keeps its own
+ * copy rather than reading the store, which may be busy for seconds.
+ */
+function publishFeatures() {
+  for (const feature of ["ai", "work", "notes", "tasks", "time"] as const) {
+    const on = feature === "ai" ? aiEnabled() : enabled(feature);
+    void commands.featureSetEnabled(feature, on).catch(() => {});
+  }
 }
 async function initialize(generation: number, signal: AbortSignal) {
   const updated: Partial<Record<PreferenceKey, true>> = {};
@@ -132,7 +147,12 @@ async function initialize(generation: number, signal: AbortSignal) {
       }
     }),
   );
-  if (generation === epoch) initialized = true;
+  if (generation === epoch) {
+    initialized = true;
+    // A read that failed leaves the default in place without going through
+    // `apply`, so the gates are published once more when the load settles.
+    publishFeatures();
+  }
 }
 
 export function init(): Promise<void> {

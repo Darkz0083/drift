@@ -149,6 +149,7 @@ mod work_models;
 mod work_operations;
 mod work_personal;
 mod essential_icons;
+mod features;
 mod newtab_background;
 mod work_product;
 #[cfg(feature = "work-product")]
@@ -1614,6 +1615,7 @@ fn record_and_deliver_operation(
 fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
     tauri_specta::Builder::<tauri::Wry>::new()
         .commands(collect_commands![
+            features::feature_set_enabled,
             essential_icons::essential_icon_choose,
             essential_icons::essential_icon_current,
             essential_icons::essential_icon_clear,
@@ -3810,6 +3812,13 @@ fn execute_command(app: &tauri::AppHandle, id: &str) -> drift_ipc::OperationAdmi
             "return" => None,
             _ => return rejected_operation(),
         };
+        // A surface whose feature is off cannot be opened, however it was
+        // reached: the menu hides it, but the id is still callable.
+        if let Some(feature) = features::page_feature(destination) {
+            if features::off(feature) {
+                return rejected_operation();
+            }
+        }
         return app
             .try_state::<Handle>()
             .map_or_else(rejected_operation, |shell| {
