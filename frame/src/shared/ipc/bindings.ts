@@ -6,6 +6,16 @@ import * as __TAURI_EVENT from "@tauri-apps/api/event";
 /** Commands */
 export const commands = {
 	/**
+	 *  Asks for an image, checks it, and stores it as this essential's mark.
+	 *
+	 *  `Ok(None)` means the picker was dismissed and nothing changed.
+	 */
+	essentialIconChoose: (id: string) => typedError<string | null, string>(__TAURI_INVOKE("essential_icon_choose", { id })),
+	/**  The stored mark for one essential, if the person chose one. */
+	essentialIconCurrent: (id: string) => __TAURI_INVOKE<string | null>("essential_icon_current", { id }),
+	/**  Forgets the chosen mark so the site's own favicon returns. */
+	essentialIconClear: (id: string) => typedError<null, string>(__TAURI_INVOKE("essential_icon_clear", { id })),
+	/**
 	 *  Asks for an image, checks it, stores it, and returns it as a `data:` URL.
 	 *
 	 *  `Ok(None)` means the person dismissed the picker; the stored background is

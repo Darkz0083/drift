@@ -148,6 +148,7 @@ mod work_models;
 #[cfg(any(feature = "work-product", test))]
 mod work_operations;
 mod work_personal;
+mod essential_icons;
 mod newtab_background;
 mod work_product;
 #[cfg(feature = "work-product")]
@@ -1613,6 +1614,9 @@ fn record_and_deliver_operation(
 fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
     tauri_specta::Builder::<tauri::Wry>::new()
         .commands(collect_commands![
+            essential_icons::essential_icon_choose,
+            essential_icons::essential_icon_current,
+            essential_icons::essential_icon_clear,
             newtab_background::newtab_background_choose,
             newtab_background::newtab_background_current,
             newtab_background::newtab_background_clear,

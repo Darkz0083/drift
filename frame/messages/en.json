@@ -3810,5 +3810,9 @@
   "pref_ntp_background_help": "Your own picture stands behind the new tab instead of the sky. PNG, JPEG, WebP or GIF up to 8 MB.",
   "pref_ntp_background_choose": "Choose image…",
   "pref_ntp_background_remove": "Remove",
-  "pref_ntp_background_failed": "That file could not be used as a background."
+  "pref_ntp_background_failed": "That file could not be used as a background.",
+  "pref_essentials_icons": "Essential icons",
+  "pref_essentials_icons_help": "Each kept site shows its own favicon. Choose a picture to stand in for it.",
+  "pref_essentials_icon_custom": "Showing the picture you chose.",
+  "pref_essentials_icon_site": "Showing the site's own favicon."
 }

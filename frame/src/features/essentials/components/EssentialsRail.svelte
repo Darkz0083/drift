@@ -12,6 +12,7 @@
   import CaptureControl from "$shared/ui/CaptureControl";
   import AudioControl from "$shared/ui/AudioControl";
   import { favicons } from "$domain/favicons";
+  import { essentialIcons } from "$domain/essential-icons.svelte";
 
   let {
     entries,
@@ -20,6 +21,11 @@
     entries: TabView[];
     onSelect: (id: string) => void;
   } = $props();
+
+  // A chosen mark replaces the site's own; most essentials never have one.
+  $effect(() => {
+    void essentialIcons.load(entries.map((tab) => tab.id));
+  });
 
   function handleContextMenu(event: MouseEvent, tab: TabView) {
     event.preventDefault();
@@ -88,7 +94,7 @@
         onclick={() => !drag.swallowClick() && onSelect(tab.id)}
       >
         <FavIcon
-          image={favicons.image(tab.icon)}
+          image={essentialIcons.image(tab.id) ?? favicons.image(tab.icon)}
           tone={favicons.tone(tab.icon)}
           loading={tab.loading}
           size={16}
