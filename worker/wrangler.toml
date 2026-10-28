@@ -1,0 +1,9 @@
+name = "drift-proxy"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# The Firebase Web API key is a public project identifier, not a secret: it
+# ships in every Firebase web client. The provider keys are secrets and are set
+# with `wrangler secret put`, never written here.
+[vars]
+FIREBASE_API_KEY = "AIzaSyBOQ-fMWSK93vIKo3ljo_XYsdAoBBcB1Y8"
