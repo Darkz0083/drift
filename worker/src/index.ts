@@ -80,17 +80,28 @@ async function identify(env: Env, bearer: string): Promise<string | null> {
   return data.id_token ?? null;
 }
 
-/** Where a model lives, and its name there. */
-function route(model: string): { base: string; model: string } {
+/**
+ * Where a model lives, and its name there.
+ *
+ * A namespaced name says exactly one place. A bare name does not: Groq's own
+ * ids carry a slash when it hosts someone else's model (`openai/gpt-oss-20b`),
+ * and OpenRouter's ids always do (`openai/gpt-4o`), so the two cannot be told
+ * apart by shape alone. A bare name therefore carries a fallback, and the
+ * provider that says it has no such model hands over to the other.
+ */
+function routes(model: string): { base: string; model: string }[] {
   const slash = model.indexOf("/");
   if (slash > 0) {
     const provider = model.slice(0, slash);
     const rest = model.slice(slash + 1);
-    if (provider === "openrouter") return { base: OPENROUTER, model: rest };
-    if (provider === "groq") return { base: GROQ, model: rest };
+    if (provider === "openrouter") return [{ base: OPENROUTER, model: rest }];
+    if (provider === "groq") return [{ base: GROQ, model: rest }];
   }
-  // An unnamespaced model is a Groq one, which is what the old proxy served.
-  return { base: GROQ, model };
+  // Bare: Groq first, which is what the old proxy served, then OpenRouter.
+  return [
+    { base: GROQ, model },
+    { base: OPENROUTER, model },
+  ];
 }
 
 function keyFor(env: Env, base: string): string {
@@ -140,29 +151,47 @@ async function chat(env: Env, request: Request): Promise<Response> {
   }
   if (typeof body.model !== "string") return problem(400, "A model is required.");
 
-  const { base, model } = route(body.model);
-  const key = keyFor(env, base);
-  if (!key) return problem(503, `No key is configured for ${body.model}.`);
+  const candidates = routes(body.model).filter((candidate) => keyFor(env, candidate.base));
+  if (candidates.length === 0) {
+    return problem(503, `No key is configured for ${body.model}.`);
+  }
 
-  const upstream = await fetch(`${base}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${key}`,
-      // OpenRouter attributes traffic by these; Groq ignores them.
-      "http-referer": "https://drift.app",
-      "x-title": "Drift",
-    },
-    body: JSON.stringify({ ...body, model }),
-    signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
-  });
+  let refused: Response | null = null;
+  for (const candidate of candidates) {
+    const upstream = await fetch(`${candidate.base}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${keyFor(env, candidate.base)}`,
+        // OpenRouter attributes traffic by these; Groq ignores them.
+        "http-referer": "https://drift.app",
+        "x-title": "Drift",
+      },
+      body: JSON.stringify({ ...body, model: candidate.model }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
 
-  // Pass the answer through as it arrives: a streamed completion has to stay
-  // streamed, and the headers carry the content type the client switches on.
-  return new Response(upstream.body, {
-    status: upstream.status,
+    // "No such model" is worth asking elsewhere, and a refused request is not
+    // billed. Anything else is the answer, and is passed through as it arrives:
+    // a streamed completion has to stay streamed.
+    if (upstream.status === 404 || upstream.status === 400) {
+      refused = upstream;
+      continue;
+    }
+    return new Response(upstream.body, {
+      status: upstream.status,
+      headers: {
+        "content-type": upstream.headers.get("content-type") ?? "application/json",
+        "cache-control": "no-store",
+      },
+    });
+  }
+
+  // Every candidate refused it; the last refusal is the honest answer.
+  return new Response(refused?.body ?? null, {
+    status: refused?.status ?? 502,
     headers: {
-      "content-type": upstream.headers.get("content-type") ?? "application/json",
+      "content-type": refused?.headers.get("content-type") ?? "application/json",
       "cache-control": "no-store",
     },
   });
