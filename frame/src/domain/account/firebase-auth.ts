@@ -148,6 +148,8 @@ export function needsRefresh(session: Session): boolean {
 /** Held in memory so `load` stays synchronous, as its callers expect. */
 let cached: Session | null = null;
 let hydrated = false;
+/** One read at a time: several surfaces ask at startup. */
+let reading: Promise<void> | null = null;
 
 function parse(raw: string | null): Session | null {
   if (!raw) return null;
@@ -165,21 +167,40 @@ function parse(raw: string | null): Session | null {
  * A copy left in `localStorage` by an earlier version is migrated: it is only
  * dropped once the Keychain write is confirmed, so a refused write leaves the
  * person signed in rather than silently signed out.
+ *
+ * A read that fails is not a read that found nothing. Marking this done on
+ * failure would present a locked vault as "signed out" for the rest of the
+ * launch; leaving it undone lets the next caller try again.
  */
-export async function hydrate(): Promise<void> {
-  if (hydrated) return;
-  hydrated = true;
-  const stored = await commands.sessionGet().catch(() => null);
-  const found = parse(stored);
-  if (found) {
-    cached = found;
-    return;
-  }
-  const legacy = parse(localStorage.getItem(STORAGE_KEY));
-  if (!legacy) return;
-  cached = legacy;
-  const kept = await commands.sessionSet(JSON.stringify(legacy)).catch(() => false);
-  if (kept) localStorage.removeItem(STORAGE_KEY);
+export function hydrate(): Promise<void> {
+  if (hydrated) return Promise.resolve();
+  if (reading) return reading;
+  reading = (async () => {
+    let stored: string | null;
+    try {
+      stored = await commands.sessionGet();
+    } catch {
+      return;
+    }
+    const found = parse(stored);
+    if (found) {
+      cached = found;
+      hydrated = true;
+      return;
+    }
+    const legacy = parse(localStorage.getItem(STORAGE_KEY));
+    if (!legacy) {
+      hydrated = true;
+      return;
+    }
+    cached = legacy;
+    const kept = await commands.sessionSet(JSON.stringify(legacy)).catch(() => false);
+    if (kept) localStorage.removeItem(STORAGE_KEY);
+    hydrated = true;
+  })().finally(() => {
+    reading = null;
+  });
+  return reading;
 }
 
 export function load(): Session | null {
