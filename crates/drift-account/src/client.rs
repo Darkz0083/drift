@@ -109,15 +109,35 @@ struct Payload {
     bytes: Vec<u8>,
 }
 
+/// Whether an address is this machine talking to itself.
+fn loopback(url: &reqwest::Url) -> bool {
+    match url.host_str() {
+        Some("localhost") => true,
+        Some(host) => host
+            .trim_start_matches('[')
+            .trim_end_matches(']')
+            .parse::<std::net::IpAddr>()
+            .is_ok_and(|address| address.is_loopback()),
+        None => false,
+    }
+}
+
 impl Client {
     pub fn new(origin: Origin) -> Result<Self, AccountError> {
-        let http = reqwest::Client::builder()
+        let mut builder = reqwest::Client::builder()
             .redirect(reqwest::redirect::Policy::none())
             .connect_timeout(CONNECT_TIMEOUT)
             .timeout(TIMEOUT)
-            .https_only(origin.0.scheme() == "https")
-            .build()
-            .map_err(|_| AccountError::Unavailable)?;
+            .https_only(origin.0.scheme() == "https");
+        // A proxy cannot see the machine's own loopback, so routing there
+        // turns "nothing is listening" into a server error — which is exactly
+        // what a caller waiting for `Offline` would then misread as the server
+        // refusing. Only a loopback origin changes behaviour: a real server is
+        // still reached the way the environment says.
+        if loopback(&origin.0) {
+            builder = builder.no_proxy();
+        }
+        let http = builder.build().map_err(|_| AccountError::Unavailable)?;
         Ok(Self { origin, http })
     }
 
@@ -1108,5 +1128,19 @@ mod tests {
         assert!(uuid("0b3c6a3e-8f7d-4a59-9a3c-1d2e3f4a5b6c"));
         assert!(!uuid("0b3c6a3e-8f7d-4a59-9a3c-1d2e3f4a5b6"));
         assert!(!uuid("0b3c6a3e/8f7d-4a59-9a3c-1d2e3f4a5b6c"));
+    }
+
+    #[test]
+    fn this_machine_is_recognised_as_loopback() {
+        for address in [
+            "http://127.0.0.1:9",
+            "http://localhost:8080",
+            "http://[::1]:3000",
+        ] {
+            assert!(loopback(&reqwest::Url::parse(address).unwrap()), "{address}");
+        }
+        for address in ["https://api.drift.app", "http://10.0.0.5", "https://drift.app"] {
+            assert!(!loopback(&reqwest::Url::parse(address).unwrap()), "{address}");
+        }
     }
 }
