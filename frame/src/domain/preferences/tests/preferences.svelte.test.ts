@@ -9,7 +9,13 @@ const native = vi.hoisted(() => ({
 }));
 vi.mock("$shared/ipc/bindings", async () => {
   const { mockBindings } = await import("$shared/testing/bindings");
-  return mockBindings({ settingGet: native.get, settingSet: native.set });
+  return mockBindings({
+    settingGet: native.get,
+    settingSet: native.set,
+    // Preferences publish the feature gates as they load; that is a side
+    // effect of loading, not part of what these tests observe.
+    featureSetEnabled: async () => true,
+  });
 });
 vi.mock("$domain/operations", () => ({ settle: native.settle }));
 vi.mock("$shared/ipc/native-events", () => ({ events: { uiCommand: { listen: native.listen } } }));

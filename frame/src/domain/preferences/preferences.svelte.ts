@@ -114,7 +114,13 @@ function apply(key: PreferenceKey, next: string) {
 function publishFeatures() {
   for (const feature of ["ai", "work", "notes", "tasks", "time"] as const) {
     const on = feature === "ai" ? aiEnabled() : enabled(feature);
-    void commands.featureSetEnabled(feature, on).catch(() => {});
+    // Publishing a gate is secondary to loading preferences: a binding that is
+    // missing or refuses must never stop the settings themselves from landing.
+    try {
+      void commands.featureSetEnabled(feature, on).catch(() => {});
+    } catch {
+      return;
+    }
   }
 }
 async function initialize(generation: number, signal: AbortSignal) {
