@@ -5,6 +5,17 @@ import * as __TAURI_EVENT from "@tauri-apps/api/event";
 
 /** Commands */
 export const commands = {
+	/**
+	 *  Asks for an image, checks it, stores it, and returns it as a `data:` URL.
+	 *
+	 *  `Ok(None)` means the person dismissed the picker; the stored background is
+	 *  left exactly as it was.
+	 */
+	newtabBackgroundChoose: () => typedError<string | null, string>(__TAURI_INVOKE("newtab_background_choose")),
+	/**  The stored background as a `data:` URL, if the person has chosen one. */
+	newtabBackgroundCurrent: () => __TAURI_INVOKE<string | null>("newtab_background_current"),
+	/**  Forgets the stored background so the new tab returns to its sky. */
+	newtabBackgroundClear: () => typedError<null, string>(__TAURI_INVOKE("newtab_background_clear")),
 	workCall: (expectedProfile: string, call: WorkCallV1_Deserialize) => __TAURI_INVOKE<WorkResponseV1_Serialize>("work_call", { expectedProfile, call }),
 	/**
 	 *  Saves a plan's calendar where the person chooses. Only a calendar: the

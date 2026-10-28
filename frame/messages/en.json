@@ -3805,5 +3805,10 @@
   "site_data_clear_failed": "Couldn't clear the data of {site}",
   "native_clear_data_for_this_site_more": "Clear Data for This Site…",
   "page_permission_private": "Private windows don't save this choice.",
-  "page_permission_location_off": "Turn on Location Services for Drift in System Settings › Privacy & Security."
+  "page_permission_location_off": "Turn on Location Services for Drift in System Settings › Privacy & Security.",
+  "pref_ntp_background": "Background image",
+  "pref_ntp_background_help": "Your own picture stands behind the new tab instead of the sky. PNG, JPEG, WebP or GIF up to 8 MB.",
+  "pref_ntp_background_choose": "Choose image…",
+  "pref_ntp_background_remove": "Remove",
+  "pref_ntp_background_failed": "That file could not be used as a background."
 }

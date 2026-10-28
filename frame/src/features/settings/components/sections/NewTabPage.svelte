@@ -1,6 +1,8 @@
 <script lang="ts">
   import * as m from "$shared/i18n/messages";
   import { preferences } from "$domain/preferences";
+  import { commands } from "$shared/ipc/bindings";
+  import Button from "$shared/ui/Button";
   import Select from "$shared/ui/Select";
   import Switch from "$shared/ui/Switch";
   import SettingsGroup from "$shared/ui/SettingsGroup";
@@ -8,6 +10,27 @@
 
   let greeting = $derived(preferences.value("ui.newtab-greeting") === "true");
   let clock = $derived(preferences.value("ui.newtab-clock") === "true");
+
+  // Held as a data URL rather than a path: the page never learns where the
+  // file lives, and no filesystem protocol has to be open to show it.
+  let background = $state<string | null>(null);
+  let backgroundFailed = $state(false);
+  $effect(() => {
+    void commands.newtabBackgroundCurrent().then((url) => (background = url ?? null));
+  });
+  async function chooseBackground() {
+    backgroundFailed = false;
+    try {
+      const url = await commands.newtabBackgroundChoose();
+      if (url) background = url;
+    } catch {
+      backgroundFailed = true;
+    }
+  }
+  async function removeBackground() {
+    await commands.newtabBackgroundClear();
+    background = null;
+  }
 
   const set = (key: preferences.PreferenceKey, value: string) => void preferences.set(key, value);
 </script>
@@ -78,4 +101,24 @@
         onchange={(v) => set("ui.newtab-tasks", String(v))}
       /></SettingsRow
     >{/if}
+  <SettingsRow
+    settingId="ntp.background"
+    title={m.pref_ntp_background()}
+    description={backgroundFailed ? m.pref_ntp_background_failed() : m.pref_ntp_background_help()}
+    ><div class="background">
+      <Button size="compact" onclick={() => void chooseBackground()}
+        >{m.pref_ntp_background_choose()}</Button
+      >
+      {#if background}<Button size="compact" variant="ghost" onclick={() => void removeBackground()}
+          >{m.pref_ntp_background_remove()}</Button
+        >{/if}
+    </div></SettingsRow
+  >
 </SettingsGroup>
+
+<style>
+  .background {
+    display: flex;
+    gap: 8px;
+  }
+</style>

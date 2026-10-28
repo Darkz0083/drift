@@ -156,6 +156,16 @@
   // Day over a light page, night over a dark one.
   let scene = $derived(skyScene());
 
+  // The picture the person chose for this page, if any. It arrives as a data
+  // URL, so the page never learns where the file lives.
+  let custom = $state<string | null>(null);
+  onMount(() => {
+    void commands.newtabBackgroundCurrent().then((url) => (custom = url ?? null));
+  });
+  // A chosen picture is a photograph, not the drawn sky: it fills the page
+  // rather than being placed against the horizon.
+  let backdrop = $derived(custom ?? SCENES[scene]);
+
   // The sky arrives once a session, as the first new tab opens, and is simply
   // there on every one after.
   const arriving = !seen(untrack(() => scene));
@@ -267,9 +277,9 @@
   {#if ground}<div class="page" aria-hidden="true" style:clip-path={`path(evenodd, "${ground}")`}>
       <div
         class="sky"
-        style:background-image={`url("${SCENES[scene]}")`}
-        style:background-size={`${sky.w}px ${sky.h}px`}
-        style:background-position={`${sky.x}px ${sky.y}px`}
+        style:background-image={`url("${backdrop}")`}
+        style:background-size={custom ? "cover" : `${sky.w}px ${sky.h}px`}
+        style:background-position={custom ? "center" : `${sky.x}px ${sky.y}px`}
       ></div>
     </div>{/if}
 

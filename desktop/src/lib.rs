@@ -148,6 +148,7 @@ mod work_models;
 #[cfg(any(feature = "work-product", test))]
 mod work_operations;
 mod work_personal;
+mod newtab_background;
 mod work_product;
 #[cfg(feature = "work-product")]
 mod work_provider;
@@ -1612,6 +1613,9 @@ fn record_and_deliver_operation(
 fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
     tauri_specta::Builder::<tauri::Wry>::new()
         .commands(collect_commands![
+            newtab_background::newtab_background_choose,
+            newtab_background::newtab_background_current,
+            newtab_background::newtab_background_clear,
             work_product::work_call,
             work_product::work_save_calendar,
             work_product::work_edit_draft,
