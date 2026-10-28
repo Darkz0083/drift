@@ -10,9 +10,19 @@
  * it expires — a stale token looks exactly like a broken app to the user.
  */
 
+import { observe } from "$shared/lib/observe";
+
 const API_KEY = "AIzaSyBOQ-fMWSK93vIKo3ljo_XYsdAoBBcB1Y8";
 const BASE = "https://identitytoolkit.googleapis.com/v1/accounts";
 const STORAGE_KEY = "drift.session";
+
+/** The bound the rest of the account domain puts on a request. Without one, a
+ *  network that accepts the connection and then says nothing leaves sign-in
+ *  and token refresh waiting forever with no way to tell the person. */
+const TIMEOUT = 15_000;
+
+/** The message for a request that never answered, or answered too late. */
+const unreachable = () => new Error("Couldn't reach the sign-in service. Check your connection and try again.");
 
 export type Session = {
   uid: string;
@@ -57,11 +67,16 @@ function readable(code: string | undefined): string {
 }
 
 async function call(path: string, body: unknown): Promise<Session> {
-  const res = await fetch(`${BASE}:${path}?key=${API_KEY}`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const observed = await observe(
+    fetch(`${BASE}:${path}?key=${API_KEY}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    }),
+    TIMEOUT,
+  );
+  if (observed.state !== "received") throw unreachable();
+  const res = observed.value;
   const data = (await res.json()) as AuthResponse;
 
   if (!res.ok || data.error) {
@@ -93,14 +108,16 @@ export async function refreshSession(session: Session): Promise<Session> {
 
   // The secure-token endpoint, not identitytoolkit: this is the only one that
   // mints a new ID token from a refresh token.
-  const res = await fetch(
-    `https://securetoken.googleapis.com/v1/token?key=${API_KEY}`,
-    {
+  const observed = await observe(
+    fetch(`https://securetoken.googleapis.com/v1/token?key=${API_KEY}`, {
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded" },
       body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(session.refreshToken)}`,
-    }
+    }),
+    TIMEOUT,
   );
+  if (observed.state !== "received") throw unreachable();
+  const res = observed.value;
   if (!res.ok) throw new Error("Session expired. Sign in again.");
 
   const data = (await res.json()) as {
