@@ -269,8 +269,7 @@ pub const REGISTRY: &[CommandSpec] = &[
         "Developer Tools",
         split("CmdOrCtrl+Alt+I", "Ctrl+Shift+I"),
         Group::View,
-    ),
-    alternate(
+    ),    alternate(
         "page.devtools.alt",
         "Developer Tools (Alternate)",
         other_only("F12"),
@@ -287,6 +286,16 @@ pub const REGISTRY: &[CommandSpec] = &[
         "url.focus",
         "Open Location",
         Keys::same("CmdOrCtrl+L"),
+        Group::View,
+    ),
+    // Reader is a view of the page already on screen, so it sits beside the
+    // other ways of looking at one.
+    command(
+        "view.reader",
+        "Reader View",
+        // Ctrl+Alt+letter is AltGr on some layouts, so the other platforms get
+        // a function key rather than a chord that would eat text input.
+        split("CmdOrCtrl+Alt+R", "F9"),
         Group::View,
     ),
     command("zoom.in", "Zoom In", Keys::same("CmdOrCtrl+="), Group::View),

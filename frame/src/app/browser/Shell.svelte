@@ -44,6 +44,7 @@
   // reads it, and making it reactive would have the effect below depend on the
   // value it writes.
   let recent: string[] = [];
+  let readerOpen = $state(false);
   $effect(() => {
     const id = tabs.activeId();
     const alive = tabs.tabs().map((tab) => tab.id);
@@ -73,6 +74,7 @@
   import { loadLibraryPage } from "$features/library";
   import { loadHistoryPage } from "$features/history";
   import { loadSourcePage } from "$features/source";
+  import { loadReader } from "$features/reader";
   import { bookmarkReveal } from "$features/bookmarks";
   import { loadTasksPage } from "$features/tasks";
   import { loadFocusCover, loadTimePage } from "$features/time";
@@ -135,6 +137,7 @@
         if (event.payload === "note.new") void newNote();
         else if (event.payload === "tab.next") activateRecent(1);
         else if (event.payload === "tab.previous") activateRecent(-1);
+        else if (event.payload === "view.reader") readerOpen = true;
         else handleNativeSection(event.payload);
       })
       .then((unsubscribe) => {
@@ -675,6 +678,10 @@
   </div>
 </div>
 {#if ClearSiteData}<ClearSiteData />{/if}
+{#if readerOpen && tabs.activeId()}{#key tabs.activeId()}{#await loadReader() then { default: ReaderOverlay }}<ReaderOverlay
+        tab={tabs.activeId() ?? ""}
+        onclose={() => (readerOpen = false)}
+      />{/await}{/key}{/if}
 
 <style>
   .stage-column {
