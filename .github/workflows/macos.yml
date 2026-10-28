@@ -20,10 +20,10 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
 
@@ -59,7 +59,7 @@ jobs:
         run: npx tauri build --bundles app,dmg
 
       - name: Upload the disk image and app
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: drift-macos
           if-no-files-found: error
