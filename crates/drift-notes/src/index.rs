@@ -6,7 +6,7 @@ use std::path::Path;
 use rusqlite::{params, Connection, OpenFlags, OptionalExtension, Row as SqlRow};
 use drift_core::notes::NoteSummary;
 
-const SCHEMA: i64 = 1;
+const SCHEMA: i64 = 2;
 const MAX_RECEIPTS: i64 = 512;
 const MAX_BACKLINKS: i64 = 100;
 const NAMED_AFTER: &str = "named-after:";
@@ -101,6 +101,39 @@ pub struct Page {
     pub next: Option<String>,
 }
 
+/// A page the person chose to remember, and what it was for.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PageMemory {
+    pub id: i64,
+    pub url: String,
+    pub title: String,
+    pub project: String,
+    pub note: String,
+    pub created: i64,
+}
+
+/// A page about to be remembered.
+pub struct NewPageMemory<'a> {
+    pub url: &'a str,
+    /// Scheme and host: what a lookup by site uses.
+    pub origin: &'a str,
+    pub title: &'a str,
+    pub project: &'a str,
+    pub note: &'a str,
+    pub created: i64,
+}
+
+fn read_page_memory(row: &rusqlite::Row<'_>) -> rusqlite::Result<PageMemory> {
+    Ok(PageMemory {
+        id: row.get(0)?,
+        url: row.get(1)?,
+        title: row.get(2)?,
+        project: row.get(3)?,
+        note: row.get(4)?,
+        created: row.get(5)?,
+    })
+}
+
 impl Index {
     pub fn open(path: &Path) -> rusqlite::Result<Self> {
         if let Ok(meta) = std::fs::symlink_metadata(path) {
@@ -182,7 +215,32 @@ impl Index {
                     sequence INTEGER NOT NULL
                  ) STRICT;
                  CREATE TABLE settings(key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL) STRICT;
-                 PRAGMA user_version=1;
+                 CREATE TABLE page_memory(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    url TEXT NOT NULL,
+                    origin TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    project TEXT NOT NULL,
+                    note TEXT NOT NULL,
+                    created INTEGER NOT NULL
+                 ) STRICT;
+                 CREATE INDEX page_memory_site ON page_memory(origin, created DESC);
+                 PRAGMA user_version=2;
+                 COMMIT;",
+            )?,
+            1 => conn.execute_batch(
+                "BEGIN;
+                 CREATE TABLE page_memory(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    url TEXT NOT NULL,
+                    origin TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    project TEXT NOT NULL,
+                    note TEXT NOT NULL,
+                    created INTEGER NOT NULL
+                 ) STRICT;
+                 CREATE INDEX page_memory_site ON page_memory(origin, created DESC);
+                 PRAGMA user_version=2;
                  COMMIT;",
             )?,
             SCHEMA => {}
@@ -204,6 +262,59 @@ impl Index {
             "INSERT INTO settings(key,value) VALUES(?1,?2) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
             [key, value],
         )?;
+        Ok(())
+    }
+
+    /// Records a page the person chose to remember, and why.
+    ///
+    /// `origin` is the scheme and host, which is what a lookup by site uses:
+    /// the same article read twice is one site, and a query string is not part
+    /// of who published it.
+    pub fn remember_page(&self, page: &NewPageMemory<'_>) -> rusqlite::Result<i64> {
+        self.conn.execute(
+            "INSERT INTO page_memory(url,origin,title,project,note,created)
+             VALUES(?1,?2,?3,?4,?5,?6)",
+            rusqlite::params![
+                page.url,
+                page.origin,
+                page.title,
+                page.project,
+                page.note,
+                page.created
+            ],
+        )?;
+        Ok(self.conn.last_insert_rowid())
+    }
+
+    /// What the person remembered about a site, most recent first.
+    pub fn page_memory_for(
+        &self,
+        origin: &str,
+        limit: i64,
+    ) -> rusqlite::Result<Vec<PageMemory>> {
+        let mut statement = self.conn.prepare(
+            "SELECT id,url,title,project,note,created FROM page_memory
+             WHERE origin=?1 ORDER BY created DESC, id DESC LIMIT ?2",
+        )?;
+        let rows = statement.query_map(rusqlite::params![origin, limit], read_page_memory)?;
+        rows.collect()
+    }
+
+    /// Everything remembered, most recent first.
+    pub fn page_memory_all(&self, limit: i64) -> rusqlite::Result<Vec<PageMemory>> {
+        let mut statement = self.conn.prepare(
+            "SELECT id,url,title,project,note,created FROM page_memory
+             ORDER BY created DESC, id DESC LIMIT ?1",
+        )?;
+        let rows = statement.query_map(rusqlite::params![limit], read_page_memory)?;
+        rows.collect()
+    }
+
+    /// Forgets one remembered page. A missing row is not an error: the caller
+    /// wanted it gone, and it is.
+    pub fn forget_page(&self, id: i64) -> rusqlite::Result<()> {
+        self.conn
+            .execute("DELETE FROM page_memory WHERE id=?1", [id])?;
         Ok(())
     }
 
@@ -706,5 +817,87 @@ mod tests {
                 .as_deref(),
             Some(A)
         );
+    }
+
+    fn page<'a>(origin: &'a str, title: &'a str, created: i64) -> NewPageMemory<'a> {
+        NewPageMemory {
+            url: "https://example.com/post?utm=1",
+            origin,
+            title,
+            project: "Launch",
+            note: "the pricing section is the part that mattered",
+            created,
+        }
+    }
+
+    #[test]
+    fn a_remembered_page_comes_back_for_its_site() {
+        let index = Index::memory();
+        index.remember_page(&page("https://example.com", "Post", 10)).unwrap();
+
+        let found = index.page_memory_for("https://example.com", 10).unwrap();
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0].title, "Post");
+        assert_eq!(found[0].project, "Launch");
+    }
+
+    #[test]
+    fn another_site_sees_nothing() {
+        let index = Index::memory();
+        index.remember_page(&page("https://example.com", "Post", 10)).unwrap();
+        assert!(index.page_memory_for("https://other.example", 10).unwrap().is_empty());
+    }
+
+    #[test]
+    fn the_most_recent_memory_comes_first() {
+        let index = Index::memory();
+        index.remember_page(&page("https://example.com", "Older", 10)).unwrap();
+        index.remember_page(&page("https://example.com", "Newer", 20)).unwrap();
+
+        let titles: Vec<String> = index
+            .page_memory_for("https://example.com", 10)
+            .unwrap()
+            .into_iter()
+            .map(|memory| memory.title)
+            .collect();
+        assert_eq!(titles, ["Newer", "Older"]);
+    }
+
+    #[test]
+    fn forgetting_one_leaves_the_others() {
+        let index = Index::memory();
+        let first = index.remember_page(&page("https://example.com", "One", 10)).unwrap();
+        index.remember_page(&page("https://example.com", "Two", 20)).unwrap();
+
+        index.forget_page(first).unwrap();
+        let left = index.page_memory_all(10).unwrap();
+        assert_eq!(left.len(), 1);
+        assert_eq!(left[0].title, "Two");
+    }
+
+    #[test]
+    fn forgetting_something_already_gone_is_not_an_error() {
+        let index = Index::memory();
+        index.forget_page(404).unwrap();
+    }
+
+    /// An index written before this table existed gains it, rather than
+    /// failing to open.
+    #[test]
+    fn an_older_index_gains_the_table() {
+        let index = Index::memory();
+        index
+            .conn
+            .execute_batch("DROP TABLE page_memory; PRAGMA user_version=1;")
+            .unwrap();
+        let version: i64 = index
+            .conn
+            .query_row("PRAGMA user_version", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(version, 1);
+
+        let reopened = Index::configure(index.conn).unwrap();
+        reopened.remember_page(&page("https://example.com", "After", 10)).unwrap();
+        assert_eq!(reopened.page_memory_for("https://example.com", 10).unwrap().len(), 1);
     }
 }
