@@ -97,7 +97,10 @@ mod imp {
     use tauri::Manager as _;
 
     fn path(app: &tauri::AppHandle) -> Option<std::path::PathBuf> {
-        app.path().app_data_dir().ok().map(|dir| dir.join("session"))
+        app.path()
+            .app_data_dir()
+            .ok()
+            .map(|dir| dir.join("session"))
     }
 
     pub(super) fn read(app: &tauri::AppHandle) -> Option<String> {
@@ -128,7 +131,7 @@ mod imp {
 
     pub(super) fn clear(app: &tauri::AppHandle) -> bool {
         match path(app) {
-            Some(path) => std::fs::remove_file(path).is_ok() || !path.exists(),
+            Some(path) => std::fs::remove_file(&path).is_ok() || !path.exists(),
             None => false,
         }
     }
