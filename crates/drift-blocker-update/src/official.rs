@@ -616,12 +616,15 @@ fn availability_from_status(status: &UpdateStatus) -> Option<CatalogAvailability
         _ => None,
     }
 }
-fn same_sources(package: &Package, sources: &[Source; 2]) -> bool {
-    package
-        .sources
-        .iter()
-        .zip(sources)
-        .all(|(a, b)| a.sha256 == b.sha256 && a.bytes == b.bytes)
+fn same_sources(package: &Package, sources: &[Source]) -> bool {
+    // Length is part of identity: a package that lost a source is not the same
+    // package, and `zip` alone would call a two-source subset a match.
+    package.sources.len() == sources.len()
+        && package
+            .sources
+            .iter()
+            .zip(sources)
+            .all(|(a, b)| a.sha256 == b.sha256 && a.bytes == b.bytes)
 }
 
 async fn fetch_official_sources(
@@ -629,7 +632,7 @@ async fn fetch_official_sources(
     client: &OfficialFilterClient,
     cancelled: &mut watch::Receiver<bool>,
     force: bool,
-) -> Result<[Source; 2], (FailureKind, Option<u64>)> {
+) -> Result<Vec<Source>, (FailureKind, Option<u64>)> {
     let mut fetch =
         |source,
          validators: Option<drift_update_transport::official_filters::FilterValidators>| {
@@ -644,7 +647,7 @@ async fn fetch_sources<F, Fut>(
     fetch: &mut F,
     cancelled: &mut watch::Receiver<bool>,
     force: bool,
-) -> Result<[Source; 2], (FailureKind, Option<u64>)>
+) -> Result<Vec<Source>, (FailureKind, Option<u64>)>
 where
     F: FnMut(
         OfficialFilter,
@@ -664,12 +667,12 @@ where
         .as_ref()
         .or(store.record.rejected.as_ref())
         .or(store.record.current.as_ref());
-    let mut output = Vec::with_capacity(2);
-    for (index, source) in [OfficialFilter::EasyList, OfficialFilter::EasyPrivacy]
-        .into_iter()
-        .enumerate()
+    let mut output = Vec::with_capacity(OfficialFilter::ALL.len());
+    for (index, source) in OfficialFilter::ALL.into_iter().enumerate()
     {
-        let old = prior.map(|p| &p.sources[index]);
+        // A package stored before a source was added has fewer entries than the
+        // catalogue now fetches; an out-of-range index is simply no prior.
+        let old = prior.and_then(|p| p.sources.get(index));
         let cached = if force {
             None
         } else {
@@ -720,11 +723,11 @@ where
             }
         }
     }
-    output.try_into().map_err(|_| (FailureKind::Internal, None))
+    Ok(output)
 }
 fn stage(
     store: &mut OfficialStore,
-    sources: [Source; 2],
+    sources: Vec<Source>,
 ) -> Result<Package, crate::storage_io::StoreError> {
     let package = store.new_package(sources, now())?;
     let mut next = store.record.clone();
@@ -739,7 +742,7 @@ fn finish_refresh(
     seed: &ActivatedCatalog,
     shared: &Shared,
     operation: u64,
-    sources: [Source; 2],
+    sources: Vec<Source>,
 ) {
     if store
         .record
@@ -831,13 +834,24 @@ mod tests {
     use std::collections::VecDeque;
     use drift_update_transport::official_filters::{FilterFetchFailure, FilterValidators};
     fn source(index: usize) -> Vec<u8> {
-        let title = if index == 0 {
-            "EasyList"
-        } else {
-            "EasyPrivacy"
+        // Each admitted publisher states its identity differently: EasyList
+        // opens with an Adblock Plus banner and a twelve-digit version, uBlock
+        // Origin opens with plain comments and dates itself.
+        let head = match OfficialFilter::ALL[index] {
+            OfficialFilter::EasyList => {
+                "[Adblock Plus 2.0]\n! Version: 202609300001\n! Title: EasyList\n! Homepage: https://easylist.to/\n"
+            }
+            OfficialFilter::EasyPrivacy => {
+                "[Adblock Plus 1.1]\n! Version: 202609300001\n! Title: EasyPrivacy\n! Homepage: https://easylist.to/\n"
+            }
+            OfficialFilter::UblockFilters => {
+                "! Title: uBlock filters\n! Last modified: Mon, 26 Oct 2026 13:22:50 +0000\n! Homepage: https://github.com/uBlockOrigin/uAssets\n"
+            }
+            OfficialFilter::UblockQuickFixes => {
+                "! Title: uBlock₀ filters – Quick fixes\n! Last modified: Mon, 26 Oct 2026 13:22:50 +0000\n! Homepage: https://github.com/uBlockOrigin/uAssets\n"
+            }
         };
-        let header = if index == 0 { "2.0" } else { "1.1" };
-        let mut text=format!("[Adblock Plus {header}]\n! Version: 202609300001\n! Title: {title}\n! Homepage: https://easylist.to/\n");
+        let mut text = head.to_owned();
         for n in 0..12000 {
             text.push_str(&format!("||ads{n}.example.invalid^\n"));
         }
@@ -850,7 +864,7 @@ mod tests {
                 manifest_sha256: [1; 32],
                 created_unix: created,
                 expires_unix: created + 7 * DAY,
-                source_count: 2,
+                source_count: OfficialFilter::ALL.len() as u32,
                 source_bytes: 600000,
             },
             catalog: drift_blocker::PolicyCatalog::eager(
@@ -865,12 +879,13 @@ mod tests {
             etag: Some("\"stable\"".into()),
             last_modified: None,
         };
-        let sources = [
-            store
-                .put_source(0, &source(0), validators.clone(), None)
-                .unwrap(),
-            store.put_source(1, &source(1), validators, None).unwrap(),
-        ];
+        let sources = (0..OfficialFilter::ALL.len())
+            .map(|index| {
+                store
+                    .put_source(index, &source(index), validators.clone(), None)
+                    .unwrap()
+            })
+            .collect::<Vec<_>>();
         let package = store.new_package(sources, now()).unwrap();
         let mut record = store.record.clone();
         record.highest_revision = package.identity.revision;
@@ -928,7 +943,10 @@ mod tests {
             .block_on(fetch_sources(&store, &mut fetch, &mut cancelled, false))
             .unwrap();
         assert!(same_sources(&package, &result));
-        assert_eq!(calls, vec![Some("\"stable\"".into()); 2]);
+        assert_eq!(
+            calls,
+            vec![Some("\"stable\"".into()); OfficialFilter::ALL.len()]
+        );
     }
 
     #[test]
@@ -940,12 +958,16 @@ mod tests {
                 &package.sources[0].sha256,
             ));
         crate::storage_io::atomic_write(&path, b"corrupt").unwrap();
+        // Source 0 loses its cached bytes, so its 304 is refused and it is
+        // fetched unconditionally once; every other source is unchanged.
         let mut responses = VecDeque::from([
             FilterResponse::NotModified,
             FilterResponse::Modified {
                 bytes: source(0),
                 validators: FilterValidators::default(),
             },
+            FilterResponse::NotModified,
+            FilterResponse::NotModified,
             FilterResponse::NotModified,
         ]);
         let mut calls = Vec::new();
@@ -958,7 +980,13 @@ mod tests {
             .block_on(fetch_sources(&store, &mut fetch, &mut cancelled, false))
             .unwrap();
         assert!(same_sources(&package, &result));
-        assert_eq!(calls, vec![false, false, true]);
+        // Source 0 has no usable cached bytes, so it is fetched without
+        // validators and, after an unsolicited 304, fetched once more. The
+        // rest still hold their cache and send validators.
+        assert_eq!(
+            calls,
+            [vec![false, false], vec![true; OfficialFilter::ALL.len() - 1]].concat()
+        );
         assert!(store.cached_bytes(&package.sources[0]).is_ok());
     }
 
@@ -1020,7 +1048,7 @@ mod tests {
                 .unwrap(),
             original.sources[1].clone(),
         ];
-        let candidate = stage(&mut store, sources).unwrap();
+        let candidate = stage(&mut store, sources.to_vec()).unwrap();
         drop(store);
         let worker = OfficialWorker::start(dir.path().join("official"), seed(1)).unwrap();
         let (status, initial, prepared) = worker.observe_and_take_catalogs();

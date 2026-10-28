@@ -10,7 +10,7 @@ use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use drift_blocker::{PolicyCatalog, PolicySource, SourceFormat, SourceId, StaticPolicyCatalog};
-use drift_update_transport::official_filters::FilterValidators;
+use drift_update_transport::official_filters::{FilterValidators, OfficialFilter};
 
 const MAX_SOURCE: u64 = 16 * 1024 * 1024;
 const MAX_STATE: u64 = 64 * 1024;
@@ -40,7 +40,7 @@ impl Source {
 #[serde(deny_unknown_fields)]
 pub(crate) struct Package {
     pub identity: CatalogIdentity,
-    pub sources: [Source; 2],
+    pub sources: Vec<Source>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -123,25 +123,23 @@ impl OfficialStore {
             catalog: PolicyCatalog::deferred_reloadable(
                 package.identity.manifest_sha256,
                 move || {
-                    let mut sources = Vec::with_capacity(2);
+                    let mut sources = Vec::with_capacity(OfficialFilter::ALL.len());
                     for (index, source) in package.sources.iter().enumerate() {
+                        let Some(kind) = OfficialFilter::ALL.get(index).copied() else {
+                            return Err(drift_blocker::BlockerCompileFailure::InvalidSource);
+                        };
                         let bytes = read_source(&root, source).map_err(|_| {
                             drift_blocker::BlockerCompileFailure::SourceUnavailable
                         })?;
                         let text = String::from_utf8(bytes)
                             .map_err(|_| drift_blocker::BlockerCompileFailure::InvalidSource)?;
-                        let (version, rules) = validate_source(index, &text)
+                        let (version, rules) = validate_source(kind, &text)
                             .map_err(|_| drift_blocker::BlockerCompileFailure::InvalidSource)?;
                         if version != source.version || rules != source.rules {
                             return Err(drift_blocker::BlockerCompileFailure::SourceUnavailable);
                         }
                         sources.push(PolicySource::new(
-                            SourceId::new(if index == 0 {
-                                "easylist"
-                            } else {
-                                "easyprivacy"
-                            })
-                            .expect("fixed source id"),
+                            SourceId::new(kind.id()).expect("fixed source id"),
                             SourceFormat::Standard,
                             Arc::from(text),
                         ));
@@ -204,7 +202,11 @@ impl OfficialStore {
             return Err(StoreError::ActivationSealed);
         }
         let text = std::str::from_utf8(bytes).map_err(|_| StoreError::InvalidPackage)?;
-        let (version, rules) = validate_source(index, text)?;
+        let kind = OfficialFilter::ALL
+            .get(index)
+            .copied()
+            .ok_or(StoreError::InvalidPackage)?;
+        let (version, rules) = validate_source(kind, text)?;
         if previous.is_some_and(|old| rules < old.rules / 2 || (bytes.len() as u64) < old.bytes / 2)
         {
             return Err(StoreError::InvalidPackage);
@@ -225,7 +227,7 @@ impl OfficialStore {
         })
     }
 
-    pub fn new_package(&self, sources: [Source; 2], now: u64) -> Result<Package, StoreError> {
+    pub fn new_package(&self, sources: Vec<Source>, now: u64) -> Result<Package, StoreError> {
         let revision = self
             .record
             .highest_revision
@@ -247,7 +249,7 @@ impl OfficialStore {
                 manifest_sha256: Sha256::digest(manifest).into(),
                 created_unix: now,
                 expires_unix: now.saturating_add(7 * DAY),
-                source_count: 2,
+                source_count: sources.len() as u32,
                 source_bytes: sources.iter().map(|s| s.bytes).sum(),
             },
             sources,
@@ -386,7 +388,7 @@ fn validate_record(record: &Record, now: u64) -> Result<(), StoreError> {
     {
         if package.identity.revision == 0
             || package.identity.revision > record.highest_revision
-            || package.identity.source_count != 2
+            || package.identity.source_count as usize != package.sources.len()
             || package.identity.created_unix >= package.identity.expires_unix
             || package.identity.expires_unix
                 != package.identity.created_unix.saturating_add(7 * DAY)
@@ -428,32 +430,54 @@ fn validate_record(record: &Record, now: u64) -> Result<(), StoreError> {
     }
     Ok(())
 }
-fn validate_source(index: usize, text: &str) -> Result<(String, u64), StoreError> {
-    if text.len() < 256 * 1024
-        || text.len() as u64 > MAX_SOURCE
-        || !matches!(
-            text.lines().next(),
-            Some("[Adblock Plus 1.1]" | "[Adblock Plus 2.0]")
-        )
-        || text.contains('\0')
-    {
+fn validate_source(kind: OfficialFilter, text: &str) -> Result<(String, u64), StoreError> {
+    if text.len() < 256 * 1024 || text.len() as u64 > MAX_SOURCE || text.contains('\0') {
         return Err(StoreError::InvalidPackage);
     }
     let head = text.lines().take(32).collect::<Vec<_>>();
-    let title = if index == 0 {
-        "! Title: EasyList"
-    } else {
-        "! Title: EasyPrivacy"
+    // EasyList's publisher opens with an Adblock Plus banner and states a
+    // twelve-digit version. uBlock Origin's publisher does neither: the list
+    // opens straight into `!` comments and dates itself with `! Last modified`.
+    let (title, homepage, banner) = match kind {
+        OfficialFilter::EasyList => ("! Title: EasyList", "! Homepage: https://easylist.to/", true),
+        OfficialFilter::EasyPrivacy => {
+            ("! Title: EasyPrivacy", "! Homepage: https://easylist.to/", true)
+        }
+        OfficialFilter::UblockFilters => (
+            "! Title: uBlock filters",
+            "! Homepage: https://github.com/uBlockOrigin/uAssets",
+            false,
+        ),
+        OfficialFilter::UblockQuickFixes => (
+            "! Title: uBlock₀ filters – Quick fixes",
+            "! Homepage: https://github.com/uBlockOrigin/uAssets",
+            false,
+        ),
     };
-    if !head.contains(&title) || !head.contains(&"! Homepage: https://easylist.to/") {
+    if banner
+        && !matches!(
+            text.lines().next(),
+            Some("[Adblock Plus 1.1]" | "[Adblock Plus 2.0]")
+        )
+    {
         return Err(StoreError::InvalidPackage);
     }
-    let version = head
-        .iter()
-        .find_map(|line| line.strip_prefix("! Version: "))
-        .filter(|s| s.len() == 12 && s.bytes().all(|b| b.is_ascii_digit()))
-        .ok_or(StoreError::InvalidPackage)?
-        .to_owned();
+    if !head.contains(&title) || !head.contains(&homepage) {
+        return Err(StoreError::InvalidPackage);
+    }
+    let version = match kind {
+        OfficialFilter::EasyList | OfficialFilter::EasyPrivacy => head
+            .iter()
+            .find_map(|line| line.strip_prefix("! Version: "))
+            .filter(|s| s.len() == 12 && s.bytes().all(|b| b.is_ascii_digit()))
+            .ok_or(StoreError::InvalidPackage)?
+            .to_owned(),
+        OfficialFilter::UblockFilters | OfficialFilter::UblockQuickFixes => head
+            .iter()
+            .find_map(|line| line.strip_prefix("! Last modified: "))
+            .and_then(compact_stamp)
+            .ok_or(StoreError::InvalidPackage)?,
+    };
     let rules = text
         .lines()
         .filter(|l| !l.is_empty() && !l.starts_with('!') && !l.starts_with('['))
@@ -462,6 +486,41 @@ fn validate_source(index: usize, text: &str) -> Result<(String, u64), StoreError
         return Err(StoreError::InvalidPackage);
     }
     Ok((version, rules))
+}
+/// `Mon, 26 Oct 2026 13:22:50 +0000` -> `202610261322`.
+///
+/// uBlock Origin dates its lists in RFC 2822 form while the manifest keeps a
+/// twelve-digit stamp so freshness compares as a number everywhere. Anything
+/// incomplete or out of range is refused rather than guessed at.
+fn compact_stamp(stamp: &str) -> Option<String> {
+    let mut parts = stamp.split_whitespace();
+    let first = parts.next()?;
+    let (day, month, year, time) = if first.ends_with(',') {
+        (parts.next()?, parts.next()?, parts.next()?, parts.next()?)
+    } else {
+        (first, parts.next()?, parts.next()?, parts.next()?)
+    };
+    let month = match month {
+        "Jan" => 1,
+        "Feb" => 2,
+        "Mar" => 3,
+        "Apr" => 4,
+        "May" => 5,
+        "Jun" => 6,
+        "Jul" => 7,
+        "Aug" => 8,
+        "Sep" => 9,
+        "Oct" => 10,
+        "Nov" => 11,
+        "Dec" => 12,
+        _ => return None,
+    };
+    let day: u32 = day.parse().ok().filter(|d| (1..=31).contains(d))?;
+    let year: u32 = year.parse().ok().filter(|y| (2000..=9999).contains(y))?;
+    let (hour, rest) = time.split_once(':')?;
+    let hour: u32 = hour.parse().ok().filter(|h| *h < 24)?;
+    let minute: u32 = rest.split(':').next()?.parse().ok().filter(|m| *m < 60)?;
+    Some(format!("{year}{month:02}{day:02}{hour:02}{minute:02}"))
 }
 fn jitter() -> u64 {
     std::time::SystemTime::now()
@@ -486,17 +545,67 @@ pub(super) fn object_name_for_test(hash: &[u8; 32]) -> String {
 mod tests {
     use super::*;
     fn source(index: usize) -> Vec<u8> {
-        let title = if index == 0 {
-            "EasyList"
-        } else {
-            "EasyPrivacy"
+        let head = match OfficialFilter::ALL[index] {
+            OfficialFilter::EasyList => {
+                "[Adblock Plus 2.0]\n! Version: 202609300001\n! Title: EasyList\n! Homepage: https://easylist.to/\n"
+            }
+            OfficialFilter::EasyPrivacy => {
+                "[Adblock Plus 1.1]\n! Version: 202609300001\n! Title: EasyPrivacy\n! Homepage: https://easylist.to/\n"
+            }
+            OfficialFilter::UblockFilters => {
+                "! Title: uBlock filters\n! Last modified: Mon, 26 Oct 2026 13:22:50 +0000\n! Homepage: https://github.com/uBlockOrigin/uAssets\n"
+            }
+            OfficialFilter::UblockQuickFixes => {
+                "! Title: uBlock₀ filters – Quick fixes\n! Last modified: Mon, 26 Oct 2026 13:22:50 +0000\n! Homepage: https://github.com/uBlockOrigin/uAssets\n"
+            }
         };
-        let header = if index == 0 { "2.0" } else { "1.1" };
-        let mut text=format!("[Adblock Plus {header}]\n! Version: 202609300001\n! Title: {title}\n! Homepage: https://easylist.to/\n");
+        let mut text = head.to_owned();
         for n in 0..12000 {
             text.push_str(&format!("||ads{n}.example.invalid^\n"));
         }
         text.into_bytes()
+    }
+    #[test]
+    fn a_publisher_date_becomes_a_twelve_digit_stamp() {
+        assert_eq!(
+            compact_stamp("Mon, 26 Oct 2026 13:22:50 +0000").as_deref(),
+            Some("202610261322")
+        );
+        // The weekday is optional in the wild; the rest is not.
+        assert_eq!(
+            compact_stamp("26 Oct 2026 13:22:50 +0000").as_deref(),
+            Some("202610261322")
+        );
+    }
+    #[test]
+    fn an_unusable_publisher_date_is_refused() {
+        for stamp in [
+            "",
+            "Mon, 26 Foo 2026 13:22:50 +0000",
+            "Mon, 32 Oct 2026 13:22:50 +0000",
+            "Mon, 26 Oct 2026 24:22:50 +0000",
+            "Mon, 26 Oct 2026 13:72:50 +0000",
+            "26 Oct 2026",
+        ] {
+            assert!(compact_stamp(stamp).is_none(), "accepted {stamp:?}");
+        }
+    }
+    #[test]
+    fn each_publisher_is_validated_against_its_own_header() {
+        for (index, kind) in OfficialFilter::ALL.into_iter().enumerate() {
+            let bytes = source(index);
+            let text = std::str::from_utf8(&bytes).unwrap();
+            assert!(validate_source(kind, text).is_ok(), "rejected {kind:?}");
+            // A publisher's content cannot be claimed by another's slot.
+            for other in OfficialFilter::ALL {
+                if other != kind {
+                    assert!(
+                        validate_source(other, text).is_err(),
+                        "{other:?} accepted {kind:?} content"
+                    );
+                }
+            }
+        }
     }
     fn root() -> tempfile::TempDir {
         tempfile::tempdir_in(std::env::current_dir().unwrap()).unwrap()
@@ -515,7 +624,7 @@ mod tests {
                 .put_source(1, &source(1), FilterValidators::default(), None)
                 .unwrap(),
         ];
-        let package = store.new_package(sources, 1000).unwrap();
+        let package = store.new_package(sources.to_vec(), 1000).unwrap();
         let mut next = store.record.clone();
         next.highest_revision = package.identity.revision;
         next.candidate = Some(package.clone());
@@ -550,7 +659,7 @@ mod tests {
                 .unwrap(),
             package.sources[1].clone(),
         ];
-        let newer = store.new_package(sources, 1002).unwrap();
+        let newer = store.new_package(sources.to_vec(), 1002).unwrap();
         let mut next = store.record.clone();
         next.highest_revision = newer.identity.revision;
         next.previous = next.current.take();
@@ -603,7 +712,7 @@ mod tests {
                 .put_source(1, &source(1), FilterValidators::default(), None)
                 .unwrap(),
         ];
-        let mut package = recovered.new_package(sources, 1000).unwrap();
+        let mut package = recovered.new_package(sources.to_vec(), 1000).unwrap();
         package.sources[0].sha256[0] ^= 1;
         let mut record = recovered.record.clone();
         record.highest_revision = package.identity.revision;

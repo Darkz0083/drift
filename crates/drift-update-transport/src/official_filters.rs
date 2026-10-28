@@ -13,19 +13,45 @@ use reqwest::{Client, StatusCode};
 use std::time::Duration;
 
 /// The entire allowlist of remotely maintained subscription sources.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum OfficialFilter {
     /// Advertising filters published by EasyList.
     EasyList,
     /// Tracking filters published by EasyList.
     EasyPrivacy,
+    /// Filters optimised for uBlock Origin, used alongside EasyList.
+    UblockFilters,
+    /// uBlock Origin's short-lived fixes for sites that just broke.
+    UblockQuickFixes,
 }
 impl OfficialFilter {
+    /// Every admitted source, in the order the store keeps them.
+    pub const ALL: [Self; 4] = [
+        Self::EasyList,
+        Self::EasyPrivacy,
+        Self::UblockFilters,
+        Self::UblockQuickFixes,
+    ];
+    /// Stable identifier recorded in the manifest, never a path.
+    pub const fn id(self) -> &'static str {
+        match self {
+            Self::EasyList => "easylist",
+            Self::EasyPrivacy => "easyprivacy",
+            Self::UblockFilters => "ublock-filters",
+            Self::UblockQuickFixes => "ublock-quick-fixes",
+        }
+    }
     /// Fixed canonical HTTPS URL. No caller-controlled URL is accepted.
     pub const fn url(self) -> &'static str {
         match self {
             Self::EasyList => "https://easylist.to/easylist/easylist.txt",
             Self::EasyPrivacy => "https://easylist.to/easylist/easyprivacy.txt",
+            Self::UblockFilters => {
+                "https://ublockorigin.github.io/uAssets/filters/filters.txt"
+            }
+            Self::UblockQuickFixes => {
+                "https://ublockorigin.github.io/uAssets/filters/quick-fixes.txt"
+            }
         }
     }
 }
