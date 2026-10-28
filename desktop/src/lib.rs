@@ -3826,6 +3826,15 @@ fn execute_command(app: &tauri::AppHandle, id: &str) -> drift_ipc::OperationAdmi
             rejected_operation()
         };
     }
+    if matches!(id, "tab.next" | "tab.previous") {
+        // The tab order lives in the frontend projection, which is the only
+        // place that knows what has been used recently.
+        return if try_emit_to_privileged(app, MAIN_LABEL, EVENT_UI, &id) {
+            accepted_ui_operation()
+        } else {
+            rejected_operation()
+        };
+    }
     if let Some(action) = id.strip_prefix("tabmenu.") {
         return execute_tab_menu_action(app, action);
     }

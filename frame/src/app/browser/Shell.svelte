@@ -38,6 +38,29 @@
   import { clearRequest } from "$domain/site-data";
   import { BlockerShield, HidingBar, hideElements, toggleSiteProtection } from "$features/blocker";
 
+  // Tabs in the order they were last used, most recent first. Cycling follows
+  // this rather than the visible order, so going back returns to where you
+  // were — the ask in #142. Plain state, not `$state`: only the handler below
+  // reads it, and making it reactive would have the effect below depend on the
+  // value it writes.
+  let recent: string[] = [];
+  $effect(() => {
+    const id = tabs.activeId();
+    const alive = tabs.tabs().map((tab) => tab.id);
+    if (!id || !alive.includes(id)) return;
+    recent = [id, ...recent.filter((other) => other !== id && alive.includes(other))];
+  });
+
+  /** Moves one step through the recently used tabs, wrapping around. */
+  function activateRecent(step: 1 | -1) {
+    const current = tabs.activeId();
+    const list = recent.length > 1 ? recent : tabs.tabs().map((tab) => tab.id);
+    if (list.length < 2) return;
+    const index = Math.max(0, list.indexOf(current ?? ""));
+    const target = list[(index + step + list.length) % list.length];
+    if (target && target !== current) tabs.activate(target);
+  }
+
   import { onMount } from "svelte";
   import { events } from "$shared/ipc/native-events";
   import { askSettings, handleNativeSection } from "$features/settings";
@@ -110,6 +133,8 @@
     void events.uiCommand
       .listen((event) => {
         if (event.payload === "note.new") void newNote();
+        else if (event.payload === "tab.next") activateRecent(1);
+        else if (event.payload === "tab.previous") activateRecent(-1);
         else handleNativeSection(event.payload);
       })
       .then((unsubscribe) => {
