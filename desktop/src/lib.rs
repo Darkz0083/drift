@@ -151,6 +151,7 @@ mod work_personal;
 mod essential_icons;
 mod features;
 mod newtab_background;
+mod session_store;
 mod work_product;
 #[cfg(feature = "work-product")]
 mod work_provider;
@@ -1615,6 +1616,9 @@ fn record_and_deliver_operation(
 fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
     tauri_specta::Builder::<tauri::Wry>::new()
         .commands(collect_commands![
+            session_get,
+            session_set,
+            session_clear,
             features::feature_set_enabled,
             essential_icons::essential_icon_choose,
             essential_icons::essential_icon_current,
@@ -4821,6 +4825,41 @@ async fn setting_get(caller: WebviewWindow, key: String) -> Option<String> {
     .await
     .ok()
     .flatten()
+}
+
+/// The account session, kept out of the webview's reach.
+///
+/// It is a credential: the ID token it carries is what the model proxy accepts,
+/// and the refresh token beside it mints more. `localStorage` is plaintext in
+/// the app's data directory, so it belongs with the provider keys instead.
+const MAX_SESSION_BYTES: usize = 16 * 1024;
+
+#[tauri::command]
+#[specta::specta]
+fn session_get(caller: WebviewWindow, app: tauri::AppHandle) -> Option<String> {
+    if !authorize(&caller, CallerPolicy::Main, "session_get") {
+        return None;
+    }
+    session_store::read(&app)
+}
+
+#[tauri::command]
+#[specta::specta]
+fn session_set(caller: WebviewWindow, app: tauri::AppHandle, value: String) -> bool {
+    if !authorize(&caller, CallerPolicy::Main, "session_set") || !bounded(&value, MAX_SESSION_BYTES)
+    {
+        return false;
+    }
+    session_store::write(&app, &value)
+}
+
+#[tauri::command]
+#[specta::specta]
+fn session_clear(caller: WebviewWindow, app: tauri::AppHandle) -> bool {
+    if !authorize(&caller, CallerPolicy::Main, "session_clear") {
+        return false;
+    }
+    session_store::clear(&app)
 }
 
 #[tauri::command]

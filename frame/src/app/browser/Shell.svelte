@@ -74,6 +74,7 @@
   import { loadLibraryPage } from "$features/library";
   import { loadHistoryPage } from "$features/history";
   import { loadSourcePage } from "$features/source";
+  import { hydrate as hydrateAccount } from "$domain/account/firebase-auth";
   import { loadReader } from "$features/reader";
   import { bookmarkReveal } from "$features/bookmarks";
   import { loadTasksPage } from "$features/tasks";
@@ -130,6 +131,11 @@
     }),
   );
   onMount(() => {
+    // The account session lives in the Keychain; reading it is asynchronous, so
+    // it is started here rather than by whichever surface happens to open
+    // first. Any copy left in `localStorage` by an earlier version is migrated
+    // and then dropped.
+    void hydrateAccount();
     let disposed = false;
     let stop: (() => void) | undefined;
     void events.uiCommand

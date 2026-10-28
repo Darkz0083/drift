@@ -51,7 +51,10 @@ export async function applyToAssistant(profile: string, session: Session | null)
     return;
   }
 
-  const token = session.refreshToken || session.idToken;
+  // The ID token, not the refresh token: it lives an hour, so a copy that
+  // escapes ages out on its own. The proxy verifies it and mints nothing from
+  // it, which is why the shorter-lived credential is the one to hand over.
+  const token = session.idToken || session.refreshToken;
   if (!token || (applied === token && bound === profile)) return;
   applied = token;
   bound = profile;

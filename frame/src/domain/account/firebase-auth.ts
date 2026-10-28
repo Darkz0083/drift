@@ -11,6 +11,7 @@
  */
 
 import { observe } from "$shared/lib/observe";
+import { commands } from "$shared/ipc/bindings";
 
 const API_KEY = "AIzaSyBOQ-fMWSK93vIKo3ljo_XYsdAoBBcB1Y8";
 const BASE = "https://identitytoolkit.googleapis.com/v1/accounts";
@@ -144,10 +145,13 @@ export function needsRefresh(session: Session): boolean {
   return Date.now() > session.expiresAt - 5 * 60 * 1000;
 }
 
-export function load(): Session | null {
+/** Held in memory so `load` stays synchronous, as its callers expect. */
+let cached: Session | null = null;
+let hydrated = false;
+
+function parse(raw: string | null): Session | null {
+  if (!raw) return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
     const parsed = JSON.parse(raw) as Session;
     return parsed.idToken ? parsed : null;
   } catch {
@@ -155,12 +159,46 @@ export function load(): Session | null {
   }
 }
 
+/**
+ * Reads the stored session once, from the Keychain.
+ *
+ * A copy left in `localStorage` by an earlier version is migrated: it is only
+ * dropped once the Keychain write is confirmed, so a refused write leaves the
+ * person signed in rather than silently signed out.
+ */
+export async function hydrate(): Promise<void> {
+  if (hydrated) return;
+  hydrated = true;
+  const stored = await commands.sessionGet().catch(() => null);
+  const found = parse(stored);
+  if (found) {
+    cached = found;
+    return;
+  }
+  const legacy = parse(localStorage.getItem(STORAGE_KEY));
+  if (!legacy) return;
+  cached = legacy;
+  const kept = await commands.sessionSet(JSON.stringify(legacy)).catch(() => false);
+  if (kept) localStorage.removeItem(STORAGE_KEY);
+}
+
+export function load(): Session | null {
+  return cached;
+}
+
 export function save(session: Session): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+  cached = session;
+  void commands.sessionSet(JSON.stringify(session)).catch(() => {});
 }
 
 export function clear(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  cached = null;
+  void commands.sessionClear().catch(() => {});
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* A storage that refuses is one less copy to worry about. */
+  }
 }
 
 /** The proxy endpoint this session is entitled to. */

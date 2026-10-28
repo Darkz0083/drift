@@ -13,7 +13,7 @@
    */
   import DriftAccountPanel from "$domain/account/DriftAccountPanel.svelte";
   import { applyToAssistant } from "$domain/account/assistant";
-  import { load, type Session } from "$domain/account/firebase-auth";
+  import { hydrate, load, type Session } from "$domain/account/firebase-auth";
   import { tabs } from "$domain/tabs";
 
   let profile = $derived(tabs.profile());
@@ -33,7 +33,7 @@
   // from it without announcing it, so point the assistant at it here.
   $effect(() => {
     if (!assistantProfile()) return;
-    hand(load());
+    void hydrate().then(() => hand(load()));
   });
 </script>
 

@@ -8,6 +8,7 @@
    */
   import {
     clear,
+    hydrate,
     load,
     needsRefresh,
     refreshSession,
@@ -24,6 +25,14 @@
   } = $props();
 
   let session = $state<Session | null>(load());
+
+  // The session is read from the Keychain, which is asynchronous, so it may
+  // arrive after this panel is already on screen.
+  $effect(() => {
+    void hydrate().then(() => {
+      if (!session) session = load();
+    });
+  });
   let email = $state("");
   let password = $state("");
   let busy = $state(false);

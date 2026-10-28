@@ -5,6 +5,9 @@ import * as __TAURI_EVENT from "@tauri-apps/api/event";
 
 /** Commands */
 export const commands = {
+	sessionGet: () => __TAURI_INVOKE<string | null>("session_get"),
+	sessionSet: (value: string) => __TAURI_INVOKE<boolean>("session_set", { value }),
+	sessionClear: () => __TAURI_INVOKE<boolean>("session_clear"),
 	/**
 	 *  Records a feature's state. Answers false when the caller or the name is not
 	 *  one this module owns, so a refusal is visible rather than silent.
